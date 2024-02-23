@@ -16,3 +16,9 @@ use App\Http\Controllers\PageController;
 Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
 Route::get('/dashboard', [PageController::class, 'dashboard']);
+// for auth
+Route::post('/login', [UsersController::class, 'login']);
+Route::post('/getUsers', [UsersController::class, 'getusers']);
+Route::post('/register', [UsersController::class, 'register']);
+
+

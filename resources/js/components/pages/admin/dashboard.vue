@@ -131,12 +131,27 @@
                     </div>
                 </div>
             </div>
-            <div class="flex w-full pt-8 min-h-[calc(100vh-62px)] overflow-x-hidden bg-white-500">
+            <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden bg-white-500">
                 <div
                 id="settings-wrapper"
                 >
+                    <template v-if="activeSetting === 'Dashboard'">
+                       <home_tbl />
+                    </template>
                     <template v-if="activeSetting === 'Accounts'">
                        <accounts_tbl />
+                    </template>
+                    <template v-if="activeSetting === 'Keyword'">
+                       <keywords_tbl />
+                    </template>
+                    <template v-if="activeSetting === 'Author'">
+                       <authors_tble />
+                    </template>
+                    <template v-if="activeSetting === 'Category'">
+                       <category_tble />
+                    </template>
+                    <template v-if="activeSetting === 'Thesis'">
+                       <thesis_tbl />
                     </template>
                 </div>
             </div>
@@ -146,7 +161,13 @@
 
 <script>
 import navbar from '../../navbar.vue';
-import accountModule from '../accounts.vue';
+import authorModule from './author.vue';
+import categoryModule from './category.vue';
+import accountsModule from './accounts.vue';
+import keywordsModule from './keyword.vue';
+import thesisModule from './thesis.vue';
+import homeModule from './home.vue';
+
 export default {
     data () {
         return {
@@ -154,15 +175,20 @@ export default {
             account_mngt: ['Accounts'],
             thesis_mngt: ['Thesis','Keyword','Category','Author'],
             activeSetting: 'Dashboard',
-            menu_open: false,
+            menu_open: true,
         };
     },
     components: {
         navigation: navbar,
-        accounts_tbl: accountModule,
-       
-    },
+        accounts_tbl: accountsModule,
+        keywords_tbl: keywordsModule,
+        authors_tble: authorModule,
+        category_tble: categoryModule,
+        thesis_tbl: thesisModule,
+        home_tbl: homeModule,
 
+    },
+    
     methods: {
         isSettingActive(setting) {
             return this.activeSetting === setting;

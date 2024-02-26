@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('keywords', function (Blueprint $table) {
             $table->id();
+            $table->string('keyword');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

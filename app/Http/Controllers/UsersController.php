@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Libraries\SharedFunctions;
 use App\Models\Users;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
 class UsersController extends Controller
 {
     //
@@ -19,27 +21,22 @@ class UsersController extends Controller
         $rs = SharedFunctions::default_msg();
         
         $this->validate($request, [
-            'userID' => 'required|max:20',
+            'userID' => 'required',
             'password' => 'required',
-            'password_match' => 'required',
         ]);
 
-        $user = Users::find($request->userID)->count();
+        $user = Users::where('userID',$request->userID)->count();
         if($user > 0)  
         {
             $rs = SharedFunctions::prompt_msg("There is an account registered with this User ID!");
             goto end;
         }
-        if(!$user && $request->password !== $request->password_match)
-        {
-          $rs = sharedfunction::prompt_msg('Invalid Account Credentials');
-          goto end;
-        }
-        
+       
         $newUser = new Users();
         $newUser->userID = $request->userID;
         $newUser->password = bcrypt($request->password);
-        if($newUser->save()) $rs = sharedfunction::prompt_msg('Invalid Account Credentials');
+        $rs = SharedFunctions::success_msg('Account successfully created.');
+        if(!$newUser->save()) $rs = SharedFunctions::prompt_msg('Invalid Account Credentials');
 
         end: return response()->json($rs);
     }
@@ -51,9 +48,8 @@ class UsersController extends Controller
             'userID' => 'required',
             'password' => 'required'
         ]);
-       
         Auth::attempt([
-            'email'     => $request->email,
+            'userID'     => $request->userID,
             'password'  => $request->password
         ]);
     
@@ -63,4 +59,6 @@ class UsersController extends Controller
         }
         return response()->json($rs);
     }
+
+    
 }

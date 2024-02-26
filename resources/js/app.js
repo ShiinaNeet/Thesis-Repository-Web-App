@@ -5,7 +5,7 @@ import { createApp } from "vue";
 import { createVuestic } from "vuestic-ui";
 import "vuestic-ui/css";
 
-import accountModule from "./components/pages/accounts.vue";
+import accountModule from "./components/pages/admin/accounts.vue";
 import LoginModule from "./components/login.vue";
 import dashboardModule from "./components/pages/admin/dashboard.vue";
 

@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::create('theses', function (Blueprint $table) {
             $table->id();
+            $table->string('pdf')->nullable();
+            $table->string('video')->nullable();
+            $table->string('title');
+            $table->text('abstract');
+            $table->timestamp('published_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

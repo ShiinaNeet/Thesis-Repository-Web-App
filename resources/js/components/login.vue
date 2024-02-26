@@ -92,7 +92,10 @@
                     <h5 class="va-text-secondary">
                         Please register to continue
                     </h5>
-                    <div class="mt-10">
+                    <div class="flex-col bg-red-200 py-4 justify-center mt-4">
+                        <h3 class="font-bold text-black-900 justify-center flex-center" v-for="invalid in account.invalidMessage">{{ invalid }}</h3>
+                    </div>
+                    <div class="mt-3">
                         <va-input
                         v-model="account.register.userId"
                         label="User ID"
@@ -226,6 +229,7 @@ export default {
                 invalidMessage: [
                     "Please check your credentials and try again.",
                     "",
+                    "",
                 ],
                 isPasswordVisible: false,
                 login: {
@@ -281,7 +285,7 @@ export default {
                 type: 'JSON',
                 url: '/register',
                 data: {
-                    userId: this.account.register.userId,
+                    userID: this.account.register.userId,
                     password: this.account.register.password,
                 },
             }).then(response => {
@@ -291,16 +295,16 @@ export default {
                     this.account.isValid = true;
                     this.account.validMessage = response.data.text;
                     this.account.isInvalid = false;
-
                     this.account.register.saved = false;
+                    this.setActiveWindow('Login');
                 } else {
                     this.account.invalidMessage[1] = response.data.text;
                     this.account.isInvalid = true;
-
+                   
                     this.account.register.saved = false;
                 }
             }).catch(error => {
-                this.account.invalidMessage[1] = error.response.data.message;
+                this.account.invalidMessage[1] = error.response.text;
                 this.account.isLoading = false;
                 this.account.isInvalid = true;
                 this.account.register.terms.isInvalid = false;
@@ -317,7 +321,7 @@ export default {
                 type: 'JSON',
                 url: '/login',
                 data: {
-                    userId: this.account.login.userId,
+                    userID: this.account.login.userId,
                     password: this.account.login.password,
                 }
             }).then(response => {

@@ -1,7 +1,6 @@
 <template>
     <div class="h-screen">
         <navigation />
-
         <div class="flex items-start min-h-[calc(100vh-62px)]">
             <div class="flex items-center w-9/12 py-8 min-h-[calc(100vh-62px)]" style="position: sticky; top:62px;">
                 <div
@@ -19,7 +18,7 @@
                         <va-input
                         v-model="account.login.userId"
                         type="number"
-                        label="E-mail Address"
+                        label="User ID"
                         class="w-full mb-2 bg-[rgba(255,255,255,0.45)]"
                         :error="account.isInvalid"
                         :disabled="account.isLoading"
@@ -96,27 +95,35 @@
                     <div class="mt-10">
                         <va-input
                         v-model="account.register.userId"
-                        type="number"
                         label="User ID"
-                        class="mb-2 w-full bg-[rgba(255,255,255,0.45)]"
-                        requiredMark
-                        :error="account.isInvalid && ((this.account.invalidMessage[1] != '') || (account.register.userId == null || account.register.userId == ''))"
-                        :error-messages="account.invalidMessage[1]"
-                        :success="account.isValid"
-                        :messages="account.validMessage"
-                        :readonly="account.isValid"
-                        @update:modelValue="account.isInvalid = false"
+                        class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
+                        :disabled="account.isLoading"
                         outline
                         />
+                    </div>
+                    <div class="mt-1">
+                        <va-input
+                        v-model="account.register.password"
+                        :type="account.register.isPasswordVisible ? 'text' : 'password'"
+                        label="Password"
+                        class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
+                        :disabled="account.isLoading"
+                        outline
+                        >
+                            <template #appendInner>
+                                <va-icon
+                                :name="account.register.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                size="small"
+                                color="#154EC1"
+                                @click="account.register.isPasswordVisible = !account.register.isPasswordVisible"
+                                />
+                            </template>
+                        </va-input>
                     </div>
                     <div class="flex">
                         <va-checkbox
                         v-model="account.register.terms.checked"
                         class="mr-2 w-full z-[3]"
-                        :error="account.register.terms.isInvalid"
-                        :error-messages="account.register.terms.invalidMessage"
-                        :disabled="account.register.saved || account.isValid"
-                        @update:modelValue="account.register.terms.isInvalid = false"
                         />
                         <label class="absolute pt-[0.15rem] pl-[1.75rem] text-[15px] z-[1]">
                             I have read and agree to the
@@ -127,6 +134,9 @@
                                 terms and condition
                             </a>
                         </label>
+                    </div>
+                    <div v-if="account.register.terms.isInvalid" class="text-red-500 text-sm">
+                        {{ account.register.terms.invalidMessage }}
                     </div>
                     <div class="mt-6 mb-6">
                         <va-button
@@ -158,6 +168,7 @@
                             </a>
                         </span>
                     </div> 
+                    
                 </div>
             </div>
         </div>
@@ -218,12 +229,21 @@ export default {
                 ],
                 isPasswordVisible: false,
                 login: {
-                    userId: null,
+                    userId: 0,
                     password: null,
                 },
                 register: {
-                    userId: null,
-                    invalidMessage: "The User ID field is required.",
+                    userId: 0,
+                    password: null,
+                    passwordmatch:null,
+                    invalidMessage: false,
+                    invalidPassword: false,
+                    isValidUserID: true,
+                    idErrorMessage:"Wrong Login credential",
+                    passwordMisMatch: [ "The password does not match.",
+                                        "The User ID field is required.",
+                                      ],
+                    isPasswordVisible:false,
                     terms: {
                         checked: false,
                         isInvalid: false,
@@ -240,57 +260,53 @@ export default {
         navigation: navmenu,
     },
     methods: {
-        formatMobileNumber(mobile) {
-            const mobileWithoutLeadingZero = mobile.substring(1);
-            return `(` + this.$root.config.contactCountryCode + `) ${mobileWithoutLeadingZero.slice(0, 3)} ${mobileWithoutLeadingZero.slice(3, 6)} ${mobileWithoutLeadingZero.slice(6)}`;
-        },
         registerAccount() {
             this.account.isLoading = true;
             this.account.isValid = false;
             this.account.isInvalid = false;
+            if(this.account.register.terms.checked === false){
+                this.account.register.terms.isInvalid = true;
+                this.account.register.terms.invalidMessage = "Accepting the terms and Conditions are required."
+                this.account.isLoading = false;
+                this.account.register.saved = false;
+                this.account.isInvalid = false;
+                return;
+            }
+            if(this.account.register.userId === 0){
+                this.account.register.isValidUserID = false;
+                this.account.register.idErrorMessage = "Incorrect Account Credential";
+            }
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/register',
+                data: {
+                    userId: this.account.register.userId,
+                    password: this.account.register.password,
+                },
+            }).then(response => {
+                this.account.isLoading = false;
 
-            if (this.account.register.userId && this.account.register.terms.checked) {
-                axios({
-                    method: 'POST',
-                    type: 'JSON',
-                    url: '/register',
-                    data: {
-                        userId: this.account.register.userId,
-                    },
-                }).then(response => {
-                    this.account.isLoading = false;
+                if (response.data.status == 1) {
+                    this.account.isValid = true;
+                    this.account.validMessage = response.data.text;
+                    this.account.isInvalid = false;
 
-                    if (response.data.status == 1) {
-                        // this.$root.prompt(response.data.text);
-                        this.account.isValid = true;
-                        this.account.validMessage = response.data.text;
-                        this.account.isInvalid = false;
-
-                        this.account.register.saved = false;
-                    } else {
-                        this.account.invalidMessage[1] = response.data.text;
-                        this.account.isInvalid = true;
-
-                        this.account.register.saved = false;
-                    }
-                }).catch(error => {
-                    // this.$root.prompt(error.response.data.message);
-                    this.account.invalidMessage[1] = error.response.data.message;
-                    this.account.isLoading = false;
+                    this.account.register.saved = false;
+                } else {
+                    this.account.invalidMessage[1] = response.data.text;
                     this.account.isInvalid = true;
 
                     this.account.register.saved = false;
-                });
-            } else {
+                }
+            }).catch(error => {
+                this.account.invalidMessage[1] = error.response.data.message;
                 this.account.isLoading = false;
-
-                this.account.invalidMessage[1] = this.account.register.invalidMessage;
                 this.account.isInvalid = true;
-
-                if (!this.account.register.terms.checked) this.account.register.terms.isInvalid = true;
-
+                this.account.register.terms.isInvalid = false;
                 this.account.register.saved = false;
-            }
+                this.account.register.invalidMessage = false;
+            });
         },
         loginAccount() {
             this.account.isLoading = true;

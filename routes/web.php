@@ -28,10 +28,12 @@ Route::post('/register', [UsersController::class, 'register']);
 
 Route::group(['middleware' => 'check_auth'], function () {
     
+    Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);
     Route::get('keyword/get', [KeywordsController::class, 'get']);
     Route::get('category/get', [CategoryController::class, 'get']);
     Route::get('thesis/get', [ThesisController::class, 'get']);
+    Route::get('dashboard/get', [PageController::class, 'dashboardData']);
 
     Route::prefix('keyword')->group(function () {
         Route::post('delete', [KeywordsController::class, 'delete']);

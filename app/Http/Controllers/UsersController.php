@@ -13,7 +13,12 @@ class UsersController extends Controller
     //
     public function GetUsers(Request $request)
     {
-        return 'wewok';
+        $rs = SharedFunctions::default_msg();
+
+        $users = Users::get();
+        $rs = SharedFunctions::success_msg("");
+        $rs["result"] = $users;
+        return $rs;
     }
 
     public function register(Request $request)

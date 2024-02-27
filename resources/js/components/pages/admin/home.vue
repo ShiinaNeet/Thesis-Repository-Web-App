@@ -32,6 +32,14 @@
             </VaCardContent>
             </VaCard>
         </div>
+        <div class="flex flex-wrap gap-5 py-5">
+            <VaCard :bordered="false">
+            <VaCardTitle>Authors</VaCardTitle>
+            <VaCardContent class="text-6xl">
+                {{ authors.count }}
+            </VaCardContent>
+            </VaCard>
+        </div>
     </div>
 </template>
 
@@ -41,6 +49,7 @@ export default{
         return{
             users:{
                 count:0,
+                data:[],
             },
             thesis:{
                 active:{
@@ -49,8 +58,28 @@ export default{
                 outdated:{
                     count:0,
                 }
-            }
+            },
+            authors:{
+                count:0,
+            },
         }
+    },
+    mounted(){
+        this.getDashboardData();
+    },
+    methods:{
+        getDashboardData(){
+            axios({
+                method: 'GET',
+                type: 'JSON',
+                url: '/dashboard/get',
+                }).then(response => {
+                    this.users.count = response.data.result.users;
+                    this.authors.count = response.data.result.authors;
+                }).catch(error => {
+                    console.log("error: ". error);
+                });
+        },
     }
 }
 

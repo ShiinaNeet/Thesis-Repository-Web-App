@@ -2,7 +2,7 @@
     <div class="mx-5 mb-2 px-2.5 pb-2.5 bg-white rounded">
         <va-data-table
         id="data-table"
-        :items="we"
+        :items="accounts"
         :columns="acc.tblColumns"
         :per-page="$root.config.tblPerPage"
         :current-page="$root.config.tblCurrPage"
@@ -12,6 +12,7 @@
         animated
         striped
         >
+        
         </va-data-table>
     </div>
 </template>
@@ -26,7 +27,7 @@ export default {
     data () {
         const acc = {
             tblColumns: [
-                { key: "email", label: "E-mail Address", sortable: true },
+                { key: "userID", label: "User ID", sortable: true },
                 { key: "user_type", label: "Type", width: 180, sortable: false },
                 { key: "deleted_at", label: "Status", width: 50, sortable: false },
                 { key: "created_at", label: "Register Date", width: 125, sortable: true },
@@ -158,7 +159,7 @@ export default {
             axios({
                 method: 'GET',
                 type: 'JSON',
-                url: '/get_accounts'
+                url: '/accounts/get'
             }).then(response => {
                 if (response.data.status == 1) {
                     this.accounts = response.data.result;

@@ -90,14 +90,9 @@
                 class="p-2"
                 id="table-row-desc"
                 >
-                    <va-input
-                    type="textarea"
-                    :model-value="rowData.abstract"
-                    placeholder="No description available"
-                    readonly
-                    autosize
-                    outline
-                    />
+                <video width="320" height="240" controls>
+                    <source :src="rowData.video" type="video/mp4">       
+                </video>
                 </div>
             </template>
             <template #bodyAppend>
@@ -131,6 +126,7 @@
                 <div class="va-title mb-3">
                     Add Thesis
                 </div>
+                <form action="POST">
                 <va-input
                 v-model="createThesis.data.title"
                 label="Title *"
@@ -162,7 +158,8 @@
                 :error-messages="'The publish date field is required.'"
                 @keyup="createThesis.PublishedDateEmpty = false"
                 />
-                <input type="file" id="video" name="filename" />
+                <input type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
+                <input type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
                 <div class="flex w-full gap-x-3 mt-[15px]">
                     <div class="flex w-1/2 justify-between">
                         <va-button
@@ -185,11 +182,13 @@
                         :loading="createThesis.saved"
                         :disabled="createThesis.saved"
                         @click="createThesis.saved = true, insertUpdateThesis('create')"
+                        type="submit"
                         >
                             <p class="font-normal">Save</p>
                         </va-button>
                     </div>
                 </div>
+            </form>
             </div>
         </template>
     </va-modal>
@@ -397,6 +396,9 @@ export default {
         };
 
         return {
+            files:[],
+            uploadFiles:[],
+            showProgress: false,
             keyconfig,
             thesisList: [],
             keyword: {},
@@ -435,6 +437,10 @@ export default {
         this.getThesis();
     },
     methods: {
+        uploadFile(event){
+            const file = event.target.files[0];
+          
+        },
         handleButtonClick() {
             this.editThesis.saved = true;
 
@@ -507,12 +513,22 @@ export default {
         insertUpdateThesis(method) {
             if (method !== 'create' || method !== 'save') {
                 let formData = new FormData();
-                formData.append("video",this.)
+
+                // Append other form data
+                formData.append('title', this.createThesis.data.title);
+                formData.append('abstract', this.createThesis.data.abstract);
+                formData.append('published_at', this.createThesis.data.published_at);
+                let videofile = this.$refs.videoInput.files[0];
+                let pdffile = this.$refs.pdfInput.files[0];
+                formData.append('video', videofile);
+                formData.append('pdf', pdffile);
                 axios({
                     method: 'POST',
-                    type: 'JSON',
                     url: '/thesis/save',
-                    data: method === 'create' ? this.createThesis.data : (method === 'save' && this.editThesis.data)
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    },
+                    data: method === 'create' ? formData : (method === 'save' && this.editThesis.data)
                 }).then(response => {
                     if (response.data.status == 1) {
                         this.$root.prompt(response.data.text);
@@ -576,6 +592,11 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.thesisList = response.data.result;
+                    this.thesisList.forEach(thesis => {
+                        // Access the 'pdf' property of each thesis
+                        // Note: Assuming 'pdf' is a string or contains the URL to the PDF file
+                        console.log(thesis.video);
+                    });
                 } else this.$root.prompt(response.data.text);
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);

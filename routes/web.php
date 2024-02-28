@@ -34,7 +34,7 @@ Route::group(['middleware' => 'check_auth'], function () {
     Route::get('category/get', [CategoryController::class, 'get']);
     Route::get('thesis/get', [ThesisController::class, 'get']);
     Route::get('dashboard/get', [PageController::class, 'dashboardData']);
-
+    Route::get('videos/{videoname}', [ThesisController::class, 'getVideo']);
     Route::prefix('keyword')->group(function () {
         Route::post('delete', [KeywordsController::class, 'delete']);
         Route::post('disable', [KeywordsController::class, 'disable']);
@@ -58,7 +58,7 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [CategoryController::class, 'enable']);
       
     });
-
+    Route::post('abc', [ThesisController::class, 'upload']);
     Route::prefix('thesis')->group(function () {
         Route::post('delete', [ThesisController::class, 'delete']);
         Route::post('disable', [ThesisController::class, 'disable']);
@@ -66,6 +66,6 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [ThesisController::class, 'enable']);
       
     });
-
+    
 
 });

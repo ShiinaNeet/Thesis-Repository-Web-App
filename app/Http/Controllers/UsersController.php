@@ -65,5 +65,32 @@ class UsersController extends Controller
         return response()->json($rs);
     }
 
+    public function save_account(Request $request)
+    {
+        $rs = SharedFunctions::default_msg();
+        $this->validate($request, [
+            'userID' => 'required|numeric',
+            'user_type' => 'required',
+            'password' => 'required',
+        ]);
+        $new_account = false;
+        if (isset($request->id)) $user = Users::find($request->id);
+        else { $user = new Users(); $new_account = true; }
+        $password = $request->password;
+        $user->email = $request->email;
+        $user->user_type = $request->user_type;
+        if ($new_account) $user->password = bcrypt($password);
+
+ 
+        if ($user->save()) {
+            if ($new_account) {
+                $rs = SharedFunctions::success_msg("Account created");
+                
+            } else {
+                $rs = SharedFunctions::success_msg("Account saved");
+            }
+        }
+        return response()->json($rs);
+    }
     
 }

@@ -162,6 +162,7 @@
                 :error-messages="'The publish date field is required.'"
                 @keyup="createThesis.PublishedDateEmpty = false"
                 />
+                <input type="file" id="video" name="filename" />
                 <div class="flex w-full gap-x-3 mt-[15px]">
                     <div class="flex w-1/2 justify-between">
                         <va-button
@@ -505,6 +506,8 @@ export default {
         },
         insertUpdateThesis(method) {
             if (method !== 'create' || method !== 'save') {
+                let formData = new FormData();
+                formData.append("video",this.)
                 axios({
                     method: 'POST',
                     type: 'JSON',

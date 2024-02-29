@@ -43,6 +43,17 @@
             <span class="text-white">Thesis</span>
           </VaButton>
         </VaNavbarItem>
+        <VaNavbarItem class="hidden sm:block">
+          <VaButton
+          class=""
+          preset="secondary"
+          hover-behavior="opacity"
+          :hover-opacity="0.4"
+          @click="logout"
+          >
+            <span class="text-white">Thesis</span>
+          </VaButton>
+        </VaNavbarItem>
       </div>
     </template>
   </VaNavbar>
@@ -68,7 +79,42 @@ const darkNavbarColors = computed(() => {
     };
   }
 });
+
+
 </script>
+<script>
+export default {
+  data() {
+      return{
+
+      }
+      },
+  methods:{
+    logout(){
+      axios({
+        method: 'POST',
+        type: 'JSON',
+        url: '/login',
+        data: {
+            userID: this.account.login.userId,
+        }
+      }).then(response => {
+          if (response.data.status == 1) {
+              setTimeout(() => {
+                  window.location = response.data.redirect;
+              }, this.loginDelay);
+          } else {
+            
+          }
+      }).catch(error => {
+        console.log("test");
+      
+      });
+    }
+  }
+}
+</script>
+
 
 <style scoped>
 .logo {

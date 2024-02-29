@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ThesisController;
 use App\Http\Controllers\UsersController;
+use Illuminate\Auth\Events\Logout;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,6 +37,7 @@ Route::group(['middleware' => 'check_auth'], function () {
     Route::get('thesis/get', [ThesisController::class, 'get']);
     Route::get('dashboard/get', [PageController::class, 'dashboardData']);
     Route::get('videos/{videoname}', [ThesisController::class, 'getVideo']);
+    Route::get('pdf/{pdfname}', [ThesisController::class, 'getPdf']);
     Route::prefix('keyword')->group(function () {
         Route::post('delete', [KeywordsController::class, 'delete']);
         Route::post('disable', [KeywordsController::class, 'disable']);
@@ -59,6 +62,7 @@ Route::group(['middleware' => 'check_auth'], function () {
       
     });
     Route::post('abc', [ThesisController::class, 'upload']);
+    Route::post('logout',[UsersController::class, 'logout']);
     Route::prefix('thesis')->group(function () {
         Route::post('delete', [ThesisController::class, 'delete']);
         Route::post('disable', [ThesisController::class, 'disable']);

@@ -155,10 +155,10 @@
         <template #content>
             <div class="w-[410px] p-5">
                 <div class="va-title mb-3">
-                    Edit Help
+                    Edit author
                 </div>
                 <va-input
-                v-model="editKeyword.data.author"
+                v-model="editKeyword.data.name"
                 label="author *"
                 class="w-full mb-2"
                 maxlength="120"

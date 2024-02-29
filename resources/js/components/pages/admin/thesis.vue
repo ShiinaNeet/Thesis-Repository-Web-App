@@ -87,13 +87,27 @@
             </template>
             <template #expandableRow="{ rowData }">
                 <div
-                class="p-2"
-                id="table-row-desc"
+                class="p-2 flex flex-row"
+                id="table-row-d"
                 >
-                <video width="320" height="240" controls>
-                    <source :src="rowData.video" type="video/mp4">       
-                </video>
+                    <div class="w-1/2 h-full">
+                        <video width="320" height="240" controls>
+                            <source :src="rowData.video" type="video/mp4">       
+                        </video>    
+                    </div>
+                    <div class="w-1/2 p-3 h-full justify-center">
+                        <h2 class="pdf py-2">
+                            View PDF
+                        </h2>
+                        <a 
+                        class="text-blue-500 underline py-2"
+                        :href="rowData.pdf">Download</a>
+                        
+                        <!-- <iframe :src="rowData.pdf" style="width:600px; height:500px;" frameborder="0"></iframe> -->
+                        
+                    </div>
                 </div>
+
             </template>
             <template #bodyAppend>
                 <tr v-if="$root.tblPagination(thesisList)">
@@ -204,7 +218,7 @@
                     Edit Help
                 </div>
                 <va-input
-                v-model="createThesis.data.title"
+                v-model="editThesis.data.title"
                 label="Title *"
                 class="w-full mb-2"
                 maxlength="120"
@@ -234,7 +248,8 @@
                 :error-messages="'The publish date field is required.'"
                 @keyup="editThesis.publishedDateEmpty = false"
                 />
-                
+                <input type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
+                <input type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
                 <div class="flex w-full gap-x-3 mt-[15px]">
                     <div class="flex w-1/2 justify-between">
                         <va-button
@@ -515,20 +530,33 @@ export default {
                 let formData = new FormData();
 
                 // Append other form data
-                formData.append('title', this.createThesis.data.title);
-                formData.append('abstract', this.createThesis.data.abstract);
-                formData.append('published_at', this.createThesis.data.published_at);
-                let videofile = this.$refs.videoInput.files[0];
-                let pdffile = this.$refs.pdfInput.files[0];
-                formData.append('video', videofile);
-                formData.append('pdf', pdffile);
+                if(method == 'create'){
+                    formData.append('title', this.createThesis.data.title);
+                    formData.append('abstract', this.createThesis.data.abstract);
+                    formData.append('published_at', this.createThesis.data.published_at);
+                    let videofile = this.$refs.videoInput.files[0];
+                    let pdffile = this.$refs.pdfInput.files[0];
+                    formData.append('video', videofile);
+                    formData.append('pdf', pdffile);
+                }
+                else{
+                    formData.append('id', this.editThesis.data.id);
+                    formData.append('title', this.editThesis.data.title);
+                    formData.append('abstract', this.editThesis.data.abstract);
+                    formData.append('published_at', this.editThesis.data.published_at);
+                    let videofile = this.$refs.videoInput.files[0];
+                    let pdffile = this.$refs.pdfInput.files[0];
+                    formData.append('video', videofile);
+                    formData.append('pdf', pdffile);
+                }
+                
                 axios({
                     method: 'POST',
                     url: '/thesis/save',
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },
-                    data: method === 'create' ? formData : (method === 'save' && this.editThesis.data)
+                    data: formData,
                 }).then(response => {
                     if (response.data.status == 1) {
                         this.$root.prompt(response.data.text);

@@ -18,14 +18,6 @@
             </VaCard>
 
             <VaCard :bordered="false">
-            <VaCardTitle>Active Thesis</VaCardTitle>
-            <VaCardContent class="text-6xl">
-                {{ thesis.active.count }}
-            </VaCardContent>
-            </VaCard>
-        </div>
-        <div class="flex flex-wrap gap-5 py-5">
-            <VaCard :bordered="false">
             <VaCardTitle>Outdated Thesis</VaCardTitle>
             <VaCardContent class="text-6xl">
                 {{ thesis.outdated.count }}
@@ -62,6 +54,7 @@ export default{
             authors:{
                 count:0,
             },
+            
         }
     },
     mounted(){
@@ -76,6 +69,7 @@ export default{
                 }).then(response => {
                     this.users.count = response.data.result.users;
                     this.authors.count = response.data.result.authors;
+                    this.thesis.active.count = response.data.result.thesis;
                 }).catch(error => {
                     console.log("error: ". error);
                 });

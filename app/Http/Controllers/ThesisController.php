@@ -75,9 +75,11 @@ class ThesisController extends Controller
             'title' => 'required|max:120',
             'abstract' => 'required|max:500',
             'published_at' => 'required|date',
-            'video' => 'required|file|mimes:mp4,mov,avi,wmv',
-            'pdf' => 'required|file|mimes:pdf'
+            
+            
         ]);
+        //'video' => 'required|file|mimes:mp4,mov,avi,wmv',
+        //'pdf' => 'required|file|mimes:pdf'
         $new_help = false;
         if (isset($request->id)) $thesis = thesis::find($request->id);
         else { $thesis = new thesis(); $new_help = true; }
@@ -125,7 +127,7 @@ class ThesisController extends Controller
             return response()->file(storage_path('app/' . $pdfPath));
         } else {
             // If the video file does not exist, return a 404 response
-            return response()->json(['error' => 'Video not found'], 404);
+            return response()->json(['error' => 'pdf not found'], 404);
         }
     }
 }

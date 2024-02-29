@@ -8,7 +8,7 @@ import "vuestic-ui/css";
 import accountModule from "./components/pages/admin/accounts.vue";
 import LoginModule from "./components/login.vue";
 import dashboardModule from "./components/pages/admin/dashboard.vue";
-
+import studentDashboardModule from "./components/pages/student/dashboard.vue";
 
 const app = createApp({
     data () {
@@ -39,6 +39,7 @@ const app = createApp({
         'login': LoginModule,
         'accounts': accountModule,
         'dashboard': dashboardModule,
+        'studentdashboard':studentDashboardModule,
         
     },
     methods: {

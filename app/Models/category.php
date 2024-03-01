@@ -10,4 +10,9 @@ class category extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    
+    public function theses()
+    {
+        return $this->belongsToMany(Thesis::class, 'thesis_keyword', 'keyword_id', 'thesis_id');
+    }
 }

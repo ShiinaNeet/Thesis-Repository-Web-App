@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
 use App\Models\thesis;
+use App\Models\authors;
+use App\Models\category;
+use App\Models\keywords;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class ThesisController extends Controller
@@ -47,6 +52,7 @@ class ThesisController extends Controller
     public function get()
     {
         $query = thesis::withTrashed()
+            ->with(['author', 'category', 'keywords'])
             ->orderBy('created_at', 'DESC')
             ->get();
 
@@ -69,8 +75,8 @@ class ThesisController extends Controller
     public function save(Request $request)
     {
         $rs = SharedFunctions::default_msg();
-        
-
+       
+        // dd($request->all());
         $this->validate($request, [
             'title' => 'required|max:120',
             'abstract' => 'required|max:500',
@@ -83,6 +89,7 @@ class ThesisController extends Controller
         $new_help = false;
         if (isset($request->id)) $thesis = thesis::find($request->id);
         else { $thesis = new thesis(); $new_help = true; }
+
         $thesis->title = $request->title;
         $thesis->abstract = $request->abstract;
         $thesis->published_at = $request->published_at;
@@ -100,10 +107,58 @@ class ThesisController extends Controller
             $thesis->pdf = $path; 
         }
     
-        if ($thesis->save()) {
-            $rs = SharedFunctions::success_msg("Thesis saved");
+        if (!$thesis->save()) {
+            return response()->json(SharedFunctions::prompt_msg("Error saving thesis"));
         }
-        return response()->json($rs);
+
+        // Attach authors to the thesis
+        if ($request->has('authors')) {
+            $authors = json_decode($request->authors); // Decode JSON string into an array
+                if(is_array($authors)) { // Check if it's an array
+                    foreach ($authors as $authorId) {
+                        DB::table('thesis_author')->insert([
+                            'thesis_id' => $thesis->id,
+                            'author_id' => $authorId
+                        ]);
+                    }
+                } else {
+                    // Handle case where authors is not an array
+                    return response()->json(['error' => 'Authors data is not in the correct format'], 400);
+                }
+        }
+
+        if ($request->has('keywords')) {
+            $keywords = json_decode($request->keywords); // Decode JSON string into an array
+            if (is_array($keywords)) { // Check if it's an array
+                foreach ($keywords as $keywordId) {
+                    DB::table('thesis_keyword')->insert([
+                        'thesis_id' => $thesis->id,
+                        'keyword_id' => $keywordId
+                    ]);
+                }
+            } else {
+                // Handle case where keywords is not an array
+                return response()->json(['error' => 'Keywords data is not in the correct format'], 400);
+            }
+        }
+        
+        if ($request->has('categories')) {
+            $categories = json_decode($request->categories); // Decode JSON string into an array
+            if (is_array($categories)) { // Check if it's an array
+                foreach ($categories as $categoryId) {
+                    DB::table('thesis_category')->insert([
+                        'thesis_id' => $thesis->id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            } else {
+                // Handle case where categories is not an array
+                return response()->json(['error' => 'Categories data is not in the correct format'], 400);
+            }
+        }
+        
+        $message = $new_help ? "Thesis created successfully" : "Thesis updated successfully";
+        return response()->json(SharedFunctions::success_msg($message));
     }
 
     public function getVideo($videoname)

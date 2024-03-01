@@ -33,8 +33,8 @@
                 <VaCard
                 square
                 outlined
-                v-for="thesis in thesisList"
-                class="mb-3"
+                v-for="thesis in data.thesisList"
+                class="mb-3 h-full"
                 >
                     <VaCardTitle><h2>{{ thesis.title }}</h2></VaCardTitle>
                     <VaCardContent>
@@ -50,7 +50,7 @@
                             
                             {{ thesis.tags }}
                         </div>
-                        <div >
+                        <div class="h-1/3">
                             <!-- Abstract here -->
                             {{ thesis.abstract }}
                         </div>
@@ -85,6 +85,9 @@ export default{
     mounted(){
         this.getThesis();
     },
+    computed(){
+        this.getThesis();
+    },
     methods:{
         getThesis(){
             axios({
@@ -94,7 +97,7 @@ export default{
             }).then(response => {
                 if(response.data.status == 1)
                 {
-                    this.thesisList = response.data.result;
+                    this.data.thesisList = response.data.result;
                     console.log(this.thesisList);
                 }
             })

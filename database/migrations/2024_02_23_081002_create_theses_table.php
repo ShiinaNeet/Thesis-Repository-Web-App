@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('video')->nullable();
             $table->string('title');
             $table->text('abstract');
-            $table->timestamp('published_at')->nullable();
+            $table->string('published_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

@@ -49,9 +49,9 @@
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"
-          @click="logout"
+          @click="$root.redirectToPage('/logout')"
           >
-            <span class="text-white">Thesis</span>
+            <span class="text-white">Logout</span>
           </VaButton>
         </VaNavbarItem>
       </div>
@@ -94,7 +94,7 @@ export default {
       axios({
         method: 'POST',
         type: 'JSON',
-        url: '/login',
+        url: '/logout',
         data: {
             userID: this.account.login.userId,
         }

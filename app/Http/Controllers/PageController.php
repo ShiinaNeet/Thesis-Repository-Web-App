@@ -17,12 +17,19 @@ class PageController extends Controller
           
             return view('student.dashboard', $data);
         }
-        elseif(Auth::check() && $user->user_type == Users::TYPE_ADMIN){
+    //     elseif(Auth::check() && $user->user_type == Users::TYPE_ADMIN){
           
-            return redirect(url('/dashboard'));
-        }
+    //         return redirect(url('/dashboard'));
+    //     }
         
-       end: return view('login', $data);
+    //    end: return view('login', $data);
+
+        if(Auth::check()){
+            return redirect('/dashboard');
+        }else{
+            return view('/login', $data);
+        }
+
 
     }
     function login(){

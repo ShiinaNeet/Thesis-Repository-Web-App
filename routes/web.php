@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthorsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\KeywordsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
@@ -22,6 +23,7 @@ use Illuminate\Auth\Events\Logout;
 
 Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
+Route::get('/logout', [UsersController::class, 'logout']);
 Route::get('/dashboard', [PageController::class, 'dashboard']);
 // for auth
 Route::post('/login', [UsersController::class, 'login']);
@@ -45,7 +47,8 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [KeywordsController::class, 'enable']);
       
     });
-
+    Route::post('database/import', [DatabaseController::class, 'import']);
+    Route::get('database/export', [DatabaseController::class, 'export']);
     Route::prefix('author')->group(function () {
         Route::post('delete', [AuthorsController::class, 'delete']);
         Route::post('disable', [AuthorsController::class, 'disable']);
@@ -61,6 +64,8 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [CategoryController::class, 'enable']);
       
     });
+ 
+
     Route::post('abc', [ThesisController::class, 'upload']);
     Route::post('logout',[UsersController::class, 'logout']);
     Route::prefix('thesis')->group(function () {

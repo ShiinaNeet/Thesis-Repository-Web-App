@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
 use App\Models\Users;
+use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session as FacadesSession;
 
 class UsersController extends Controller
 {
@@ -91,6 +93,12 @@ class UsersController extends Controller
             }
         }
         return response()->json($rs);
+    }
+
+    public function logout(){
+        Auth::logout();
+        FacadesSession::flush();
+        return redirect('/login');
     }
     
 }

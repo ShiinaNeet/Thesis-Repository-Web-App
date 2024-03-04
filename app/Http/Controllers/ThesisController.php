@@ -92,7 +92,22 @@ class ThesisController extends Controller
 
         $thesis->title = $request->title;
         $thesis->abstract = $request->abstract;
-        $thesis->published_at = $request->published_at;
+        
+        if ($request->has('published_at')) {
+            $publishedAt = $request->published_at;
+            // Check if $publishedAt is not null and is a valid string
+            if (is_string($publishedAt) && !empty($publishedAt)) {
+                // Assuming $thesis is an instance of your Eloquent model
+                $thesis->published_at = $publishedAt;
+                // Save the changes to the database
+                
+                // Return success response or perform other actions
+                
+            } else {
+                // Handle case where published_at is not in the correct format
+                return response()->json(['error' => 'Published at date is not in the correct format'], 400);
+            }
+        }
         
         if ($request->hasFile('video') && $request->file('video')->isValid()) {
             $file = $request->file('video');
@@ -114,18 +129,19 @@ class ThesisController extends Controller
         // Attach authors to the thesis
         if ($request->has('authors')) {
             $authors = json_decode($request->authors); // Decode JSON string into an array
-                if(is_array($authors)) { // Check if it's an array
-                    foreach ($authors as $authorId) {
-                        DB::table('thesis_author')->insert([
-                            'thesis_id' => $thesis->id,
-                            'author_id' => $authorId
-                        ]);
-                    }
-                } else {
-                    // Handle case where authors is not an array
-                    return response()->json(['error' => 'Authors data is not in the correct format'], 400);
+            if (is_array($authors)) { // Check if it's an array
+                foreach ($authors as $authorId) {
+                    DB::table('thesis_author')->insert([
+                        'thesis_id' => $thesis->id,
+                        'author_id' => $authorId
+                    ]);
                 }
+            } else {
+                // Handle case where authors is not in the correct format
+                return response()->json(['error' => 'Authors data is not in the correct format'], 400);
+            }
         }
+        
 
         if ($request->has('keywords')) {
             $keywords = json_decode($request->keywords); // Decode JSON string into an array
@@ -158,6 +174,113 @@ class ThesisController extends Controller
         }
         
         $message = $new_help ? "Thesis created successfully" : "Thesis updated successfully";
+        return response()->json(SharedFunctions::success_msg($message));
+    }
+
+    public function update(Request $request)
+    {
+        $rs = SharedFunctions::default_msg();
+       
+        // dd($request->all());
+        $this->validate($request, [
+            'title' => 'required|max:120',
+            'abstract' => 'required|max:500',
+            'published_at' => 'required|date',
+            
+            
+        ]);
+        //'video' => 'required|file|mimes:mp4,mov,avi,wmv',
+        //'pdf' => 'required|file|mimes:pdf'
+       
+        if(!$thesis = thesis::find($request->id)){
+            return response()->json(SharedFunctions::prompt_msg("error occured. Can't find any thesis with ID:"  + $request->id));
+        }
+
+
+        $thesis->title = $request->title;
+        $thesis->abstract = $request->abstract;
+        
+        if ($request->has('published_at')) {
+            $publishedAt = $request->published_at;
+            // Check if $publishedAt is not null and is a valid string
+            if (is_string($publishedAt) && !empty($publishedAt)) {
+                // Assuming $thesis is an instance of your Eloquent model
+                $thesis->published_at = $publishedAt;
+                // Save the changes to the database
+                
+                // Return success response or perform other actions
+                
+            } else {
+                // Handle case where published_at is not in the correct format
+                return response()->json(['error' => 'Published at date is not in the correct format'], 400);
+            }
+        }
+        
+        if ($request->hasFile('video') && $request->file('video')->isValid()) {
+            $file = $request->file('video');
+            $fileName = $file->getClientOriginalName(); 
+            $path = $file->storeAs('videos', $fileName); 
+            $thesis->video = $path; 
+        }
+        if ($request->hasFile('pdf') && $request->file('pdf')->isValid()) {
+            $file = $request->file('pdf');
+            $fileName = $file->getClientOriginalName(); 
+            $path = $file->storeAs('pdf', $fileName); 
+            $thesis->pdf = $path; 
+        }
+    
+        if (!$thesis->save()) {
+            return response()->json(SharedFunctions::prompt_msg("Error saving thesis"));
+        }
+
+        // Attach authors to the thesis
+        if ($request->has('authors')) {
+            $authors = json_decode($request->authors); // Decode JSON string into an array
+            if (is_array($authors)) { // Check if it's an array
+                foreach ($authors as $authorId) {
+                    DB::table('thesis_author')->insert([
+                        'thesis_id' => $thesis->id,
+                        'author_id' => $authorId
+                    ]);
+                }
+            } else {
+                // Handle case where authors is not in the correct format
+                return response()->json(['error' => 'Authors data is not in the correct format'], 400);
+            }
+        }
+        
+
+        if ($request->has('keywords')) {
+            $keywords = json_decode($request->keywords); // Decode JSON string into an array
+            if (is_array($keywords)) { // Check if it's an array
+                foreach ($keywords as $keywordId) {
+                    DB::table('thesis_keyword')->insert([
+                        'thesis_id' => $thesis->id,
+                        'keyword_id' => $keywordId
+                    ]);
+                }
+            } else {
+                // Handle case where keywords is not an array
+                return response()->json(['error' => 'Keywords data is not in the correct format'], 400);
+            }
+        }
+        
+        if ($request->has('categories')) {
+            $categories = json_decode($request->categories); // Decode JSON string into an array
+            if (is_array($categories)) { // Check if it's an array
+                foreach ($categories as $categoryId) {
+                    DB::table('thesis_category')->insert([
+                        'thesis_id' => $thesis->id,
+                        'category_id' => $categoryId
+                    ]);
+                }
+            } else {
+                // Handle case where categories is not an array
+                return response()->json(['error' => 'Categories data is not in the correct format'], 400);
+            }
+        }
+        
+        $message = "Thesis updated successfully";
         return response()->json(SharedFunctions::success_msg($message));
     }
 

@@ -1,6 +1,6 @@
 <template>
-    <div class="py-5 h-screen w-screen">
-        <div class="h-1/3 px-55 w-full flex flex-center justify-center bg-slate-100">
+    <div class="py-5 ">
+        <div class="h-[250px] px-55 lg:w-full sm:w-1/3 flex flex-center justify-center bg-slate-100">
             <div class="flex w-full justify-center flex-col">
                 <div class="w-full flex flex-col ee">
                     <!-- Input field -->
@@ -28,40 +28,82 @@
                 </div>
             </div>
         </div>
-        <div class="bg-red-500 mx-5 w-full">
-            <div class="wewe">
+        <div class="bg-white-500 mx-5 w-full h-full">
+            <div class="flex flex-center justify-center flex-col">
                 <VaCard
                 square
                 outlined
                 v-for="thesis in data.thesisList"
-                class="mb-3 h-full"
+                class="mb-3 h-full w-1/2 "
                 >
-                    <VaCardTitle><h2>{{ thesis.title }}</h2></VaCardTitle>
+                    <VaCardTitle>
+                        <h2 class="text-2xl font-blod underline text-blue-700">{{ thesis.title }}</h2> <br/>
+                    </VaCardTitle>
                     <VaCardContent>
-                        <div>
-                            <!-- Place tags here -->
-                            <div v-for="tags in thesis.tags">
-                                <VaBadge
-                                text="tags.name"
-                                color="success"
-                                class="mr-2"
-                                />
+                        <div class="title">
+                            <div class="w-fit pb-3 h-1/5">
+                                <div class="">
+                                    <div class="flex items-center"> <!-- Flex container for label and paragraph -->
+                                        <label class="text-lg font-bold mr-2"> <!-- Label -->
+                                            Authors:  
+                                        </label>
+                                        <div class="flex flex-wrap whitespace-normal"> <!-- Flex container for author tags -->
+                                            <span class="flex text-green-700 underline font-bold" v-for="(author, index) in thesis.author" :key="index">
+                                                {{ ''+ author.name }}
+                                                <span v-if="index !== thesis.author.length - 1">, </span> <!-- Add comma for all authors except the last one -->
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div>
+                                    <!-- date here import formatdate here-->
+                                <label
+                                class="text-lg font-bold"
+                                for="thesis.published_at">
+                                    Published Date: 
+                                </label>{{ formatDate(thesis.published_at, 'MMM. Do YYYY', 'Invalid Date')}}
+                                </div>
                             </div>
-                            
-                            {{ thesis.tags }}
+                            <!-- Place tags here -->
+                            <div class="w-fit pb-3 h-1/5">
+                                <div class="flex lg:flex-row flex-col gap-1">
+                                    <div v-for="keyword in thesis.keywords">
+                                        <VaChip 
+                                        square
+                                        color="success"
+                                        class="mr-2"
+                                        >
+                                        {{ keyword.keyword }}
+                                        </VaChip>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="h-1/3">
+                        <div class="max-h-[150px] truncate w-full flex text-wrap break-all py-3 ">
                             <!-- Abstract here -->
-                            {{ thesis.abstract }}
+                            <p class="text-wrap break-all">  {{  thesis.abstract  +thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract+thesis.abstract}}</p>
                         </div>
-                        <div class="files ">
-                            <a :href="thesis.pdf">Download PDF here</a> <br/>
-                            <a :href="thesis.video">Download PDF here</a>
+                        <div class="files flex flex-center w-fit gap-5 ">
+                            <VaButton
+                            :disabled="thesis.pdf === ''"
+                            icon="download"
+                            color="info"
+                            :href="thesis.pdf"
+                            >
+                            Download PDF here
+                            </VaButton>
+                            <VaButton
+                            :disabled="thesis.video === ''"
+                            icon="download"
+                            color="info"
+                            :href="thesis.video"
+                            >
+                            Download video here
+                            </VaButton>
+                           
                         </div>
-                        <div >
-                            <!-- date here import formatdate here-->
-                            {{ thesis.published_at }}
-                        </div>
+                        
                     </VaCardContent>
                 </VaCard>
             </div>
@@ -72,6 +114,7 @@
 
 
 <script>
+import formatDate from '@/functions/formatdate.js';
 
 export default{
     data(){
@@ -101,7 +144,8 @@ export default{
                     console.log(this.thesisList);
                 }
             })
-        }
+        },
+        formatDate,
     },
     components:{
 

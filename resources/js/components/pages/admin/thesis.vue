@@ -10,14 +10,14 @@
         :filter="filter"
         @filtered="filtered = $event.items"
         animated
-        class="w-full"
+
         >
             <template #headerAppend>
-                <tr class="table-crud__slot w-screen" >
+                <tr class="table-crud__slot " >
                     <th
                     v-for="key in Object.keys(createThesis.data)"
                     :key="key"
-                    class="py-1 pr-1 w-screen"
+                    class="py-1 pr-1 "
                     >
                         <va-input
                         v-if="key.includes('title')"
@@ -90,49 +90,69 @@
             <template #expandableRow="{ rowData }">
                 <div
                 class="p-2 flex flex-row"
-                id="table-row-d h-full"
+                id="table-row-d h-1/2 w-2/3"
                 >
-                    <div class="w-1/2 h-full pr-3 rounded-lg">
-                        <video class="h-1/2 w-full" controls>
+                    <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg">
+                        <video class="h-1/2 w-full " controls>
                             <source :src="rowData.video" type="video/mp4">       
                         </video>    
                     </div>
-                    <div class="w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">
+                    <div class="w-1/2 max-w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">
                         <h1 class="text-2xl">
                          Title: {{ rowData.title }}   
                         </h1>
-                        <h3>
-                         Author: {{ rowData.author[0].name }}   
-                        </h3>
-                        <VaDivider>
-                            <span class="px-2">Abstract</span>
-                        </VaDivider>
-                        <h3 class="bg-white-500">
-                          {{ rowData.abstract }}   
-                        </h3>
-                        <VaDivider>
-                            <span class="px-2">Tags</span>
-                        </VaDivider>
-                        <h3 class="flex lg:flex-row flex-col gap-1 w-fit">
-                            Tags: 
-                            <span v-for="keywordList in rowData.keywords" class="flex items-center">
+                        <div class="w-fit py-3 pt-4">
+                            <div class="flex lg:flex-row flex-col gap-1">
+                                <h3 class="text-2xl">Author:</h3> 
+                            <span v-for="authore in rowData.author" class="flex items-center">
                                 <VaBadge
-                                    :text="keywordList.keyword"
-                                    color="warning"
-                                    text-color="#812E9E"
-                                />
+                                        :text="authore.name"
+                                        color="info"
+                                        text-color="#812E9E"
+                                    />
                             </span>
-                            
+                            </div>
+                        </div>
+                        <h3>
+                         Published Date: {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
                         </h3>
                         <VaDivider>
-                            <span class="px-2">Files</span>
+                            <span class="px-2 font-bold text-lg py-3">Abstract</span>
                         </VaDivider>
-                        <h2 class="pdf py-2">
-                            View PDF
-                        </h2>
-                        <a 
-                        class="text-blue-500 underline py-2"
-                        :href="rowData.pdf">Download</a>
+                        <div class="bg-white-500 w-full py-3 pt-4">
+                            <p class="text-wrap break-all">
+                                {{ rowData.abstract }}
+                            </p>
+                        </div>
+                        <VaDivider>
+                            <span class="px-2 py-3 font-bold text-lg">Tags</span>
+                        </VaDivider>
+                        <div class=" w-fit py-3 pt-4">
+                            <div class="flex lg:flex-row flex-col gap-1">
+                                <h2>Tags: </h2>
+                                <span v-for="keywordList in rowData.keywords" class="flex items-center">
+                                    <VaBadge
+                                        :text="keywordList.keyword"
+                                        color="warning"
+                                        text-color="#812E9E"
+                                    />
+                                </span>
+                            </div>
+                        </div>
+                        <VaDivider>
+                            <span class="px-2 font-bold text-lg">Files</span>
+                        </VaDivider>
+                        <div>
+                            <h2 class="pdf py-2">
+                                PDF : <a 
+                                            class="text-blue-500 underline py-2"
+                                            :href="rowData.pdf">
+                                                Download
+                                            </a>
+                            </h2>
+                            
+                        </div>
+                        
                     </div>
                 </div>
 
@@ -431,16 +451,17 @@
                         >
                             <template #content="{ value }">
                                 <VaChip
-                                v-for="(ww, idx) in value"
+                                v-for="(wwwwq, id) in value"
                                 :key="idx"
                                 size="small"
                                 color="secondary"
                                 class="mr-1 mb-1"
                                 square
                                 closeable
-                                @update:modelValue="updateAuthorsArr('save', idx)"
+                                @update:modelValue="updateAuthorsArr('save', id)"
                                 >
-                                   {{ ww.name }}
+                                   {{ wwwwq.name }}
+                                   {{ console.log(value) }}
                                 </VaChip>
                             </template>
                         </VaSelect>
@@ -457,12 +478,11 @@
                     :error-messages="'The abstract field is required.'"
                     @keyup="editThesis.abstractEmpty = false"
                     />
-                    <va-input
+                    <VaDateInput
                     v-model="editThesis.data.published_at"
-                    label="Publish date *"
-                    type="date"
+                    label="Published date *"
+                    preset="bordered"
                     class="w-full mb-2"
-                    maxlength="500"
                     :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
                     :error="editThesis.abstractEmpty"
                     :error-messages="'The publish date field is required.'"
@@ -620,7 +640,7 @@ const newThesis = {
     abstract:null,
     published_at: formatDate(now()),
     id: null,
-    category:[],
+    category:[], 
     keywords:[],
     author:[],
 };
@@ -704,10 +724,18 @@ export default {
         },
         updateAuthorsArr(method, idx) {
             if (method !== 'create' || method !== 'save') {
-                method === 'create' ? (this.createThesis.data.author =
-                    this.createThesis.data.author.filter((v) => v !== this.createThesis.data.author[idx]))
-                    : (method === 'save' && (this.editThesis.data.author =
-                        this.editThesis.data.author.filter((v) => v !== this.editThesis.data.author[idx])));
+                if(method === 'create') {
+                    this.createThesis.data.author =
+                        this.createThesis.data.author.filter((v) => v !== this.createThesis.data.author[idx]);
+                    console.log(this.createThesis.data.author);
+                 }
+                 else{
+                    if(method === 'save') {
+                        this.editThesis.data.author = 
+                        this.editThesis.data.author.filter((v) => v !== this.editThesis.data.author[idx]);
+                        console.log(this.editThesis.data.author);
+                  }
+            }
                
             }
             else
@@ -847,15 +875,45 @@ export default {
                                 this.createThesis.AbstractEmpty = false,
                                 this.createThesis.PublishedDateEmpty = false,
                                 this.editThesis.saved = false));
-                        this.getThesis();
+                                this.getThesis();
                     }
                     else {
-                        this.$root.prompt(response.data.text);
-                        this.createThesis.saved = false;
+                        this.editThesis.saved = false;
+                        this.$root.prompt(response.data.message);
+                        method === 'create' ? (this.createThesis.data = { ...newThesis },
+                            this.createThesis.modal = false,
+                            this.createThesis.TitleEmpty = false,
+                            this.createThesis.AbstractEmpty = false,
+                            this.createThesis.PublishedDateEmpty = false,
+                            this.createThesis.saved = false)
+                            : (method === 'save' && (this.editThesis.data = {},
+                                this.editThesis.modal = false,
+                                this.createThesis.TitleEmpty = false,
+                                this.createThesis.AbstractEmpty = false,
+                                this.createThesis.PublishedDateEmpty = false,
+                                this.editThesis.saved = false));
+                                this.getThesis();
                     }
+                    this.getThesis();
                 }).catch(error => {
                     // this.$root.prompt(error.response.data.message);
+                    this.editThesis.saved = false;
                     let resDataError = Object.keys(error.response.data.errors);
+                    if (resDataError.filter(key => key == 'message').length > 0) {
+                        method === 'create' ? (this.createThesis.data = { ...newThesis },
+                            this.createThesis.modal = false,
+                            this.createThesis.TitleEmpty = false,
+                            this.createThesis.AbstractEmpty = false,
+                            this.createThesis.PublishedDateEmpty = false,
+                            this.createThesis.saved = false)
+                            : (method === 'save' && (this.editThesis.data = {},
+                                this.editThesis.modal = false,
+                                this.createThesis.TitleEmpty = false,
+                                this.createThesis.AbstractEmpty = false,
+                                this.createThesis.PublishedDateEmpty = false,
+                                this.editThesis.saved = false));
+                                this.getThesis();
+                    }
                     if (resDataError.filter(key => key == 'title').length) {
                         method === 'create' ? this.createThesis.TitleEmpty = true
                             : (method === 'save' && (this.editThesis.TitleEmpty = true));
@@ -870,6 +928,7 @@ export default {
                     }
                     method === 'create' ? this.createThesis.saved = false
                         : (method === 'save' && (this.editThesis.saved = false));
+                    this.getThesis();    
                 });
             }
             else
@@ -883,11 +942,7 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.thesisList = response.data.result;
-                    this.thesisList.forEach(thesis => {
-                        // Access the 'pdf' property of each thesis
-                        // Note: Assuming 'pdf' is a string or contains the URL to the PDF file
-                        console.log(thesis.video);
-                    });
+                    
                 }
                 else
                     this.$root.prompt(response.data.text);

@@ -153,6 +153,9 @@
                     <template v-if="activeSetting === 'Thesis'">
                        <thesis_tbl />
                     </template>
+                    <template v-if="activeSetting === 'Backup and Restore'">
+                       <backup_tbl />
+                    </template>
                 </div>
             </div>
         </div>
@@ -167,13 +170,13 @@ import accountsModule from './accounts.vue';
 import keywordsModule from './keyword.vue';
 import thesisModule from './thesis.vue';
 import homeModule from './home.vue';
-
+import backupModule from './backup.vue';
 export default {
     data () {
         return {
             dashboard: ['Dashboard'],
             account_mngt: ['Accounts'],
-            thesis_mngt: ['Thesis','Keyword','Category','Author'],
+            thesis_mngt: ['Thesis','Keyword','Category','Author', 'Backup and Restore'],
             activeSetting: 'Dashboard',
             menu_open: true,
         };
@@ -186,6 +189,7 @@ export default {
         category_tble: categoryModule,
         thesis_tbl: thesisModule,
         home_tbl: homeModule,
+        backup_tbl: backupModule,
 
     },
     

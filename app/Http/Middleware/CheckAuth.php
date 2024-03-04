@@ -10,6 +10,6 @@ class CheckAuth
     public function handle($request, Closure $next, ...$guards)
     {
         if (Auth::check()) return $next($request);
-        else return redirect('/');
+        else return redirect('/login');
     }
 }

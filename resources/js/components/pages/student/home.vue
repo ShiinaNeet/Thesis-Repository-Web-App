@@ -37,7 +37,9 @@
                 class="mb-3 h-full w-1/2 "
                 >
                     <VaCardTitle>
-                        <h2 class="text-2xl font-blod underline text-blue-700">{{ thesis.title }}</h2> <br/>
+                        <h2 
+                        @click="selectThesis(thesis.id)"
+                        class="text-2xl font-bold underline text-blue-700 hover:bg-slate-400">{{ thesis.title }}</h2> <br/>
                     </VaCardTitle>
                     <VaCardContent>
                         <div class="title">
@@ -66,6 +68,19 @@
                                 </div>
                             </div>
                             <!-- Place tags here -->
+                            <div class="w-fit pb-3 h-1/5">
+                                <div class="flex lg:flex-row flex-col gap-1">
+                                    <div v-for="category in thesis.category">
+                                        <VaChip 
+                                        square
+                                        color="success"
+                                        class="mr-2"
+                                        >
+                                        {{ category.name }}
+                                        </VaChip>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="w-fit pb-3 h-1/5">
                                 <div class="flex lg:flex-row flex-col gap-1">
                                     <div v-for="keyword in thesis.keywords">
@@ -141,9 +156,13 @@ export default{
                 if(response.data.status == 1)
                 {
                     this.data.thesisList = response.data.result;
-                    console.log(this.thesisList);
+                    
                 }
             })
+        },
+        selectThesis(id) {
+            this.$emit('thesisSelected', id);
+            console.log(id) // Emit event with selected ID
         },
         formatDate,
     },

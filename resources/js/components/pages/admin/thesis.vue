@@ -43,9 +43,10 @@
                 </tr>
             </template>
 
-            <!-- <template #cell(title)="{ value }">
-                {{ value }}wew
-            </template> -->
+            <template #cell(title)="{ value }">
+                <h1 class="truncate"
+                >{{ value }}</h1>
+            </template>
            
             <template #cell(published_at)="{ value }">
                 {{ formatDate(value, 'MMM. Do YYYY', 'Invalid Date') }}
@@ -98,7 +99,7 @@
                         </video>    
                     </div>
                     <div class="w-1/2 max-w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">
-                        <h1 class="text-2xl">
+                        <h1 class="text-2xl text-wrap break-all">
                          Title: {{ rowData.title }}   
                         </h1>
                         <div class="w-fit py-3 pt-4">

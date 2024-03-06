@@ -25,18 +25,21 @@ Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
 Route::get('/logout', [UsersController::class, 'logout']);
 Route::get('/dashboard', [PageController::class, 'dashboard']);
+
+
 // for auth
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/getUsers', [UsersController::class, 'getusers']);
 Route::post('/register', [UsersController::class, 'register']);
 
 Route::group(['middleware' => 'check_auth'], function () {
-    
+   
     Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);
     Route::get('keyword/get', [KeywordsController::class, 'get']);
     Route::get('category/get', [CategoryController::class, 'get']);
     Route::get('thesis/get', [ThesisController::class, 'get']);
+    Route::get('thesisq/{id}', [ThesisController::class, 'getThesisById']);
     Route::get('dashboard/get', [PageController::class, 'dashboardData']);
     Route::get('videos/{videoname}', [ThesisController::class, 'getVideo']);
     Route::get('pdf/{pdfname}', [ThesisController::class, 'getPdf']);

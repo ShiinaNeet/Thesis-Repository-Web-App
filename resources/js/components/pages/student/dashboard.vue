@@ -6,7 +6,10 @@
             id="settings-wrapper"
             >
                 <template v-if="activeSetting === 'Dashboard'">
-                    <home_tbl />
+                    <home_tbl @thesisSelected="handleThesisSelected" />
+                </template>
+                <template v-if="activeSetting === 'ThesisView'">
+                    <thesis_tbl :selectedThesisId="selectedThesisId"/>
                 </template>
                 
             </div>
@@ -18,7 +21,7 @@
 <script>
 import navbar from '../../navbar.vue';
 import home from './home.vue';
-
+import thesisview from './thesisview.vue';
 
 export default {
     data () {
@@ -28,11 +31,13 @@ export default {
             thesis_mngt: ['Thesis','Keyword','Category','Author'],
             activeSetting: 'Dashboard',
             menu_open: true,
+            selectedThesisId: null,
         };
     },
     components: {
         navigation: navbar,
         home_tbl:home,
+        thesis_tbl:thesisview,
     },
     
     methods: {
@@ -42,6 +47,11 @@ export default {
         setSettingActive(setting) {
             this.$root.config.tblCurrPage = 1;
             this.activeSetting = setting;
+        },
+        handleThesisSelected(id) {
+            this.selectedThesisId = id;
+            console.log(id) // Capture emitted ID
+            this.activeSetting = 'ThesisView';
         },
     }
 }

@@ -14,6 +14,16 @@ use Illuminate\Support\Facades\Storage;
 
 class ThesisController extends Controller
 {
+    public function getThesisById($id){
+
+        $thesis = thesis::withTrashed()
+            ->with(['author', 'category', 'keywords'])
+            ->where('id','=',$id)
+            ->get();
+        $rs = SharedFunctions::success_msg('Success');
+        $rs['result'] = $thesis;
+        return response()->json($rs);
+    }
     public function delete(Request $request)
     {
         $rs = SharedFunctions::default_msg();

@@ -23,15 +23,10 @@ const app = createApp({
                 uploadSizeLimitInMBytes: 2,
                 minPasswordChars: 8,
                 strictPasswordUpdate: true,
-                contactEmail: 'drivingschool@wheelscapstone.site',
+                contactEmail: 'STICollege@balaya.sti.edu.ph',
                 contactNumberOne: '09493092321',
                 contactNumberTwo: '09123456789',
                 contactCountryCode: '+63',
-                calendar: {
-                    openTime: '08:00',
-                    closeTime: '17:00',
-                    days: [ 1, 2, 3, 4, 5, 6 ],
-                },
             },
         };
     },

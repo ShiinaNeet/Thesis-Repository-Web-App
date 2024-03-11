@@ -31,9 +31,10 @@ Route::get('/dashboard', [PageController::class, 'dashboard']);
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/getUsers', [UsersController::class, 'getusers']);
 Route::post('/register', [UsersController::class, 'register']);
+Route::post('/search', [ThesisController::class,'search']);
 
 Route::group(['middleware' => 'check_auth'], function () {
-   
+    Route::get('search', [PageController::class, 'thesisSearch']);
     Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);
     Route::get('keyword/get', [KeywordsController::class, 'get']);
@@ -43,6 +44,9 @@ Route::group(['middleware' => 'check_auth'], function () {
     Route::get('dashboard/get', [PageController::class, 'dashboardData']);
     Route::get('videos/{videoname}', [ThesisController::class, 'getVideo']);
     Route::get('pdf/{pdfname}', [ThesisController::class, 'getPdf']);
+  
+   
+
     Route::prefix('keyword')->group(function () {
         Route::post('delete', [KeywordsController::class, 'delete']);
         Route::post('disable', [KeywordsController::class, 'disable']);

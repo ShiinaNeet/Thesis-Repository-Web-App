@@ -50,7 +50,7 @@ export default {
         },
         handleThesisSelected(id) {
             this.selectedThesisId = id;
-            console.log(id) // Capture emitted ID
+          
             this.activeSetting = 'ThesisView';
         },
     }

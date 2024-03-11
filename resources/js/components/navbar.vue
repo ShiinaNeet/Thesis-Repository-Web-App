@@ -27,9 +27,9 @@
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"
-          @click="$root.redirectToPage('/Users')"
+          @click="$root.redirectToPage('/thesis/search')"
           >
-            <span class="text-white">Users</span>
+            <span class="text-white">Search</span>
           </VaButton>
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
@@ -45,6 +45,7 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
+          v-if="$root.auth && $root.auth.userType"
           class=""
           preset="secondary"
           hover-behavior="opacity"

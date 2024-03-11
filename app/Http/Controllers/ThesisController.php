@@ -10,10 +10,31 @@ use App\Models\keywords;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class ThesisController extends Controller
 {
+    public function search(Request $request){
+        $thesis = Thesis::withTrashed()
+            ->with(['author', 'category', 'keywords'])
+            ->where(function($query) use ($request) {
+                $query->where('title', 'like', '%' . $request->searchkeywords . '%')
+                    ->orWhere('category.name', 'like', '%' . $request->searchkeywords . '%')
+                    ->orWhere('author.name', 'like', '%' . $request->searchkeywords . '%')
+                    ->orWhere('keywords.keyword', 'like', '%' . $request->searchkeywords . '%');
+
+                // Dynamically add conditions for other columns if needed
+                $columns = Schema::getColumnListing('thesis');
+                foreach ($columns as $column) {
+                    $query->orWhere($column, 'like', '%' . $request->searchkeywords . '%');
+                }
+            })
+            ->get();
+        $rs = SharedFunctions::success_msg('Success');
+        $rs['result'] = $thesis;
+        return response()->json($rs);
+    }
     public function getThesisById($id){
 
         $thesis = thesis::withTrashed()
@@ -105,17 +126,17 @@ class ThesisController extends Controller
         
         if ($request->has('published_at')) {
             $publishedAt = $request->published_at;
+            // Convert date string to a format MySQL understands
+            $publishedAt = date('Y-m-d H:i:s', strtotime($publishedAt));
+        
             // Check if $publishedAt is not null and is a valid string
-            if (is_string($publishedAt) && !empty($publishedAt)) {
+            if ($publishedAt !== false) {
                 // Assuming $thesis is an instance of your Eloquent model
                 $thesis->published_at = $publishedAt;
                 // Save the changes to the database
-                
-                // Return success response or perform other actions
-                
             } else {
                 // Handle case where published_at is not in the correct format
-                return response()->json(['error' => 'Published at date is not in the correct format'], 400);
+                $rs = SharedFunctions::prompt_msg("Published at date is not in the correct format");
             }
         }
         
@@ -132,15 +153,15 @@ class ThesisController extends Controller
             $thesis->pdf = $path; 
         }
     
-        if (!$thesis->save()) {
-            return response()->json(SharedFunctions::prompt_msg("Error saving thesis"));
-        }
+        
 
         // Attach authors to the thesis
         if ($request->has('authors')) {
             $authors = json_decode($request->authors); // Decode JSON string into an array
             if (is_array($authors)) { // Check if it's an array
+                DB::table('thesis_author')->where('thesis_id', $thesis->id)->delete();
                 foreach ($authors as $authorId) {
+                    
                     DB::table('thesis_author')->insert([
                         'thesis_id' => $thesis->id,
                         'author_id' => $authorId
@@ -148,7 +169,8 @@ class ThesisController extends Controller
                 }
             } else {
                 // Handle case where authors is not in the correct format
-                return response()->json(['error' => 'Authors data is not in the correct format'], 400);
+               
+                $rs =   SharedFunctions::prompt_msg("Authors data is not in the correct format");
             }
         }
         
@@ -156,6 +178,7 @@ class ThesisController extends Controller
         if ($request->has('keywords')) {
             $keywords = json_decode($request->keywords); // Decode JSON string into an array
             if (is_array($keywords)) { // Check if it's an array
+                DB::table('thesis_keyword')->where('thesis_id', $thesis->id)->delete();
                 foreach ($keywords as $keywordId) {
                     DB::table('thesis_keyword')->insert([
                         'thesis_id' => $thesis->id,
@@ -164,13 +187,15 @@ class ThesisController extends Controller
                 }
             } else {
                 // Handle case where keywords is not an array
-                return response()->json(['error' => 'Keywords data is not in the correct format'], 400);
+                // return response()->json(['error' => 'Keywords data is not in the correct format'], 400);
+                $rs = SharedFunctions::prompt_msg("Keywords data is not in the correct format");
             }
         }
         
         if ($request->has('categories')) {
             $categories = json_decode($request->categories); // Decode JSON string into an array
             if (is_array($categories)) { // Check if it's an array
+                DB::table('thesis_category')->where('thesis_id', $thesis->id)->delete();
                 foreach ($categories as $categoryId) {
                     DB::table('thesis_category')->insert([
                         'thesis_id' => $thesis->id,
@@ -179,10 +204,13 @@ class ThesisController extends Controller
                 }
             } else {
                 // Handle case where categories is not an array
-                return response()->json(['error' => 'Categories data is not in the correct format'], 400);
+                // return response()->json(['error' => 'Categories data is not in the correct format'], 400);
+                $rs = SharedFunctions::prompt_msg("Categories data is not in the correct format");
             }
         }
-        
+        if (!$thesis->save()) {
+            return response()->json(SharedFunctions::prompt_msg("Error saving thesis"));
+        }
         $message = $new_help ? "Thesis created successfully" : "Thesis updated successfully";
         return response()->json(SharedFunctions::success_msg($message));
     }
@@ -278,6 +306,7 @@ class ThesisController extends Controller
         if ($request->has('categories')) {
             $categories = json_decode($request->categories); // Decode JSON string into an array
             if (is_array($categories)) { // Check if it's an array
+
                 foreach ($categories as $categoryId) {
                     DB::table('thesis_category')->insert([
                         'thesis_id' => $thesis->id,

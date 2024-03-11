@@ -34,6 +34,7 @@
                 userID: {!! json_encode($userID) !!},
                 userType: {!! json_encode($user_type) !!},
                
+               
             };
         </script>
 

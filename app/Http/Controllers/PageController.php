@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Auth;
 
 class PageController extends Controller
 {
+    public function thesisSearch(){
+        $data['css'] = ['global'];
+        return view('student.dashboard', $data);
+    }
+
     function index(){
         $data['css'] = ['global'];
         $user = Auth::user();

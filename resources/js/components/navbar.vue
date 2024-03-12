@@ -27,7 +27,7 @@
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"
-          @click="$root.redirectToPage('/thesis/search')"
+          @click="$root.redirectToPage('/search')"
           >
             <span class="text-white">Search</span>
           </VaButton>

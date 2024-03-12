@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 px-2.5 pb-2.5 bg-white rounded">
+    <div class="mx-5 mb-2 w-full px-2.5 pb-2.5 bg-white rounded">
         <va-data-table
         id="data-table"
         :items="thesisList"
@@ -10,7 +10,8 @@
         :filter="filter"
         @filtered="filtered = $event.items"
         animated
-
+        itemSize="250px"
+       
         >
             <template #headerAppend>
                 <tr class="table-crud__slot " >
@@ -44,8 +45,10 @@
             </template>
 
             <template #cell(title)="{ value }">
-                <h1 class="truncate"
-                >{{ value }}</h1>
+                <div class="truncate text-wrap"
+                >
+                    {{ value }}
+                </div>
             </template>
            
             <template #cell(published_at)="{ value }">

@@ -1,5 +1,21 @@
 <template>
-    <div class="mx-5 mb-2 px-2.5 pb-2.5 bg-white rounded">
+    <div class="fmx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">
+        
+        <div class="grid place-content-end">
+            <div class="flex flex-center justify-content py-2">
+                <VaButton
+                icon="add"
+                color="primary"
+                outlined
+                preset="secondary"
+                border-color="primary"
+                @click="createAccount.modal=true"
+                
+                >
+                    ADD
+                </VaButton>
+            </div>
+        </div>
         <va-data-table
         id="data-table"
         :items="accounts"
@@ -11,102 +27,73 @@
         @filtered="filtered = $event.items"
         animated
         striped
+        class=""
         >
             <template #headerAppend>
-                    <tr class="table-crud__slot">
+                    <tr class="table-crud__slot ">
                         <th
                         v-for="key in Object.keys(createAccount.data)"
                         :key="key"
-                        class="py-1 pr-1"
+                        class="py-0 pr-1 flex flex-col col-auto justify-center"
                         >
                             <va-input
-                            v-if="key.includes('userID') && !fmode"
+                            class="flex"
+                            v-if="key.includes('userID')"
                             v-model="filter"
                             placeholder="Search..."
-                            >
-                                <template #appendInner>
-                                    <va-icon
-                                    name="userID"
-                                    title="Add Account"
-                                    color="#C2C2C2"
-                                    @click="fmode = 1"
-                                    />
-                                </template>
-                            </va-input>
-                            <va-input
-                            v-if="key.includes('userID') && fmode"
-                            v-model="createAccount.data[key]"
-                            type="userID"
-                            :placeholder="acc.createNew[$root.arrayFind(acc.createNew, item => item.key === key)].label + ' *'"
-                            :error="createAccount.userIDEmpty"
-                            @keyup="createAccount.userIDEmpty = false"
-                            >
-                                <template #appendInner>
-                                    <va-icon
-                                    name="search"
-                                    title="Search Account"
-                                    color="#154EC1"
-                                    @click="fmode = 0"
-                                    />
-                                </template>
-                            </va-input>
-                            <va-select
-                            class="font-normal"
-                            v-if="key.includes('user_type') && fmode"
-                            v-model="createAccount.data[key]"
-                            :placeholder="acc.createNew[$root.arrayFind(acc.createNew, item => item.key === key)].label + ' *'"
-                            :options="key.includes('user_type') && acc.types.filter(item => item.label !== 'Student')"
-                            :error="createAccount.userTypeEmpty"
-                            @update:modelValue="createAccount.userTypeEmpty = false"
-                            :text-by="key.includes('user_type') && 'label'"
-                            :value-by="key.includes('user_type') && 'value'"
-                            clearable
-                            clearable-icon="backspace"
-                            />
-                            <va-button
-                            v-if="key.includes('id') && fmode"
-                            preset="primary"
-                            icon="person_add"
-                            :loading="createAccount.saved"
-                            :disabled="!createAccount.saved && (createAccount.data.userID == '' && createAccount.data.user_type == '')"
-                            @click="createAccount.saved = true, insertUpdateAccount('create')"
-                            >
-                                Add
-                            </va-button>
+                            />  
                         </th>
                     </tr>
             </template>
             <template #cell(user_type)="{ value }">
-                {{ acc.types[value].label }}
-            </template>
-            <template #cell(deleted_at)="{ value }">
-                <va-badge
-                :text="value ? 'Inactive' : 'Active'"
-                :color="value ? 'warning' : 'success'"
+                <va-badge 
+                :text="acc.types[value].label"
+                :color="acc.types[value].color"
                 />
+                <!-- {{ acc.types[value].label }} -->
+            </template>
+            <template #cell(email)="{ value }">
+                <div v-if="value === ''">
+                    <label>No Email Address</label>
+                </div>
+                
+                <div class="text-wrap" v-else>
+                    {{ value }} 
+                </div>
+                
             </template>
             <template #cell(created_at)="{ value }">
-                {{ formatDate(value, 'MMM. Do YYYY', 'Invalid Date') }}
+               {{ formatDate(value,'MMM. DD, YYYY','Invalid Date Format') }}
             </template>
             <template #cell(id)="{ rowData }">
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.id === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
                 title="Edit"
                 preset="plain"
                 icon="edit"
-                :disabled="rowData.deleted_at || rowData.id === $root.auth.userID ? true : false"
-                @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal"
+                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
+                @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal, console.log(editAccount.data)"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.id === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                title="Change Password"
+                preset="plain"
+                icon="password"
+                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
+                @click="editAccount.passwordModal = !editAccount.passwordModal"
+                />
+                <va-button
+                class="mb-2 mr-2 hover:opacity-[0.65!important]"
+                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
                 title="Toggle Status"
                 preset="plain"
                 :icon="rowData.deleted_at ? 'lock' : 'lock_open'"
-                :disabled="rowData.deleted_at || rowData.id === $root.auth.userID ? true : false"
+                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
                 @click="editAccount.data = { ...rowData }, editAccount.statusModal = !editAccount.statusModal"
                 />
+                
             </template>
 
             <template #bodyAppend>
@@ -128,36 +115,261 @@
             </template>
         </va-data-table>
     </div>
+    <!-- Create -->
+    <VaModal
+    v-model="createAccount.modal"
+    no-outside-dismiss
+    blur
+    :mobile-fullscreen=true
+    hide-default-actions
+    size="small"
+    close-button
+    >
+        <div class="w-full h-full">
+            <div class="header"> 
+                <h1>Add Account</h1>
+            </div>
+            <div 
+            v-if="createAccount.repasswordErrorMessage"
+            class="my-2 py-5 bg-red-300 rounded-lg text-black flex flex-cventer justify-center"
+            >
+                <h1 class="justify-center flex-center">Password Mismatch! Please Retry!</h1>
+            </div>
+            <div class="flex flex-col text-wrap py-5 text-red-600">
+                <VaInput
+                class="py-2"
+                v-model="createAccount.data.userID"
+                placeholder="User ID"
+                label="User ID"
+                preset="bordered"
+                type="number"
+                immediate-validation
+                :error="createAccount.userIDEmpty"
+                :error-messages="createAccount.userIDErrorMessage"
+                />
+                <VaInput
+                class="py-2"
+                v-model="createAccount.data.email"
+                placeholder="Email Addresss"
+                label="Email"
+                preset="bordered"
+                immediate-validation
+                :error="createAccount.emailEmpty"
+                :error-messages="createAccount.emailErrorMessage"
+                />
+                <VaSelect
+                class="py-2"
+                v-model="createAccount.data.user_type"
+                placeholder="User Role"
+                :options="userTypes"
+                preset="bordered"
+                value-by="id"
+                text-by="name"
+                />
+                <VaInput
+                class="py-2"
+                v-model="createAccount.data.password"
+                placeholder="Password"
+                label="Password"
+                preset="bordered"
+                immediate-validation
+                :error="createAccount.passwordEmpty"
+                :error-messages="createAccount.passwordErrorMessage[0]"
+                />
+                <VaInput
+                class="py-2"
+                immediate-validation
+                v-model="createAccount.data.repassword"
+                placeholder="Password"
+                label="Password"
+                preset="bordered"
+                :error="createAccount.repasswordEmpty"                
+                />
+            </div>
+            <div class="flex flex-center justify-center">
+                <VaButton
+                @click="createNewAccount(), createAccount.saved = true, createAccount.passwordMismatch = false"
+                class="mx-3"
+                :loading="createAccount.saved"
+                >
+                    Save
+                </VaButton>
+                <VaButton
+                @click="createAccount.modal = !createAccount.modal"
+                preset="primary"
+                class="mx-3"
+                >
+                    Cancel
+                </VaButton>
+            </div>
+        </div>
+    </VaModal>
+    <!-- Edit Modal -->
+    <VaModal
+    v-model="editAccount.modal"
+    no-outside-dismiss
+    blur
+    :mobile-fullscreen=true
+    hide-default-actions
+    size="small"
+    close-button
+    >
+        <div class="w-full h-full">
+            <div class="header"> 
+                <h1>Edit Account</h1>
+            </div>
+            <div class="flex flex-col text-wrap py-5 text-red-600">
+                <VaInput
+                class="py-2"
+                v-model="editAccount.data.userID"
+                placeholder="User ID"
+                label="User ID"
+                preset="bordered"
+                type="number"
+                immediate-validation
+                :error="editAccount.userIDEmpty"
+                :error-messages="editAccount.userIDErrorMessage"
+                />
+                <VaInput
+                class="py-2"
+                v-model="editAccount.data.email"
+                placeholder="Email Addresss"
+                label="Email"
+                preset="bordered"
+                immediate-validation
+                :error="editAccount.emailEmpty"
+                :error-messages="editAccount.emailErrorMessage"
+                />
+                <VaSelect
+                class="py-2"
+                v-model="editAccount.data.user_type"
+                placeholder="User Role"
+                :options="userTypes"
+                preset="bordered"
+                value-by="id"
+                text-by="name"
+                />
+            </div>
+            <div class="flex flex-center justify-center">
+                <VaButton
+                @click="editAccount.isLoading = true,UpdateAccount(), editAccount.saved = true, editAccount.passwordMismatch = false"
+                class="mx-3"
+                :loading="editAccount.isLoading"
+                
+                >
+                    Save
+                </VaButton>
+                
+                <VaButton
+                @click="editAccount.modal = !editAccount.modal"
+                preset="primary"
+                class="mx-3"
+                >
+                    Cancel
+                </VaButton>
+            </div>
+        </div>
+    </VaModal>
+    <!-- Password Modal -->
+    <VaModal
+    v-model="editAccount.passwordModal"
+    no-outside-dismiss
+    blur
+    :mobile-fullscreen=true
+    hide-default-actions
+    size="auto"
+    close-button
+    >
+        <div class="w-full h-full">
+            <div class="header"> 
+                <h1 
+                class="py-5 text-2xl uppercase flex-center justify-center"
+                >Generate New Password </h1>
+                <div
+                class=" w-full"
+                >
+                    <VaInput
+                    v-model="editAccount.data.userID"
+                    :placeholder="editAccount.data.userID"
+                    label="User ID"
+                    readonly
+                    preset="bordered"
+                    class="flex w-full pb-5"
+                    />
+                    <br />
+                    <VaInput
+                    v-model="editAccount.data.email"
+                    :placeholder="editAccount.data.email"
+                    label="Email"
+                    readonly
+                    preset="bordered"
+                    class="flex w-full"
+                    />
+                </div>
+                
+            </div>
+            <div class="flex flex-col text-wrap py-5 text-red-600">
+                
+            </div>
+            <div class="flex flex-center justify-center">
+                <VaButton
+                @click="editAccount.isLoading = true,GeneratePassword(), editAccount.saved = true, editAccount.passwordMismatch = false"
+                class="mx-3"
+                :loading="editAccount.isLoading"
+                
+                >
+                    Save
+                </VaButton>
+                
+                <VaButton
+                @click="editAccount.modal = !editAccount.modal"
+                preset="primary"
+                class="mx-3"
+                >
+                    Cancel
+                </VaButton>
+            </div>
+        </div>
+    </VaModal>
 </template>
 
 
 
 <script>
 
+import formatDate from '@/functions/formatdate.js';
 
+const newAccount = {
+    userID: null,
+    email: "",
+    user_type: "",
+    deleted_at: null,
+    created_at: formatDate(new Date().getTime(), 'YYYY-MM-DD HH:mm:ss'),
+    id: null,
+};
 
 export default {
     data () {
         const acc = {
             tblColumns: [
-                { key: "userID", label: "User ID", sortable: true },
-                { key: "user_type", label: "Type", width: 180, sortable: false },
-                { key: "deleted_at", label: "Status", width: 50, sortable: false },
-                { key: "created_at", label: "Register Date", width: 125, sortable: true },
-                { key: "id", label: "Action", width: 60, sortable: false }
+                { key: "userID", label: "User ID", width: "15%", sortable: true },
+                { key: "email", label: "Email", width: "55%", sortable: false },
+                { key: "user_type", label: "Role", width: "10%", sortable: false },
+                { key: "created_at", label: "Registered Date", width: "10%",  sortable: true },
+                { key: "id", label: "Action", width: "10%", sortable: false }
             ],
             createNew: [
-                { key: "userID", label: "UserID" },
-                { key: "user_type", label: "Type" },
-                { key: "deleted_at", label: "Status" },
-                { key: "created_at", label: "Register Date" },
-                { key: "id", label: "Action" },
+                { key: "userID", label: "User ID", width: "15%", sortable: true },
+                { key: "email", label: "Email", width: "55%", sortable: false },
+                { key: "user_type", label: "Role", width: "10%", sortable: false },
+                { key: "created_at", label: "Registered Date", width: "15%",  sortable: false },
+                { key: "actionid", label: "Action", width: "5%", sortable: false }
             ],
             types: [
-                { label: "Administrator", value: 0 },
-                { label: "Librarian", value: 1 },
-                { label: "AssistantLibrarian", value: 2 },
-                { label: "Student", value: 3 }
+                { label: "Administrator", value: 0, color: "warning" },
+                { label: "AssistantLibrarian", value: 1, color: "primary" },
+                { label: "Librarian", value: 2, color: "info"},
+                { label: "Student", value: 3, color: "success" }
             ]
         };
 
@@ -166,19 +378,46 @@ export default {
             accounts: [],
             account: {},
             createAccount: {
+                modal: false,
                 userIDEmpty: false,
+                emailEmpty: false,
                 userTypeEmpty: false,
+                passwordEmpty: false,
+                passwordMismatch: false,
+                emailErrorMessage:"",
+                passwordErrorMessage:"",
+                userIDErrorMessage:"",
+                user_typeErrorMessage:"",
+                repasswordErrorMessage:"",
                 saved: false,
+                data:{...newAccount}
             },
             editAccount: {
                 modal: false,
+                userIDEmpty: false,
+                emailEmpty: false,
+                userTypeEmpty: false,
+                passwordEmpty: false,
+                passwordMismatch: false,
+                emailErrorMessage:"",
+                passwordErrorMessage:"",
+                userIDErrorMessage:"",
+                user_typeErrorMessage:"",
+                repasswordErrorMessage:"",
                 statusModal: false,
                 saved: false,
+                isLoading:false,
                 data: {}
             },
             filtered: null,
             filter: "",
-            fmode: 1
+            fmode: 1,
+            userTypes: [
+                { id: 0, name: "Administrator" },
+                { id: 1, name: "Assistant Librarian" },
+                { id: 2, name: "Librarian" },
+                { id: 3, name: "Student" }
+            ],
         };
     },
     computed: {
@@ -227,46 +466,87 @@ export default {
                 this.$root.prompt(error.response.data.message);
             });
         },
-        insertUpdateAccount(method) {
-            if (method !== 'create' || method !== 'save') {
-                axios({
-                    method: 'POST',
-                    type: 'JSON',
-                    url: '/account/save',
-                    data: method === 'create' ? this.createAccount.data : (method === 'save' && this.editAccount.data)
-                }).then(response => {
-                    if (response.data.status == 1) {
-                        this.$root.prompt(response.data.text);
-                        method === 'create' ? (
-                            this.createAccount.data = { ...newAccount },
-                            this.createAccount.saved = false
-                        )
-                        : (method === 'save' && (
-                                this.editAccount.data = { ...newAccount },
-                                this.editAccount.modal = false,
-                                this.editAccount.saved = false
-                            )
-                        );
+        createNewAccount(){
+            this.createAccount.userIDEmpty= false,
+            this.createAccount.emailEmpty= false,
+            this.createAccount.userTypeEmpty= false,
+            this.createAccount.passwordEmpty= false,
+            this.createAccount.passwordMismatch= false,
+            axios({
+            method: 'POST',
+            type: 'JSON',
+            url: '/account/save',
+            data: this.createAccount.data,
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.createAccount.data = { ...newAccount },
+                    this.createAccount.saved = false
+                    
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+            }).catch(error => {
+                let resDataError = Object.keys(error.response.data.errors);
 
-                        this.getAccounts();
-                    } else this.$root.prompt(response.data.text);
-                }).catch(error => {
-                    if (method === 'create') {
-                        let resDataError = Object.keys(error.response.data.errors);
-
-                        if (resDataError.filter(key => key == 'userID').length) {
-                            this.createAccount.userIDEmpty = true;
-                        }
-                        if (resDataError.filter(key => key == 'user_type').length) {
-                            this.createAccount.userTypeEmpty = true;
-                        }
-                        this.$root.prompt(error.response.data.message);
+                resDataError.forEach(key => {
+                    if (key === 'userID') {
+                        this.createAccount.userIDEmpty = true;
+                        this.createAccount.userIDErrorMessage = error.response.data.errors.userID[0];
                     }
-
-                    method === 'create' ? this.createAccount.saved = false
-                    : (method === 'save' && (this.editAccount.saved = false));
+                    if (key === 'email') {
+                        this.createAccount.emailEmpty = true;
+                        this.createAccount.emailErrorMessage = error.response.data.errors.email[0];
+                    }
+                    if (key === 'user_type') {
+                       
+                        this.createAccount.user_typeErrorMessage = error.response.data.errors.user_type[0];
+                    }
+                    if (key === 'password') {
+                        this.createAccount.passwordEmpty = true;
+                        this.createAccount.passwordErrorMessage = error.response.data.errors.password;
+                    }
+                    if (key === 'repassword') {
+                        this.createAccount.passwordMismatch = true;
+                        this.createAccount.repasswordErrorMessage = error.response.data.errors.repassword;
+                    }
+                    this.createAccount.saved = false;    
                 });
-            } else this.$root.prompt();
+
+            }
+            );
+        },
+        UpdateAccount() {
+            this.editAccount.isLoading = true;
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/account/update',
+                data: this.editAccount.data
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.editAccount.data = { ...newAccount },
+                    this.editAccount.modal = false,
+                    this.editAccount.saved = false,
+                    this.editAccount.isLoading = false;
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+                this.editAccount.isLoading = false;
+            }).catch(error => {
+                let resDataError = Object.keys(error.response.data.errors);
+
+                if (resDataError.filter(key => key == 'userID').length) {
+                    this.createAccount.userIDEmpty = true;
+                }
+                if (resDataError.filter(key => key == 'user_type').length) {
+                    this.createAccount.userTypeEmpty = true;
+                }
+                this.$root.prompt(error.response.data.message);
+                
+
+                this.editAccount.isLoading = false;
+            });
+            
         },
         getAccounts() {
             axios({
@@ -276,11 +556,14 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.accounts = response.data.result;
+                    console.log(this.accounts);
                 } else this.$root.prompt(response.data.text);
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);
             });
-        }
+        },
+        formatDate,
+
     }
 }
 </script>

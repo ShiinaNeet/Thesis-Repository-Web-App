@@ -45,7 +45,14 @@ Route::group(['middleware' => 'check_auth'], function () {
     Route::get('videos/{videoname}', [ThesisController::class, 'getVideo']);
     Route::get('pdf/{pdfname}', [ThesisController::class, 'getPdf']);
   
-   
+    Route::prefix('account')->group(function () {
+        Route::post('delete', [UsersController::class, 'delete']);
+        Route::post('disable', [UsersController::class, 'disable']);
+        Route::post('save', [UsersController::class, 'save']);
+        Route::post('enable', [UsersController::class, 'enable']);
+        Route::post('update', [UsersController::class, 'update']);
+      
+    });
 
     Route::prefix('keyword')->group(function () {
         Route::post('delete', [KeywordsController::class, 'delete']);

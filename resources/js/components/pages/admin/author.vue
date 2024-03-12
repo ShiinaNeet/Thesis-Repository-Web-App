@@ -45,7 +45,10 @@
             </template>
 
             <template #cell(name)="{ value }">
-                {{ value }}
+                <div class="text-wrap">
+                    {{ value }}
+                </div>
+                
             </template>
            
             <template #cell(created_at)="{ value }">

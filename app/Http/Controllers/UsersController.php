@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Session as FacadesSession;
 
 class UsersController extends Controller
 {
-    //
     public function GetUsers(Request $request)
     {
         $rs = SharedFunctions::default_msg();
@@ -67,31 +66,65 @@ class UsersController extends Controller
         return response()->json($rs);
     }
 
-    public function save_account(Request $request)
+    public function save(Request $request)
     {
         $rs = SharedFunctions::default_msg();
         $this->validate($request, [
             'userID' => 'required|numeric',
             'user_type' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
+            'repassword' => 'required',
         ]);
-        $new_account = false;
-        if (isset($request->id)) $user = Users::find($request->id);
-        else { $user = new Users(); $new_account = true; }
+       
+
+        $user = new Users(); $new_account = true; 
         $password = $request->password;
-        $user->email = $request->email;
-        $user->user_type = $request->user_type;
-        if ($new_account) $user->password = bcrypt($password);
+        $repassword = $request->repassword;
+        if($password == $repassword){
+            $user->userID = $request->userID;
+            $user->email = $request->email;
+            $user->user_type = $request->user_type;
+            $user->password = bcrypt($password);
+        }
+        else {
+            $rs = SharedFunctions::prompt_msg("Invalid Account Credentials");
+            goto end;
+        }
 
  
         if ($user->save()) {
-            if ($new_account) {
-                $rs = SharedFunctions::success_msg("Account created");
-                
-            } else {
-                $rs = SharedFunctions::success_msg("Account saved");
-            }
+            $rs = SharedFunctions::success_msg("Account created");
+           
+            
         }
+        end: return response()->json($rs);
+    }
+
+    public function update(Request $request)
+    {
+        $rs = SharedFunctions::default_msg();
+        $this->validate($request, [
+            'userID' => 'required|numeric',
+            'email' => 'required',
+            'user_type' => 'required',
+        ]);
+       
+        $user = Users::find($request->id);
+        if(!$user){
+            $rs = SharedFunctions::prompt_msg("Cannot found the account with User ID: "+$request->id);
+        }
+        
+        $user->userID = $request->userID;
+        $user->email = $request->email;
+        $user->user_type = $request->user_type;
+       
+
+        if (!$user->save()) {
+            $rs = SharedFunctions::prompt_msg("Account Update Failed!");
+           
+        }
+        $rs = SharedFunctions::success_msg("Account saved");
         return response()->json($rs);
     }
 

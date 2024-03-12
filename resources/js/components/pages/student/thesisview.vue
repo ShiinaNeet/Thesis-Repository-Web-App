@@ -67,8 +67,8 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="downloads">
-                        <div class="flex ">
+                    <div class="downloads py-5">
+                        <div class="flex gap-2">
                             <VaButton
                             icon-right="arrow_forward"
                             icon-color="#ffffff50"
@@ -103,10 +103,12 @@
     <VaModal
     v-model="isPdfOpen"
     hide-default-actions
-    class="max-w-[1080px]"
+    size="large"
+    class="w-full"
+    close-button
     >
         <div
-        class="w-fit h-fit"
+        class="w-screen h-fit"
         >
             <iframe :src="thesis.pdf" class="w-screen h-screen"></iframe>
         </div>
@@ -121,7 +123,7 @@
         <div
         class="w-full h-fit"
         >
-            <video class="w-screen h-screen">
+            <video class="w-fit h-fit" controls>
                 <source :src="thesis.video" type="video/mp4">
             </video>
         </div>

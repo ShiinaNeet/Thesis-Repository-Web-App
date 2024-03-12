@@ -344,7 +344,7 @@ class ThesisController extends Controller
             return response()->file(storage_path('app/' . $pdfPath));
         } else {
             // If the video file does not exist, return a 404 response
-            return response()->json(['error' => 'pdf not found'], 404);
+            return response()->json(['text' => 'pdf not found'], 200);
         }
     }
 }

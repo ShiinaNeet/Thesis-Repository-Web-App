@@ -9,8 +9,11 @@
       </VaNavbarItem>
     </template>
     <template #right>
-      <div class="flex gap-0">
-        <VaNavbarItem class="hidden sm:block bg-inherit justify-center items-center ">
+      <div
+      v-if="$root.auth"
+      class="flex gap-0">
+        <VaNavbarItem
+         class="hidden sm:block bg-inherit justify-center items-center ">
           <VaButton
           class=""
           preset="secondary"
@@ -29,23 +32,12 @@
           :hover-opacity="0.4"
           @click="$root.redirectToPage('/search')"
           >
-            <span class="text-white">Search</span>
-          </VaButton>
-        </VaNavbarItem>
-        <VaNavbarItem class="hidden sm:block">
-          <VaButton
-          class=""
-          preset="secondary"
-          hover-behavior="opacity"
-          :hover-opacity="0.4"
-          @click="$root.redirectToPage('/Thesis')"
-          >
             <span class="text-white">Thesis</span>
           </VaButton>
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
-          v-if="$root.auth && $root.auth.userType"
+          v-if="$root.auth && $root.auth"
           class=""
           preset="secondary"
           hover-behavior="opacity"

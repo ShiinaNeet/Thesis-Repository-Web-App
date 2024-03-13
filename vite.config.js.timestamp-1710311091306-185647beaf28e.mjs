@@ -1,0 +1,22 @@
+// vite.config.js
+import { defineConfig } from "file:///C:/laragon/www/projects/ThesisRepo/ThesisRepo/Thesis-Repository-Web-App/node_modules/vite/dist/node/index.js";
+import laravel from "file:///C:/laragon/www/projects/ThesisRepo/ThesisRepo/Thesis-Repository-Web-App/node_modules/laravel-vite-plugin/dist/index.js";
+import vue from "file:///C:/laragon/www/projects/ThesisRepo/ThesisRepo/Thesis-Repository-Web-App/node_modules/@vitejs/plugin-vue/dist/index.mjs";
+var vite_config_default = defineConfig({
+  plugins: [
+    laravel({
+      input: ["./resources/css/app.css", "./resources/js/app.js"],
+      refresh: true
+    }),
+    vue()
+  ],
+  resolve: {
+    alias: {
+      vue: "vue/dist/vue.esm-bundler.js"
+    }
+  }
+});
+export {
+  vite_config_default as default
+};
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCJDOlxcXFxsYXJhZ29uXFxcXHd3d1xcXFxwcm9qZWN0c1xcXFxUaGVzaXNSZXBvXFxcXFRoZXNpc1JlcG9cXFxcVGhlc2lzLVJlcG9zaXRvcnktV2ViLUFwcFwiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9maWxlbmFtZSA9IFwiQzpcXFxcbGFyYWdvblxcXFx3d3dcXFxccHJvamVjdHNcXFxcVGhlc2lzUmVwb1xcXFxUaGVzaXNSZXBvXFxcXFRoZXNpcy1SZXBvc2l0b3J5LVdlYi1BcHBcXFxcdml0ZS5jb25maWcuanNcIjtjb25zdCBfX3ZpdGVfaW5qZWN0ZWRfb3JpZ2luYWxfaW1wb3J0X21ldGFfdXJsID0gXCJmaWxlOi8vL0M6L2xhcmFnb24vd3d3L3Byb2plY3RzL1RoZXNpc1JlcG8vVGhlc2lzUmVwby9UaGVzaXMtUmVwb3NpdG9yeS1XZWItQXBwL3ZpdGUuY29uZmlnLmpzXCI7aW1wb3J0IHsgZGVmaW5lQ29uZmlnIH0gZnJvbSAndml0ZSc7XG5pbXBvcnQgbGFyYXZlbCBmcm9tICdsYXJhdmVsLXZpdGUtcGx1Z2luJztcbmltcG9ydCB2dWUgZnJvbSAnQHZpdGVqcy9wbHVnaW4tdnVlJztcblxuZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHtcbiAgICBwbHVnaW5zOiBbXG4gICAgICAgIGxhcmF2ZWwoe1xuICAgICAgICAgICAgaW5wdXQ6IFsnLi9yZXNvdXJjZXMvY3NzL2FwcC5jc3MnLCAnLi9yZXNvdXJjZXMvanMvYXBwLmpzJ10sXG4gICAgICAgICAgICByZWZyZXNoOiB0cnVlLFxuICAgICAgICB9KSxcbiAgICAgICAgdnVlKCksXG4gICAgXSxcbiAgICByZXNvbHZlOiB7XG4gICAgICAgIGFsaWFzOiB7XG4gICAgICAgICAgICB2dWU6ICd2dWUvZGlzdC92dWUuZXNtLWJ1bmRsZXIuanMnLFxuICAgICAgICB9XG4gICAgfSxcbn0pOyJdLAogICJtYXBwaW5ncyI6ICI7QUFBcVosU0FBUyxvQkFBb0I7QUFDbGIsT0FBTyxhQUFhO0FBQ3BCLE9BQU8sU0FBUztBQUVoQixJQUFPLHNCQUFRLGFBQWE7QUFBQSxFQUN4QixTQUFTO0FBQUEsSUFDTCxRQUFRO0FBQUEsTUFDSixPQUFPLENBQUMsMkJBQTJCLHVCQUF1QjtBQUFBLE1BQzFELFNBQVM7QUFBQSxJQUNiLENBQUM7QUFBQSxJQUNELElBQUk7QUFBQSxFQUNSO0FBQUEsRUFDQSxTQUFTO0FBQUEsSUFDTCxPQUFPO0FBQUEsTUFDSCxLQUFLO0FBQUEsSUFDVDtBQUFBLEVBQ0o7QUFDSixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

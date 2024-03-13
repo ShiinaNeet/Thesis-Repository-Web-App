@@ -1,34 +1,29 @@
 <template>
     <div class="py-5 ">
-        <div class="h-[250px] px-55 lg:w-full sm:w-1/3 flex flex-center justify-center bg-slate-100">
-            <div class="flex w-full justify-center flex-col">
-                <div class="w-full flex flex-col ee">
-                    <!-- Input field -->
-                    <div class="relative w-full align-self-center flex flex-center flex-col">
-                        <div>
-                            <VaInput
-                            v-model="data.search"
+        <div class="h-[250px] lg:w-full sm:w-full flex justify-center bg-slate-100">
+            <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center">
+                <div class="w-full flex flex-col items-center">
+                    <div class="w-1/2 mb-3">
+                        <VaInput
+                            v-model="searchQuery"
                             placeholder="Search here"
                             label="Search Thesis here"
                             inner-label
-                            class="w-[500px]"
+                            class="w-full max-w-md"
                             color="Info"
                             currentColor="Success"
-                            
+                            @keyup.enter="searchThesis('title')"
                         />
-                        </div>
-                        <div class="flex justify-end py-3 text-blue-600 hover:underline"
-                        @click="$root.redirectToPage('/login')"
-                        >
-                           Can't find what you're looking for?
-                        </div>
                     </div>
-                    <!-- Paragraph positioned outside, aligned with the input -->
-                    
+                    <!-- Can't find what you're looking for? -->
+                    <div class="text-center text-blue-600 hover:underline">
+                        <span @click="$root.redirectToPage('/login')">Can't find what you're looking for?</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="bg-white-500 mx-5 w-full h-full">
+
+        <div class="bg-white-500 w-full h-full">
             <div class="flex flex-center justify-center flex-col">
                 <VaCard
                 square
@@ -75,7 +70,7 @@
                                 </div>
                             </div>
                             <!-- Place tags here -->
-                            <div class="w-fit pb-3 h-1/5">
+                            <div class="w-fit pb-3">
                                 <div class="flex flex-col md:flex-row items-center md:items-start gap-1">
                                     <div class="w-full md:w-auto flex-shrink-0 flex-center md:mr-2">
                                         <label class="justify-center flex-center whitespace-pre-line font-bold">Category:</label>
@@ -93,7 +88,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-fit pb-3 h-1/5">
+                            <div class="w-fit pb-3">
                                 <div class="flex flex-col md:flex-row items-center md:items-start gap-1">
                                     <div class="w-full md:w-auto flex-shrink-0 flex-center md:mr-2">
                                         <label class="justify-center flex-center whitespace-pre-line font-bold">Keywords:</label>
@@ -167,6 +162,7 @@ export default{
         return{
             showFullAbstract: false,
             truncatedAbstract: '',
+            searchQuery:"",
             data:{
                 search: "",
                 thesisList: [],
@@ -226,6 +222,22 @@ export default{
                     
                 }
             })
+        },
+        searchThesis(filt){
+            axios({
+                method: 'POST',
+                url: '/thesis/search',
+                type: 'JSON',
+                data: {searchQuery: this.searchQuery}
+            }).then(response => {
+                if(response.data.status == 1)
+                {
+                    this.data.thesisList = response.data.result;
+                    
+                }
+            }).catch(error => {
+                console.log("Error: " . error);
+            });
         },
         selectThesis(id) {
             this.$emit('thesisSelected', id);

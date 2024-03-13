@@ -1,5 +1,5 @@
 <template>
-    <div class="fmx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">
+    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded text-wrap">
         
         <div class="grid place-content-end">
             <div class="flex flex-center justify-content py-2">
@@ -73,16 +73,16 @@
                 preset="plain"
                 icon="edit"
                 :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
-                @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal, console.log(editAccount.data)"
+                @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
                 :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
-                title="Change Password"
+                title="Generate New Password"
                 preset="plain"
                 icon="password"
                 :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
-                @click="editAccount.passwordModal = !editAccount.passwordModal"
+                @click="editAccount.data = { ...rowData },editAccount.passwordModal = !editAccount.passwordModal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
@@ -287,9 +287,9 @@
                 >Generate New Password </h1>
                 <div
                 class=" w-full"
+                v-if="editAccount.isPasswordWindow == false"
                 >
                     <VaInput
-                    v-model="editAccount.data.userID"
                     :placeholder="editAccount.data.userID"
                     label="User ID"
                     readonly
@@ -298,13 +298,26 @@
                     />
                     <br />
                     <VaInput
-                    v-model="editAccount.data.email"
+                   
                     :placeholder="editAccount.data.email"
                     label="Email"
                     readonly
                     preset="bordered"
                     class="flex w-full"
                     />
+                </div>
+                <div v-else-if="editAccount.isPasswordWindow == true"
+                class="flex-center justify-center"
+                >
+                    <div class="text-wrap">
+                        <VaInput
+                        v-model="editAccount.newPassword"
+                        label="New Password"
+                        readonly
+                        preset="bordered"
+                        class="flex w-full"
+                        />
+                    </div>
                 </div>
                 
             </div>
@@ -313,16 +326,16 @@
             </div>
             <div class="flex flex-center justify-center">
                 <VaButton
-                @click="editAccount.isLoading = true,GeneratePassword(), editAccount.saved = true, editAccount.passwordMismatch = false"
+                @click="editAccount.isLoading = true, GeneratePassword(), editAccount.saved = true"
                 class="mx-3"
                 :loading="editAccount.isLoading"
-                
+                v-if="editAccount.isPasswordWindow == false"
                 >
-                    Save
+                    Generate
                 </VaButton>
                 
                 <VaButton
-                @click="editAccount.modal = !editAccount.modal"
+                @click="editAccount.passwordModal = !editAccount.passwordModal, editAccount.isPasswordWindow = false"
                 preset="primary"
                 class="mx-3"
                 >
@@ -393,12 +406,14 @@ export default {
                 data:{...newAccount}
             },
             editAccount: {
+                isPasswordWindow:false,
                 modal: false,
                 userIDEmpty: false,
                 emailEmpty: false,
                 userTypeEmpty: false,
                 passwordEmpty: false,
                 passwordMismatch: false,
+                newPassword:null,
                 emailErrorMessage:"",
                 passwordErrorMessage:"",
                 userIDErrorMessage:"",
@@ -480,9 +495,9 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.$root.prompt(response.data.text);
-                    this.createAccount.data = { ...newAccount },
-                    this.createAccount.saved = false
-                    
+                    this.createAccount.data = { ...newAccount };
+                    this.createAccount.saved = false;
+                    this.createAccount.modal = false;
                     this.getAccounts();
                 } else this.$root.prompt(response.data.text);
             }).catch(error => {
@@ -548,6 +563,35 @@ export default {
             });
             
         },
+        GeneratePassword() {
+            this.editAccount.isLoading = true;
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/account/generate_password',
+                data: this.editAccount.data,
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.editAccount.data = { ...newAccount },
+                    this.editAccount.isPasswordWindow = true;
+                    
+                    this.editAccount.saved = false,
+                    this.editAccount.isLoading = false;
+                    this.editAccount.newPassword =  response.data.result;
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+                this.editAccount.isLoading = false;
+            }).catch(error => {
+                let resDataError = Object.keys(error.response.data.errors);
+                // if (resDataError.filter(key => key == 'userID').length) {
+                //     this.createAccount.userIDEmpty = true;
+                // }
+                this.$root.prompt(error.response.data.message);
+                this.editAccount.isLoading = false;
+            });
+            
+        },
         getAccounts() {
             axios({
                 method: 'GET',
@@ -556,7 +600,7 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.accounts = response.data.result;
-                    console.log(this.accounts);
+                   
                 } else this.$root.prompt(response.data.text);
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);

@@ -16,21 +16,30 @@ use Illuminate\Support\Facades\Storage;
 class ThesisController extends Controller
 {
     public function search(Request $request){
-        $thesis = Thesis::withTrashed()
-            ->with(['author', 'category', 'keywords'])
-            ->where(function($query) use ($request) {
-                $query->where('title', 'like', '%' . $request->searchkeywords . '%')
-                    ->orWhere('category.name', 'like', '%' . $request->searchkeywords . '%')
-                    ->orWhere('author.name', 'like', '%' . $request->searchkeywords . '%')
-                    ->orWhere('keywords.keyword', 'like', '%' . $request->searchkeywords . '%');
-
-                // Dynamically add conditions for other columns if needed
-                $columns = Schema::getColumnListing('thesis');
-                foreach ($columns as $column) {
-                    $query->orWhere($column, 'like', '%' . $request->searchkeywords . '%');
-                }
-            })
-            ->get();
+    
+        //Trashed = Outdated Thesis. Make sure to create Cron Job for Outdated Thesis Checking BG
+        
+        if($request->title){
+            $thesis = Thesis::withTrashed()
+                ->where('title', 'like', '%' . $request->searchQuery . '%')
+                ->get();
+        }
+        if($request->author){
+            $thesis = Thesis::withTrashed()
+                ->where('title', 'like', '%' . $request->searchQuery . '%')
+                ->get();
+        }
+        if($request->category){
+            $thesis = Thesis::withTrashed()
+                ->where('title', 'like', '%' . $request->searchQuery . '%')
+                ->get();
+        }
+        if($request->keyword){
+            $thesis = Thesis::withTrashed()
+                ->where('title', 'like', '%' . $request->searchQuery . '%')
+                ->get();
+        }
+        
         $rs = SharedFunctions::success_msg('Success');
         $rs['result'] = $thesis;
         return response()->json($rs);

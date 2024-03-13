@@ -6,6 +6,7 @@ use App\Libraries\SharedFunctions;
 use App\Models\Users;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session as FacadesSession;
@@ -126,6 +127,37 @@ class UsersController extends Controller
         }
         $rs = SharedFunctions::success_msg("Account saved");
         return response()->json($rs);
+    }
+
+    public function generate_password(Request $request)
+    {
+        $rs = SharedFunctions::prompt_msg("");
+       
+        $this->validate($request,[
+            'userID' => ['required'],
+        ]);
+
+        $user = Users::where('userID', $request->userID)->first();
+        // dd($user);
+        if(!$user){
+            $rs = SharedFunctions::prompt_msg("Something went wrong. Please refresh and try again! Error: ID missing");
+            goto end;
+        }
+        // Generate password here
+        $randomString = Str::random(15);
+        // Assign
+        $user->password = bcrypt($randomString);
+
+        if($user->save()){
+            $result = $randomString;
+            
+            $rs = SharedFunctions::success_msg("Password Successfully Generated");
+            $rs['result'] = $result;
+            goto end;
+        }
+        $rs = SharedFunctions::prompt_msg("Save Failed. Please refresh and try again!");
+        
+        end: return response()->json($rs);
     }
 
     public function logout(){

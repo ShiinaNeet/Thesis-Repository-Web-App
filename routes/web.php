@@ -24,16 +24,17 @@ use Illuminate\Auth\Events\Logout;
 Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
 Route::get('/logout', [UsersController::class, 'logout']);
-Route::get('/dashboard', [PageController::class, 'dashboard']);
+
 
 
 // for auth
 Route::post('/login', [UsersController::class, 'login']);
 Route::post('/getUsers', [UsersController::class, 'getusers']);
 Route::post('/register', [UsersController::class, 'register']);
-Route::post('/search', [ThesisController::class,'search']);
+
 
 Route::group(['middleware' => 'check_auth'], function () {
+    Route::get('/dashboard', [PageController::class, 'dashboard']);
     Route::get('search', [PageController::class, 'thesisSearch']);
     Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);
@@ -51,6 +52,7 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('save', [UsersController::class, 'save']);
         Route::post('enable', [UsersController::class, 'enable']);
         Route::post('update', [UsersController::class, 'update']);
+        Route::post('generate_password', [UsersController::class, 'generate_password']);
       
     });
 
@@ -87,6 +89,7 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('disable', [ThesisController::class, 'disable']);
         Route::post('save', [ThesisController::class, 'save']);
         Route::post('enable', [ThesisController::class, 'enable']);
+        Route::post('search', [ThesisController::class, 'search']);
       
     });
     

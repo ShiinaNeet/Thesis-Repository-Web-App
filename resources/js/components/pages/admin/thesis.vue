@@ -1,5 +1,6 @@
 <template>
-    <div class="mx-5 mb-2 w-full px-2.5 pb-2.5 bg-white rounded">
+    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">
+                
         <va-data-table
         id="data-table"
         :items="thesisList"
@@ -11,7 +12,7 @@
         @filtered="filtered = $event.items"
         animated
         itemSize="250px"
-       
+        class="w-full"
         >
             <template #headerAppend>
                 <tr class="table-crud__slot " >
@@ -96,19 +97,20 @@
                 class="p-2 flex flex-row"
                 id="table-row-d h-1/2 w-2/3"
                 >
-                    <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg">
-                        <video class="h-1/2 w-full " controls>
+                    <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg flex flex-center justify-center">
+                        <div><video class="h-1/2 w-full " controls>
                             <source :src="rowData.video" type="video/mp4">       
-                        </video>    
+                        </video> </div>
+                           
                     </div>
                     <div class="w-1/2 max-w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">
                         <h1 class="text-2xl text-wrap break-all">
                          Title: {{ rowData.title }}   
                         </h1>
-                        <div class="w-fit py-3 pt-4">
+                        <div class="w-fit py-3 pt-4 overflow-hidden">
                             <div class="flex lg:flex-row flex-col gap-1">
                                 <h3 class="text-2xl">Author:</h3> 
-                            <span v-for="authore in rowData.author" class="flex items-center">
+                            <span v-for="authore in rowData.author" class="flex flex-wrap text-wrap items-center">
                                 <VaBadge
                                         :text="authore.name"
                                         color="info"

@@ -85,7 +85,7 @@
                         })"
                         :key="idx"
                         :active="isSettingActive(setting)"
-                        @click="setSettingActive(setting)"
+                        @click="setSettingActive(setting), menu_open = !menu_open"
                         >
                             <va-sidebar-item-content class="min-h-[20px!important] p-[7px!important]">
                                 <va-sidebar-item-title class="text-sm select-none">
@@ -119,7 +119,7 @@
                         })"
                         :key="idx"
                         :active="isSettingActive(setting)"
-                        @click="setSettingActive(setting)"
+                        @click="setSettingActive(setting), setting === 'Thesis' ? menu_open = !menu_open : ''"
                         >
                             <va-sidebar-item-content class="min-h-[20px!important] p-[7px!important]">
                                 <va-sidebar-item-title class="text-sm select-none">
@@ -131,7 +131,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden bg-white-500">
+            <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden bg-slate-700">
                 <div
                 id="settings-wrapper"
                 >

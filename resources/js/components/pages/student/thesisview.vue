@@ -9,7 +9,7 @@
             class="w-2/3 mx-auto justify-center px-5 bg-gray-800 shadow-xl h-full"
             >
                 <div
-                class="w-full flex-wrap py-10 px-5 h-full"
+                class="w-full flex-wrap py-10 px-5 h-full text-wraps"
                 >
                     <div class="">
                         <h1 class="py-1 text-2xl text-center"> {{ thesis.title }}</h1>

@@ -2,7 +2,7 @@
     $auth = \Illuminate\Support\Facades\Auth::class;
     $user_type = $userID = null;
     if ($auth::check()) {
-        $userID = $auth::user()->userID;
+        $userID = $auth::user()->id;
         $user_type = $auth::user()->user_type;
     }
 @endphp

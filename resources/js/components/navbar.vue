@@ -37,8 +37,7 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
-          v-if="$root.auth && $root.auth"
-          class=""
+          v-if="$root.auth && $root.auth.userID"
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"

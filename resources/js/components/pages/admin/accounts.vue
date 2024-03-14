@@ -45,11 +45,11 @@
                         </th>
                     </tr>
             </template>
-            <template #cell(user_type)="{ value }">
+            <template #cell(user_type)="{ value }"> 
                 <va-badge 
                 :text="acc.types[value].label"
                 :color="acc.types[value].color"
-                />
+                />          
                 <!-- {{ acc.types[value].label }} -->
             </template>
             <template #cell(email)="{ value }">
@@ -68,30 +68,30 @@
             <template #cell(id)="{ rowData }">
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.id === $root.auth.userID ? 'opacity-[0!important]' : ''"
                 title="Edit"
                 preset="plain"
                 icon="edit"
-                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
+                :disabled="rowData.deleted_at || rowData.id === $root.auth.userID ? true : false"
                 @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.id === $root.auth.userID ? 'opacity-[0!important]' : ''"
                 title="Generate New Password"
                 preset="plain"
                 icon="password"
-                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
+                :disabled="rowData.deleted_at || rowData.id === $root.auth.userID ? true : false"
                 @click="editAccount.data = { ...rowData },editAccount.passwordModal = !editAccount.passwordModal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.id === $root.auth.userID ? 'opacity-[0!important]' : ''"
                 title="Toggle Status"
                 preset="plain"
                 :icon="rowData.deleted_at ? 'lock' : 'lock_open'"
-                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
-                @click="editAccount.data = { ...rowData }, editAccount.statusModal = !editAccount.statusModal"
+                :disabled=" rowData.id === $root.auth.userID ? true : false"
+                @click="editAccount.data = { ...rowData }, editAccount.disableModal = !editAccount.disableModal"
                 />
                 
             </template>
@@ -344,6 +344,62 @@
             </div>
         </div>
     </VaModal>
+    <VaModal
+    v-model="editAccount.disableModal"
+    no-outside-dismiss
+    blur
+    :mobile-fullscreen=true
+    hide-default-actions
+    size="auto"
+    close-button
+    >
+        <div class="w-full h-full">
+            <div class="header pb-5"> 
+                <h1 
+                class="py-5 text-2xl uppercase flex-center justify-center"
+                >{{ editAccount.data.deleted_at ? "Enable" : "Disable" }} Account </h1>
+                <div
+                class=" w-full"
+                v-if="editAccount.isPasswordWindow == false"
+                >
+                    <VaInput
+                    :placeholder="editAccount.data.userID"
+                    label="User ID"
+                    readonly
+                    preset="bordered"
+                    class="flex w-full pb-5"
+                    />
+                    <br />
+                    <VaInput
+                   
+                    :placeholder="editAccount.data.email"
+                    label="Email"
+                    readonly
+                    preset="bordered"
+                    class="flex w-full"
+                    />
+                </div>
+            </div>
+            <div class="flex flex-center justify-center">
+                <VaButton
+                @click="editAccount.isLoading = true, handleButtonClick(), editAccount.saved = true"
+                class="mx-3"
+                :loading="editAccount.isLoading"
+                v-if="editAccount.isPasswordWindow == false"
+                >
+                    {{ editAccount.data.deleted_at ? "Enable" : "Disable" }}
+                </VaButton>
+                
+                <VaButton
+                @click="editAccount.disableModal = !editAccount.disableModal"
+                preset="primary"
+                class="mx-3"
+                >
+                    Cancel
+                </VaButton>
+            </div>
+        </div>
+    </VaModal>
 </template>
 
 
@@ -406,6 +462,7 @@ export default {
                 data:{...newAccount}
             },
             editAccount: {
+                disableModal: false,
                 isPasswordWindow:false,
                 modal: false,
                 userIDEmpty: false,
@@ -462,11 +519,20 @@ export default {
         }
     },
     methods: {
-        toggleAccountStatus() {
+        handleButtonClick() {
+            this.editAccount.saved = true;
+
+            if (this.editAccount.data.deleted_at === null) {
+                this.toggleAccountStatus();
+            } else {
+                this.enableAccountStatus();
+            }
+        },
+        enableAccountStatus() {
             axios({
                 method: 'POST',
                 type: 'JSON',
-                url: '/account/delete',
+                url: '/account/enable',
                 data: { id: this.editAccount.data.id }
             }).then(response => {
                 if (response.data.status == 1) {
@@ -474,6 +540,29 @@ export default {
                     this.editAccount.data = { ...newAccount };
                     this.editAccount.saved = false;
                     this.editAccount.statusModal = false;
+                    this.editAccount.isLoading = false;
+                    this.editAccount.disableModal = false;
+
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
+        toggleAccountStatus() {
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/account/disable',
+                data: { id: this.editAccount.data.id }
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.editAccount.data = { ...newAccount };
+                    this.editAccount.saved = false;
+                    this.editAccount.statusModal = false;
+                    this.editAccount.isLoading = false;
+                    this.editAccount.disableModal = false;
 
                     this.getAccounts();
                 } else this.$root.prompt(response.data.text);

@@ -17,7 +17,7 @@ class UsersController extends Controller
     {
         $rs = SharedFunctions::default_msg();
 
-        $users = Users::withTrashed()->get();
+        $users = Users::get();
         $rs = SharedFunctions::success_msg("");
         $rs["result"] = $users;
         return $rs;
@@ -164,39 +164,6 @@ class UsersController extends Controller
         Auth::logout();
         FacadesSession::flush();
         return redirect('/login');
-    }
-
-    public function disable(Request $request)
-    {
-        $rs = SharedFunctions::default_msg();
-        $this->validate($request, [
-            'id' => 'required|numeric',
-        ]);
-       
-        $user = Users::withTrashed()->find($request->id);
-        if(!$user){
-            $idnumber = $request->id;
-            $rs = SharedFunctions::prompt_msg("Cannot found the account with User ID: " . $idnumber);
-        }
-        if(!$user->delete()){ 
-            $rs = SharedFunctions::prompt_msg("Failed to Disable Account!");
-        }
-
-        $rs = SharedFunctions::success_msg("Account disabled");
-        return response()->json($rs);
-    }
-
-    public function enable(Request $request)
-    {
-        $rs = SharedFunctions::default_msg();
-        $this->validate($request, [
-            'id' => 'required|numeric',
-        ]);
-       
-        Users::withTrashed()->find($request->id)->restore();
-
-        $rs = SharedFunctions::success_msg("Account enabled");
-        return response()->json($rs);
     }
     
 }

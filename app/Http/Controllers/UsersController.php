@@ -13,11 +13,35 @@ use Illuminate\Support\Facades\Session as FacadesSession;
 
 class UsersController extends Controller
 {
+    public function disable(Request $request)
+    {
+        $rs = SharedFunctions::default_msg();
+        
+        $query = Users::find($request->id);
+
+        if ($query->delete()) {
+            $rs = SharedFunctions::success_msg('Account disabled');
+            
+        }
+
+       
+        return response()->json($rs);
+    }
+    public function enable(Request $request)
+    {
+        $rs = SharedFunctions::default_msg();
+        
+        Users::withTrashed()->find($request->id)->restore();
+
+        $rs = SharedFunctions::success_msg('Account enabled');
+        return response()->json($rs);
+    }
+
     public function GetUsers(Request $request)
     {
         $rs = SharedFunctions::default_msg();
 
-        $users = Users::get();
+        $users = Users::withTrashed()->get();
         $rs = SharedFunctions::success_msg("");
         $rs["result"] = $users;
         return $rs;

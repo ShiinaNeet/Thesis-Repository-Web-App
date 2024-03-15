@@ -59,6 +59,7 @@
                 title="Edit"
                 preset="plain"
                 icon="edit"
+                :disabled="rowData.deleted_at"
                 @click="editKeyword.data = { ...rowData }, editKeyword.modal = !editKeyword.modal"
                 />
                 <va-button
@@ -153,6 +154,7 @@
     v-model="editKeyword.modal"
     noOutsideDismiss
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">
@@ -202,6 +204,7 @@
     v-model="editKeyword.deleteModal"
     @cancel="editKeyword.data = { ...createKeyword.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">
@@ -216,7 +219,7 @@
                 </va-alert>
                 <va-input
                 type="textarea"
-                :model-value="editKeyword.data.keyword"
+                :modelValue="editKeyword.data.deleted_at === null ? 'ACTIVE' :  'DISABLED'"
                 class="w-full mb-2 force-noresize"
                 readonly
                 autosize
@@ -249,9 +252,10 @@
     v-model="editKeyword.statusModal"
     @cancel="editKeyword.data = { ...createKeyword.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
-            <div class="w-[410px] p-5">
+            <div class="w-full p-5">
                 <div class="va-title mb-3">
                     Keyword Status
                 </div>
@@ -263,6 +267,7 @@
                 readonly
                 autosize
                 />
+                
                 <div class="flex w-full gap-x-3 mt-[15px]">
                     <div class="flex w-1/2 justify-between">
                         <va-button
@@ -320,7 +325,7 @@ export default {
             tblColumns: [
 
                 { key: "keyword", label: "Keyword", width: "50%", sortable: true },
-                { key: "created_at", label: "Created On", width: "45", sortable: false },
+                { key: "created_at", label: "Created On", width: "45%", sortable: false },
                 { key: "id", label: "Action", width: "5%", sortable: false }
             ]
         };

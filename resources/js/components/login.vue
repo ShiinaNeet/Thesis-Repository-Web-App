@@ -20,8 +20,8 @@
                         type="number"
                         label="User ID"
                         class="w-full mb-2 bg-[rgba(255,255,255,0.45)]"
-                        :error="account.login.invalidUserID"
-                        :error-messages="account.login.invalidUserIDMessage"
+                        :error="account.isInvalid"
+                        :error-messages="account.invalidMessage[0]"
                         :disabled="account.isLoading"
                         immediate-validation
                         outline
@@ -31,10 +31,10 @@
                         :type="account.isPasswordVisible ? 'text' : 'password'"
                         label="Password"
                         class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
-                        immediate-validation
-                        :error="account.login.invalidPassword"
-                        :error-messages="account.login.invalidPasswordMessage"
+                        :error="account.isInvalid && (account.login.password === '' || account.login.password === null)"
+                        :error-messages="account.invalidMessage[0]"
                         :disabled="account.isLoading"
+                        immediate-validation
                         outline
                         >
                             <template #appendInner>
@@ -107,7 +107,6 @@
                         outline
                         :error="account.register.isValidUserID"
                         :error-messages="account.register.userIDError"
-                        immediate-validation
                         />
                     </div>
                     <div class="mt-1">
@@ -188,61 +187,6 @@
             </div>
         </div>
     </div>
-    <VaModal
-    v-model="forgotpassword.modal"
-    no-outside-dismiss
-    blur
-    :mobile-fullscreen=true
-    hide-default-actions
-    size="auto"
-    close-button
-    >
-        <div class="w-full h-full">
-            <div class="header pb-5"> 
-                <h1 
-                class="py-5 text-2xl uppercase flex-center justify-center"
-                >Forgot Password?</h1>
-                <div
-                class=" w-full"
-                >
-                    <VaInput
-                    v-model="forgotpassword.email"
-                    placeholder="email"
-                    label="Email"
-                    type="email"
-                    preset="bordered"
-                    class="flex w-full pb-5"
-                    />
-                    <br />
-                    <VaInput
-                    placeholder="forgotpassword.userID"
-                    label="User ID"
-                    type="number"
-                    preset="bordered"
-                    class="flex w-full"
-                    />
-                </div>
-            </div>
-            <div class="flex flex-center justify-center">
-                <VaButton
-                @click="editAccount.isLoading = true, handleButtonClick(), editAccount.saved = true"
-                class="mx-3"
-                :loading="editAccount.isLoading"
-                v-if="editAccount.isPasswordWindow == false"
-                >
-                    {{ editAccount.data.deleted_at ? "Enable" : "Disable" }}
-                </VaButton>
-                
-                <VaButton
-                @click="editAccount.disableModal = !editAccount.disableModal"
-                preset="primary"
-                class="mx-3"
-                >
-                    Cancel
-                </VaButton>
-            </div>
-        </div>
-    </VaModal>
 </template>
 
 <style>
@@ -302,10 +246,6 @@ export default {
                 login: {
                     userId: 0,
                     password: null,
-                    invalidUserID: false,
-                    invalidPassword: false,
-                    invalidUserIDMessage: "User ID cannot be 0",
-                    invalidPasswordMessage: "Password is required",
                 },
                 register: {
                     userId: 0,
@@ -326,10 +266,6 @@ export default {
                     },
                     saved: false,
                 },
-                forgotpassword:{
-                    modal: true,
-
-                },
             },
             activeWindow: 'Login',
             loginDelay: 250,
@@ -343,9 +279,6 @@ export default {
             this.account.isLoading = true;
             this.account.isValid = false;
             this.account.isInvalid = false;
-            if(this.account.register.terms.checked === true){
-                this.account.register.terms.isInvalid = false;
-            }
             if(this.account.register.terms.checked === false){
                 this.account.register.terms.isInvalid = true;
                 this.account.register.terms.invalidMessage = "Accepting the terms and Conditions are required."
@@ -437,6 +370,12 @@ export default {
                 }
             }).catch(error => {
                 // this.$root.prompt(error.response.data.message);
+                let dataerror = Object.keys(error.response.data.errors)
+                dataerror.forEach(key =>{
+                    if(key === "userID"){
+                        console.log("user id error");
+                    }
+                })
                 this.account.isLoading = false;
                 this.account.isInvalid = true;
             });

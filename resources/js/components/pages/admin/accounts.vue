@@ -1,7 +1,7 @@
 <template>
     <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded text-wrap">
         
-        <div class="grid place-content-end">
+        <div class="grid place-content-end ">
             <div class="flex flex-center justify-content py-2">
                 <VaButton
                 icon="add"
@@ -90,7 +90,6 @@
                 title="Toggle Status"
                 preset="plain"
                 :icon="rowData.deleted_at ? 'lock' : 'lock_open'"
-                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
                 @click="editAccount.data = { ...rowData }, editAccount.statusModal = !editAccount.statusModal"
                 />
                 
@@ -316,6 +315,8 @@
                         readonly
                         preset="bordered"
                         class="flex w-full"
+                        :success="editAccount.newpasswordSuccess"
+                        :messages="editAccount.newPasswordMessage"
                         />
                     </div>
                 </div>
@@ -344,6 +345,50 @@
             </div>
         </div>
     </VaModal>
+
+    <va-modal
+    v-model="editAccount.statusModal"
+    @cancel="editAccount.data = { ...editAccount.data = {...newAccount} }"
+    noPadding
+    size="auto"
+    >
+        <template #content>
+            <div class="w-full p-5">
+                <div class="va-title mb-3">
+                    Account Status
+                </div>
+                
+                <va-input
+                type="textarea"
+                :model-value="editAccount.data.userID"
+                class="w-full mb-2 force-noresize"
+                readonly
+                autosize
+                />
+                
+                <div class="flex w-full gap-x-3 mt-[15px]">
+                    <div class="flex w-1/2 justify-between">
+                        <va-button
+                        preset="secondary"
+                        @click="editAccount.data = { ...newAccount }, editAccount.statusModal = !editAccount.statusModal"
+                        >
+                            <p class="font-normal">Cancel</p>
+                        </va-button>
+                    </div>
+                    <div class="flex w-1/2 justify-between">
+                        <va-button
+                        :icon="!editAccount.data.deleted_at ? 'lock' : 'lock_open'"
+                        :loading="editAccount.saved"
+                        :disabled="editAccount.saved"
+                        @click="editAccount.saved = true,handleButtonClick()"
+                        >
+                            <p class="font-normal">{{ !editAccount.data.deleted_at ? "Deactivate" : "Activate" }}</p>
+                        </va-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </va-modal>
 </template>
 
 
@@ -403,7 +448,8 @@ export default {
                 user_typeErrorMessage:"",
                 repasswordErrorMessage:"",
                 saved: false,
-                data:{...newAccount}
+                data:{...newAccount},
+                
             },
             editAccount: {
                 isPasswordWindow:false,
@@ -414,15 +460,18 @@ export default {
                 passwordEmpty: false,
                 passwordMismatch: false,
                 newPassword:null,
+                newpasswordSuccess: false,
                 emailErrorMessage:"",
                 passwordErrorMessage:"",
                 userIDErrorMessage:"",
                 user_typeErrorMessage:"",
                 repasswordErrorMessage:"",
+                newPasswordMessage:"",
                 statusModal: false,
                 saved: false,
                 isLoading:false,
-                data: {}
+                data: {},
+                
             },
             filtered: null,
             filter: "",
@@ -462,6 +511,53 @@ export default {
         }
     },
     methods: {
+        handleButtonClick() {
+            this.editAccount.saved = true;
+
+            if (this.editAccount.data.deleted_at === null) {
+                this.toggleHelpStatus();
+            } else {
+                this.enableHelpStatus();
+            }
+        },
+        toggleHelpStatus() {
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/account/disable',
+                data: { id: this.editAccount.data.id }
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.editAccount.data = { ...newAccount };
+                    this.editAccount.statusModal = false;
+                    this.editAccount.saved = false;
+
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
+        enableHelpStatus() {
+            axios({
+                method: 'POST',
+                type: 'JSON',
+                url: '/account/enable',
+                data: { id: this.editAccount.data.id }
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.$root.prompt(response.data.text);
+                    this.editAccount.data = { ...newAccount };
+                    this.editAccount.statusModal = false;
+                    this.editAccount.saved = false;
+
+                    this.getAccounts();
+                } else this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
         toggleAccountStatus() {
             axios({
                 method: 'POST',
@@ -572,10 +668,11 @@ export default {
                 data: this.editAccount.data,
             }).then(response => {
                 if (response.data.status == 1) {
-                    this.$root.prompt(response.data.text);
+                    // this.$root.prompt(response.data.text);
                     this.editAccount.data = { ...newAccount },
                     this.editAccount.isPasswordWindow = true;
-                    
+                    this.editAccount.newpasswordSuccess = true;
+                    this.editAccount.newPasswordMessage = response.data.text;
                     this.editAccount.saved = false,
                     this.editAccount.isLoading = false;
                     this.editAccount.newPassword =  response.data.result;

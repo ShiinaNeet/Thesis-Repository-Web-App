@@ -140,7 +140,7 @@
                             color="info"
                             :href="thesis.video"
                             >
-                            Download video here
+                            Download Video here
                             </VaButton>
                            
                         </div>

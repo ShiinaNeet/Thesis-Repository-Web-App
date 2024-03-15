@@ -26,6 +26,7 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
+          v-if="$root.auth."
           class=""
           preset="secondary"
           hover-behavior="opacity"

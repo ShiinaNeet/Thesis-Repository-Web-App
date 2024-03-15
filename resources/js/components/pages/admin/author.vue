@@ -60,6 +60,7 @@
                 title="Edit"
                 preset="plain"
                 icon="edit"
+                :disabled="rowData.deleted_at"
                 @click="editKeyword.data = { ...rowData }, editKeyword.modal = !editKeyword.modal"
                 />
                 <va-button
@@ -154,6 +155,7 @@
     v-model="editKeyword.modal"
     noOutsideDismiss
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">
@@ -203,6 +205,7 @@
     v-model="editKeyword.deleteModal"
     @cancel="editKeyword.data = { ...createKeyword.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">
@@ -217,7 +220,8 @@
                 </va-alert>
                 <va-input
                 type="textarea"
-                :model-value="editKeyword.data.author"
+                label="Status"
+                :modelValue="editKeyword.data.deleted_at === null ? 'ACTIVE' :  'DISABLED'"
                 class="w-full mb-2 force-noresize"
                 readonly
                 autosize
@@ -250,6 +254,7 @@
     v-model="editKeyword.statusModal"
     @cancel="editKeyword.data = { ...createKeyword.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">
@@ -259,7 +264,7 @@
                 
                 <va-input
                 type="textarea"
-                :model-value="editKeyword.data.author"
+                :model-value="editKeyword.data.name"
                 class="w-full mb-2 force-noresize"
                 readonly
                 autosize
@@ -320,8 +325,8 @@ export default {
         const keyconfig = {
             tblColumns: [
                 { key: "name", label: "Author", width: "50%", sortable: true },
-                {key: "created_at", label: "Created On", width: 125, sortable: true },
-                { key: "id", label: "Action", width: 60, sortable: false }
+                {key: "created_at", label: "Created On", width: "45%", sortable: true },
+                { key: "id", label: "Action", width: "5%", sortable: false }
             ]
         };
 

@@ -174,68 +174,81 @@ class ThesisController extends Controller
             }
         }
     
-        if ($thesis->save()) {
-            if ($request->has('authors')) {
-                $authors = json_decode($request->authors);
-                if (is_array($authors)) {
-                    if (!$new_help) {
-                        DB::table('thesis_author')->where('thesis_id', $thesis->id)->delete();
-                    }
-                    foreach ($authors as $authorId) {
-                        DB::table('thesis_author')->insert([
-                            'thesis_id' => $thesis->id,
-                            'author_id' => $authorId
-                        ]);
-                    }
-                } else {
-                    return response()->json(SharedFunctions::prompt_msg("Authors data is not in the correct format"), 400);
-                }
+        try {
+            DB::beginTransaction();
+    
+            // Delete existing related records only if updating an existing thesis
+            if ($new_help === false) {
+                DB::table('thesis_author')->where('thesis_id', $thesis->id)->delete();
+                DB::table('thesis_keyword')->where('thesis_id', $thesis->id)->delete();
+                DB::table('thesis_category')->where('thesis_id', $thesis->id)->delete();
             }
-            
-            if ($request->has('keywords')) {
-                $keywords = json_decode($request->keywords); // Decode JSON string into an array
-                if (is_array($keywords)) { // Check if it's an array
-                    if(isset($request->id))
-                    {
-                        DB::table('thesis_keyword')->where('thesis_id', $thesis->id)->delete();
+    
+            if ($thesis->save()) {
+                // Insert authors
+                if ($request->has('authors')) {
+                    $authors = json_decode($request->authors, true);
+                    if (is_array($authors)) {
+                        $authorData = [];
+                        foreach ($authors as $authorId) {
+                            $authorData[] = [
+                                'thesis_id' => $thesis->id,
+                                'author_id' => $authorId
+                            ];
+                        }
+                        DB::table('thesis_author')->insert($authorData);
+                    } else {
+                        return response()->json(SharedFunctions::prompt_msg("Authors data is not in the correct format"), 400);
                     }
-                  
-                    foreach ($keywords as $keywordId) {
-                        DB::table('thesis_keyword')->insert([
-                            'thesis_id' => $thesis->id,
-                            'keyword_id' => $keywordId
-                        ]);
-                    }
-                } else {
-                    // Handle case where keywords is not an array
-                    // return response()->json(['error' => 'Keywords data is not in the correct format'], 400);
-                    $message = SharedFunctions::prompt_msg("Keywords data is not in the correct format");
                 }
-            }
-            
-            if ($request->has('categories')) {
-                $categories = json_decode($request->categories); // Decode JSON string into an array
-                if (is_array($categories)) { // Check if it's an array
-                    if (!$new_help) {
-                        DB::table('thesis_category')->where('thesis_id', $thesis->id)->delete();
+    
+                // Insert keywords
+                if ($request->has('keywords')) {
+                    $keywords = json_decode($request->keywords , true);
+                    if (is_array($keywords)) {
+                        $keywordData = [];
+                        foreach ($keywords as $keywordId) {
+                            $keywordData[] = [
+                                'thesis_id' => $thesis->id,
+                                'keyword_id' => $keywordId
+                            ];
+                        }
+                        if (!empty($keywordData)) {
+                            DB::table('thesis_keyword')->insert($keywordData);
+                        }
+                    } else {
+                        return response()->json(SharedFunctions::prompt_msg("Keywords data is not in the correct format"), 400);
                     }
-                    foreach ($categories as $categoryId) {
-                        DB::table('thesis_category')->insert([
-                            'thesis_id' => $thesis->id,
-                            'category_id' => $categoryId
-                        ]);
-                    }
-                } else {
-                    // Handle case where categories is not an array
-                    // return response()->json(['error' => 'Categories data is not in the correct format'], 400);
-                    $message = SharedFunctions::prompt_msg("Categories data is not in the correct format");
                 }
+    
+                // Insert categories
+                if ($request->has('categories')) {
+                    $categories = json_decode($request->categories, true);
+                    if (is_array($categories)) {
+                        $categoryData = [];
+                        foreach ($categories as $categoryId) {
+                            $categoryData[] = [
+                                'thesis_id' => $thesis->id,
+                                'category_id' => $categoryId
+                            ];
+                        }
+                        DB::table('thesis_category')->insert($categoryData);
+                    } else {
+                        return response()->json(SharedFunctions::prompt_msg("Categories data is not in the correct format"), 400);
+                    }
+                }
+    
+                DB::commit();
+                $message = $new_help ? "Thesis updated successfully" : "Thesis created successfully";
+                $rs = SharedFunctions::success_msg($message);
+                
+                return response()->json($rs);
+            } else {
+                throw new \Exception("Error saving thesis");
             }
-            $message = $new_help ? "Thesis updated successfully" : "Thesis created successfully";
-           
-            return response()->json($message);
-        } else {
-            return response()->json(SharedFunctions::prompt_msg("Error saving thesis"), 500);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(SharedFunctions::prompt_msg($e->getMessage()), 500);
         }
     }
     

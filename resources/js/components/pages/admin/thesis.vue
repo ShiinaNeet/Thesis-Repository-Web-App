@@ -98,9 +98,12 @@
                 id="table-row-d h-1/2 w-2/3"
                 >
                     <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg flex flex-center justify-center">
-                        <div><video class="h-1/2 w-full " controls>
-                            <source :src="rowData.video" type="video/mp4">       
-                        </video> </div>
+                        <div>
+                            <video class="h-1/2 w-full " v-if="rowData.video !== null" controls>
+                                <source :src="rowData.video" type="video/mp4">       
+                            </video> 
+                            <div class="h-1/2 w-full flex flex-center justify-center">No video</div>
+                        </div>
                            
                     </div>
                     <div class="w-1/2 max-w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">

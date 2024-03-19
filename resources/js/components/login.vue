@@ -31,6 +31,7 @@
                         :type="account.isPasswordVisible ? 'text' : 'password'"
                         label="Password"
                         class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
+                        
                         :error="account.isInvalid && (account.login.password === '' || account.login.password === null)"
                         :error-messages="account.invalidMessage[0]"
                         :disabled="account.isLoading"

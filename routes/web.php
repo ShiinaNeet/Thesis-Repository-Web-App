@@ -25,7 +25,7 @@ Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
 Route::get('/logout', [UsersController::class, 'logout']);
 
-
+Route::get('thesis/search', [ThesisController::class, 'search']);
 
 // for auth
 Route::post('/login', [UsersController::class, 'login']);
@@ -89,7 +89,7 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('disable', [ThesisController::class, 'disable']);
         Route::post('save', [ThesisController::class, 'save']);
         Route::post('enable', [ThesisController::class, 'enable']);
-        Route::post('search', [ThesisController::class, 'search']);
+        // Route::post('searchq', [ThesisController::class, 'search']);
       
     });
     

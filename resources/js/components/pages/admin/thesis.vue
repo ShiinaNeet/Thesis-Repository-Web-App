@@ -489,12 +489,13 @@
                     label="Published date *"
                     preset="bordered"
                     class="w-full mb-2"
+                    :format="formatDatePicker"
                     :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
                     :error="editThesis.abstractEmpty"
                     :error-messages="'The publish date field is required.'"
                     @keyup="editThesis.publishedDateEmpty = false"
                     />
-                    <input type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
+                    <input type="file" id="video"  ref="videoInput" accept="video/*" @onchange="uploadFile"> {{ editThesis.video }}</input>
                     <input type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
                     <div class="flex w-full gap-x-3 mt-[15px]">
                         <div class="flex w-1/2 justify-between">
@@ -749,9 +750,13 @@ export default {
         },
         updateCategoryArr(method, idx) {
             if (method !== 'create' || method !== 'save') {
-                method === 'create' ? (this.createThesis.data.category = this.createThesis.data.category.filter((v) => v !== this.createThesis.data.category[idx]))
-                    : (method === 'save' && (this.editThesis.data.category = this.editThesis.data.category.filter((v) => v !== this.editThesis.data.category[idx])));
-                
+                if(method === 'create') (this.createThesis.data.category = this.createThesis.data.category.filter((v) => v !== this.createThesis.data.category[idx]))
+                else { 
+                    if (method === 'save'){
+                        this.editThesis.data.category =
+                        this.editThesis.data.category.filter ((v) => v !== this.editThesis.data.category[idx]);
+                    }
+                }
             }
             else
                 this.$root.prompt();
@@ -850,9 +855,11 @@ export default {
                     formData.append('id', this.editThesis.data.id);
                     formData.append('title', this.editThesis.data.title);
                     formData.append('abstract', this.editThesis.data.abstract);
-                    formData.append('published_at', this.editThesis.data.published_at);
                     let videofile = this.$refs.videoInput.files[0];
                     let pdffile = this.$refs.pdfInput.files[0];
+                    var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
+                    formData.append('published_at',newDate);
+                  
                     formData.append('authors', JSON.stringify(this.editThesis.data.author));
                     formData.append('categories', JSON.stringify(this.editThesis.data.category));
                     formData.append('keywords', JSON.stringify(this.editThesis.data.keywords));
@@ -904,6 +911,8 @@ export default {
                 }).catch(error => {
                     // this.$root.prompt(error.response.data.message);
                     this.editThesis.saved = false;
+                    this.editThesis.modal = false;
+                    this.getThesis();
                     let resDataError = Object.keys(error.response.data.errors);
                     if (resDataError.filter(key => key == 'message').length > 0) {
                         method === 'create' ? (this.createThesis.data = { ...newThesis },
@@ -1001,6 +1010,9 @@ export default {
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);
             });
+        },
+        formatDatePicker(date) {
+            return this.formatDate(date, 'MMMM DD, YYYY', 'Invalid Date');
         },
         formatDate,
     },

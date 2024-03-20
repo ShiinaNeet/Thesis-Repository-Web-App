@@ -18,8 +18,13 @@ return new class extends Migration
             $table->string('title');
             $table->text('abstract');
             $table->date('published_at')->nullable();
+            $table->string('categories');
+            $table->string('keywords');
+            $table->string('authors');
             $table->softDeletes();
             $table->timestamps();
+
+            
         });
     }
 

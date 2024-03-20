@@ -233,7 +233,7 @@
                                         class="mr-1 mb-1"
                                         square
                                         closeable
-                                        @update:modelValue="updateRequirementsArr('create', idx)"
+                                        @update:modelValue="updateRequirementsArr('create', value)"
                                     >
                                         {{ req.keyword }}
                                     </va-chip>
@@ -242,7 +242,7 @@
                             <VaSelect
                             class="w-1/2"
                             requiredMark
-                            v-model="createThesis.data.category"
+                            v-model="createThesis.data.categories"
                             label="Category to attach"
                             :options="categoryList"
                             text-by="category"
@@ -262,7 +262,7 @@
                                     class="mr-1 mb-1"
                                     square
                                     closeable
-                                    @update:modelValue="updateCategoryArr('create', idx)"
+                                    @update:modelValue="updateCategoryArr('create', value)"
                                     >
                                         {{ reqw.category }}
                                     </va-chip>
@@ -272,7 +272,7 @@
                             class="w-full"
                             requiredMark
                             multiple
-                            v-model="createThesis.data.author"
+                            v-model="createThesis.data.authors"
                             label="Author"
                             :options="authorList"
                             text-by="name"
@@ -406,14 +406,14 @@
                                     class="mr-1 mb-1"
                                     square
                                     closeable
-                                    @update:modelValue="updateRequirementsArr('save', idx)"
+                                    @update:modelValue="updateRequirementsArr('save', idx), editThesis.key = 12"
                                 >
                                     {{ reqqs.keyword }}
                                 </va-chip>
                             </template>
                         </VaSelect>
                         <VaSelect
-                        v-model="editThesis.data.category"
+                        v-model="editThesis.data.categories"
                         :options="categoryList"
                         text-by="category"
                         value-by="id"
@@ -436,16 +436,17 @@
                                 class="mr-1 mb-1"
                                 square
                                 closeable
-                                @update:modelValue="updateCategoryArr('save', idx)"
+                                @update:modelValue="updateCategoryArr('save', idx), editThesis.cate = 12"
                                 >
                                
                                 {{ ww.category }}
+                             
                                 </VaChip>
 
                             </template>
                         </VaSelect>
                         <VaSelect
-                        v-model="editThesis.data.author"
+                        v-model="editThesis.data.authors"
                         :options="authorList"
                         text-by="name"
                         value-by="id"
@@ -456,21 +457,20 @@
                         searchable
                         clearable
                         clearable-icon="backspace"
-                        @update:modelValue="editThesis.authorEmpty = false"
+                        @update:modelValue="editThesis.authr = 1"
                         >
                             <template #content="{ value }">
                                 <VaChip
-                                v-for="(wwwwq, id) in value"
+                                v-for="(author, id) in value"
                                 :key="idx"
                                 size="small"
                                 color="secondary"
                                 class="mr-1 mb-1"
                                 square
                                 closeable
-                                @update:modelValue="updateAuthorsArr('save', id)"
                                 >
-                                   {{ wwwwq.name }}
-                                   {{ console.log(value) }}
+                                   {{ author.name }}
+                                  
                                 </VaChip>
                             </template>
                         </VaSelect>
@@ -648,11 +648,11 @@ const now = () => new Date();
 const newThesis = {
     title:null,
     abstract:null,
-    published_at: formatDate(now()),
+    published_at: formatDate(now(),'yyyy-MM-dd'),
     id: null,
-    category:[], 
+    categories:[], 
     keywords:[],
-    author:[],
+    authors:[],
 };
 console.log(now());
 export default {
@@ -699,7 +699,10 @@ export default {
                 PublishedDateEmpty: false,
                 keywordsEmpty: false,
                 saved: false,
-                data: {}
+                data: {},
+                cate: 0,
+                key: 0,
+                authr:0,
             },
             activePreviewRow: null,
             filtered: null,
@@ -720,46 +723,65 @@ export default {
         this.getAuthor();
     },
     methods: {
-        updateRequirementsArr(method, idx) {
+        updateKeywordIds() {
+            if (Array.isArray(this.editThesis.data.keywords)) {
+            this.editThesis.data.keywords = this.editThesis.data.keywords.map(keywords => keywords.id);
+            }
+            
+        },
+        updateCategoryIds() {
+            if (Array.isArray(this.editThesis.data.categories)) {
+            this.editThesis.data.categories = this.editThesis.data.categories.map(categories => categories.id);
+            }
+           
+        },
+        updateAuthorIds() {
+            console.log(this.editThesis.data.authors);
+            if (Array.isArray(this.editThesis.data.authors)) {
+            this.editThesis.data.authors = this.editThesis.data.authors.map(authors => authors.id);
+            }
+            
+        },
+        updateRequirementsArr(method, selectedKeywords) {
             if (method !== 'create' || method !== 'save') {
                 method === 'create' ? (this.createThesis.data.keywords =
-                    this.createThesis.data.keywords.filter((v) => v !== this.createThesis.data.keywords[idx]))
-                    : (method === 'save' && (this.editThesis.data.keywords =
-                        this.editThesis.data.keywords.filter((v) => v !== this.editThesis.data.keywords[idx])));
-                console.log(this.createThesis.data.keywords);
-                console.log(this.editThesis.data.keywords);
+                    this.createThesis.data.keywords.filter((v) => v !== this.createThesis.data.keywords[selectedKeywords]))
+                    : (method === 'save' && (  this.editThesis.data.authors =
+                        this.editThesis.data.keywords.filter((v) => v !== this.editThesis.data.keywords[selectedKeywords])));
+                   
             }
             else
+                this.editThesis.key = 1;
                 this.$root.prompt();
         },
-        updateAuthorsArr(method, idx) {
+        updateAuthorsArr(method, selectedAuthors) {
             if (method !== 'create' || method !== 'save') {
                 if(method === 'create') {
-                    this.createThesis.data.author =
-                        this.createThesis.data.author.filter((v) => v !== this.createThesis.data.author[idx]);
-                    console.log(this.createThesis.data.author);
+                    this.createThesis.data.authors =
+                        this.createThesis.data.authors.filter((v) => v !== this.createThesis.data.authors[selectedAuthors]);
+                    console.log(this.createThesis.data.authors);
                  }
                  else{
-                    if(method === 'save') {
-                        this.editThesis.data.author = 
-                        this.editThesis.data.author.filter((v) => v !== this.editThesis.data.author[idx]);
-                        console.log(this.editThesis.data.author);
-                  }
-            }
+                    
+                    this.editThesis.data.authors = selectedAuthors.map(author => author.id);
+                         this.editThesis.authr = 1;
+                }
                
             }
             else
                 this.$root.prompt();
         },
-        updateCategoryArr(method, idx) {
+        updateCategoryArr(method, selectedCategories) {
             if (method !== 'create' || method !== 'save') {
-                if(method === 'create') (this.createThesis.data.category = this.createThesis.data.category.filter((v) => v !== this.createThesis.data.category[idx]))
+                if(method === 'create') (this.createThesis.data.categories = this.createThesis.data.categories.filter((v) => v !== this.createThesis.data.category[idx]))
                 else { 
                     if (method === 'save'){
-                        this.editThesis.data.category =
-                        this.editThesis.data.category.filter ((v) => v !== this.editThesis.data.category[idx]);
+                        this.editThesis.data.categories =
+                        this.editThesis.data.categories.filter((v) => v !== this.editThesis.data.categories[selectedCategories]);
+                        this.editThesis.cate = 1;
                     }
                 }
+               
             }
             else
                 this.$root.prompt();
@@ -848,8 +870,8 @@ export default {
                     formData.append('published_at', this.createThesis.data.published_at);
                     let videofile = this.$refs.videoInput.files[0];
                     let pdffile = this.$refs.pdfInput.files[0];
-                    formData.append('authors', JSON.stringify(this.createThesis.data.author));
-                    formData.append('categories', JSON.stringify(this.createThesis.data.category));
+                    formData.append('authors', JSON.stringify(this.createThesis.data.authors));
+                    formData.append('categories', JSON.stringify(this.createThesis.data.categories));
                     formData.append('keywords', JSON.stringify(this.createThesis.data.keywords));
                     formData.append('video', videofile);
                     formData.append('pdf', pdffile);
@@ -861,10 +883,24 @@ export default {
                     let videofile = this.$refs.videoInput.files[0];
                     let pdffile = this.$refs.pdfInput.files[0];
                     var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
-                    formData.append('published_at',newDate);
-                  
-                    formData.append('authors', JSON.stringify(this.editThesis.data.author));
-                    formData.append('categories', JSON.stringify(this.editThesis.data.category));
+                    formData.append('published_at',newDate); 
+                   
+                    if(this.editThesis.key == 0)
+                    {
+                        this.updateKeywordIds();
+                    }
+                    if(this.editThesis.authr == 0)
+                    {
+                        this.updateAuthorIds();
+                    }
+                    if(this.editThesis.cate == 0)
+                    {
+                        this.updateCategoryIds();
+                    }
+                   
+                    
+                    formData.append('authors', JSON.stringify(this.editThesis.data.authors));
+                    formData.append('categories', JSON.stringify(this.editThesis.data.categories));
                     formData.append('keywords', JSON.stringify(this.editThesis.data.keywords));
                     formData.append('video', videofile);
                     formData.append('pdf', pdffile);
@@ -1015,7 +1051,8 @@ export default {
             });
         },
         formatDatePicker(date) {
-            return this.formatDate(date, 'MMMM DD, YYYY', 'Invalid Date');
+            return this.formatDate(date, 'YYYY-MM-DD', 'Invalid Date');
+           
         },
         formatDate,
     },

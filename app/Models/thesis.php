@@ -12,17 +12,17 @@ class thesis extends Model
     use SoftDeletes;
     public function author()
     {
-        return $this->belongsToMany(authors::class, 'thesis_author', 'thesis_id', 'author_id');
+        return $this->belongsToMany(authors::class);
     }
 
 
     public function category()
     {
-        return $this->belongsToMany(Category::class, 'thesis_category', 'thesis_id', 'category_id');
+        return $this->belongsToMany(Category::class);
     }
 
     public function keywords()
     {
-        return $this->belongsToMany(Keywords::class, 'thesis_keyword', 'thesis_id', 'keyword_id');
+        return $this->belongsToMany(Keywords::class);
     }
 }

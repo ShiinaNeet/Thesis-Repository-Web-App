@@ -106,6 +106,7 @@
     v-model="createKeyword.modal"
     noOutsideDismiss
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-[410px] p-5">

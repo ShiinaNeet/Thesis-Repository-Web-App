@@ -395,7 +395,7 @@
                         clearable-icon="backspace"
                         :error="editThesis.keywordsEmpty"
                         :error-messages="'The requirement(s) field is required.'"
-                        @update:modelValue="editThesis.keywordsEmpty = false"
+                        @update:modelValue="editThesis.key = 1"
                         >
                             <template #content="{ value }">
                                 <va-chip
@@ -406,7 +406,7 @@
                                     class="mr-1 mb-1"
                                     square
                                     closeable
-                                    @update:modelValue="updateRequirementsArr('save', idx), editThesis.key = 12"
+                                   
                                 >
                                     {{ reqqs.keyword }}
                                 </va-chip>
@@ -425,7 +425,7 @@
                         clearable-icon="backspace"
                         :error="editThesis.categoryEmpty"
                         :error-messages="'The category(s) field is required.'"
-                        @update:modelValue="editThesis.categoryEmpty = false"
+                        @update:modelValue="editThesis.cate = 1"
                         >
                             <template #content="{ value }">
                                 <VaChip
@@ -436,7 +436,7 @@
                                 class="mr-1 mb-1"
                                 square
                                 closeable
-                                @update:modelValue="updateCategoryArr('save', idx), editThesis.cate = 12"
+                                
                                 >
                                
                                 {{ ww.category }}
@@ -537,6 +537,7 @@
     v-model="editThesis.deleteModal"
     @cancel="editThesis.data = { ...createThesis.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-full p-5">
@@ -584,6 +585,7 @@
     v-model="editThesis.statusModal"
     @cancel="editThesis.data = { ...createThesis.resetData }"
     noPadding
+    size="auto"
     >
         <template #content>
             <div class="w-full p-5">
@@ -744,14 +746,16 @@ export default {
         },
         updateRequirementsArr(method, selectedKeywords) {
             if (method !== 'create' || method !== 'save') {
-                method === 'create' ? (this.createThesis.data.keywords =
+                if(method === 'create') { (this.createThesis.data.keywords =
                     this.createThesis.data.keywords.filter((v) => v !== this.createThesis.data.keywords[selectedKeywords]))
-                    : (method === 'save' && (  this.editThesis.data.authors =
-                        this.editThesis.data.keywords.filter((v) => v !== this.editThesis.data.keywords[selectedKeywords])));
-                   
+                 }
+                else{  
+                    this.editThesis.data.keywords = selectedKeywords.map(keyword => keyword.id);
+                    this.editThesis.key = 1;
+                }
             }
             else
-                this.editThesis.key = 1;
+                
                 this.$root.prompt();
         },
         updateAuthorsArr(method, selectedAuthors) {

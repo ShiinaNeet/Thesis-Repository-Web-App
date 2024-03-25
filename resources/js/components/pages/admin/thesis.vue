@@ -13,6 +13,7 @@
         animated
         itemSize="250px"
         class="w-full"
+        :loading="gettingThesis"
         >
             <template #headerAppend>
                 <tr class="table-crud__slot " >
@@ -61,8 +62,7 @@
                 title="Edit"
                 preset="plain"
                 icon="edit"
-                @click="editThesis.data = { ...rowData }, editThesis.modal = !editThesis.modal
-                , console.log(editThesis.data)"
+                @click="editThesis.data = { ...rowData }, editThesis.modal = !editThesis.modal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
@@ -192,169 +192,180 @@
     noOutsideDismiss
     noPadding
     >
+       
         <template #content>
-            <div class="w-full p-5 flex flex-center justify-center">
-                <div class="py-10">
-                    <div class="va-title mb-3">
-                    Add Thesis
-                    </div>
-                    <form action="POST">
-                        <va-input
-                        v-model="createThesis.data.title"
-                        label="Title *"
-                        class="w-full mb-2"
-                        maxlength="120"
-                        :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
-                        :error="createThesis.TitleEmpty"
-                        :error-messages="'The title field is required.'"
-                        @keyup="createThesis.TitleEmpty = false"
-                        />
-                        <div class="select w-full">
-                            <VaSelect
-                            class="w-1/2"
-                            requiredMark
-                            v-model="createThesis.data.keywords"
-                            label="Keywords to attach"
-                            :options="keywordList"
-                            text-by="keyword"
-                            value-by="id"
-                            multiple
-                            searchable
-                            clearable
-                            clearable-icon="backspace"
-                            @update:modelValue="createThesis.keywordsEmpty = false"
-                            >
-                                <template #content="{ value }">
-                                    <va-chip
-                                        v-for="(req, idx) in value"
+            <VaProgressBar  :indeterminate="createThesis.isloading" />
+            <VaInnerLoading 
+            icon="cached"
+            :loading="createThesis.isloading"
+            >
+                <div class="w-full px-5 flex flex-center">
+                    <div class="py-10">
+                        <div class="va-title mb-3">
+                        Add Thesis
+                        </div>
+                        <form action="POST">
+                            <va-input
+                            v-model="createThesis.data.title"
+                            label="Title *"
+                            class="w-full mb-2"
+                            maxlength="120"
+                            :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
+                            :error="createThesis.TitleEmpty"
+                            :error-messages="'The title field is required.'"
+                            @keyup="createThesis.TitleEmpty = false"
+                            />
+                            <div class="select w-full">
+                                <VaSelect
+                                class="w-1/2"
+                                requiredMark
+                                v-model="createThesis.data.keywords"
+                                label="Keywords to attach"
+                                :options="keywordList"
+                                text-by="keyword"
+                                value-by="id"
+                                multiple
+                                searchable
+                                clearable
+                                clearable-icon="backspace"
+                                @update:modelValue="createThesis.keywordsEmpty = false"
+                                >
+                                    <template #content="{ value }">
+                                        <va-chip
+                                            v-for="(req, idx) in value"
+                                            :key="idx"
+                                            size="small"
+                                            color="secondary"
+                                            class="mr-1 mb-1"
+                                            square
+                                            closeable
+                                            @update:modelValue="updateRequirementsArr('create', value)"
+                                        >
+                                            {{ req.keyword }}
+                                        </va-chip>
+                                    </template>
+                                </VaSelect>
+                                <VaSelect
+                                class="w-1/2"
+                                requiredMark
+                                v-model="createThesis.data.categories"
+                                label="Category to attach"
+                                :options="categoryList"
+                                text-by="category"
+                                value-by="id"
+                                searchable
+                                clearable
+                                multiple
+                                clearable-icon="backspace"
+                                @update:modelValue="createThesis.categoryEmpty = false"
+                                >
+                                    <template #content="{ value }">
+                                        <va-chip
+                                        v-for="(reqw, idx) in value"
                                         :key="idx"
                                         size="small"
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
                                         closeable
-                                        @update:modelValue="updateRequirementsArr('create', value)"
-                                    >
-                                        {{ req.keyword }}
-                                    </va-chip>
-                                </template>
-                            </VaSelect>
-                            <VaSelect
-                            class="w-1/2"
-                            requiredMark
-                            v-model="createThesis.data.categories"
-                            label="Category to attach"
-                            :options="categoryList"
-                            text-by="category"
-                            value-by="id"
-                            searchable
-                            clearable
-                            multiple
-                            clearable-icon="backspace"
-                            @update:modelValue="createThesis.categoryEmpty = false"
-                            >
-                                <template #content="{ value }">
-                                    <va-chip
-                                    v-for="(reqw, idx) in value"
-                                    :key="idx"
-                                    size="small"
-                                    color="secondary"
-                                    class="mr-1 mb-1"
-                                    square
-                                    closeable
-                                    @update:modelValue="updateCategoryArr('create', value)"
-                                    >
-                                        {{ reqw.category }}
-                                    </va-chip>
-                                </template>
-                            </VaSelect>
-                            <VaSelect
-                            class="w-full"
-                            requiredMark
-                            multiple
-                            v-model="createThesis.data.authors"
-                            label="Author"
-                            :options="authorList"
-                            text-by="name"
-                            value-by="id"
-                            searchable
-                            clearable
-                            clearable-icon="backspace"
-                            @update:modelValue="createThesis.authorEmpty = false"
-                            >
-                                <template #content="{ value }">
-                                    <va-chip
-                                    v-for="(reqaa, idx) in value"
-                                    :key="idx"
-                                    size="small"
-                                    color="secondary"
-                                    class="mr-1 mb-1"
-                                    square
-                                    closeable
-                                    @update:modelValue="updateAuthorsArr('create', idx)"
-                                    >
-                                        {{ reqaa.name }}
-                                    </va-chip>
-                                </template>
-                            </VaSelect>
-                        </div>
-                        <VaTextarea
-                        v-model="createThesis.data.abstract"
-                        label="Abstract *"
-                        class="w-full h-fit mb-2"
-                        :autosize="true"
-                        max-rows="7"
-                        min-rows="7"
-                        :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
-                        :error="createThesis.abstractEmpty"
-                        :error-messages="'The abstract field is required.'"
-                        @keyup="createThesis.AbstractEmpty = false"
-                        />
-                        <va-input
-                        v-model="createThesis.data.published_at"
-                        label="Publish date *"
-                        type="date"
-                        class="w-full mb-2"
-                        maxlength="500"
-                        :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
-                        :error="createThesis.abstractEmpty"
-                        :error-messages="'The publish date field is required.'"
-                        @keyup="createThesis.PublishedDateEmpty = false"
-                        />
-                        <input type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
-                        <input type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
-                            <div class="flex w-full gap-x-3 mt-[15px]">
-                                <div class="flex w-1/2 justify-between">
-                                    <va-button
-                                    preset="secondary"
-                                    @click="
-                                        createThesis.data = { ...createThesis.resetData },
-                                        createThesis.TitleEmpty = false,
-                                        createThesis.AbstractEmptyEmpty = false,
-                                        createThesis.PublishedDateEmpty = false,
-                                        createThesis.saved = false,
-                                        createThesis.modal = !createThesis.modal
-                                    "
-                                    >
-                                        <p class="font-normal">Cancel</p>
-                                    </va-button>
-                                </div>
-                                <div class="flex w-1/2 justify-between">
-                                    <va-button
-                                    icon="save"
-                                    :loading="createThesis.saved"
-                                    :disabled="createThesis.saved"
-                                    @click="createThesis.saved = true, insertUpdateThesis('create')"
-                                    type="submit"
-                                    >
-                                        <p class="font-normal">Save</p>
-                                    </va-button>
-                                </div>
+                                        @update:modelValue="updateCategoryArr('create', value)"
+                                        >
+                                            {{ reqw.category }}
+                                        </va-chip>
+                                    </template>
+                                </VaSelect>
+                                <VaSelect
+                                class="w-full"
+                                requiredMark
+                                multiple
+                                v-model="createThesis.data.authors"
+                                label="Author"
+                                :options="authorList"
+                                text-by="name"
+                                value-by="id"
+                                searchable
+                                clearable
+                                clearable-icon="backspace"
+                                @update:modelValue="createThesis.authorEmpty = false"
+                                >
+                                    <template #content="{ value }">
+                                        <va-chip
+                                        v-for="(reqaa, idx) in value"
+                                        :key="idx"
+                                        size="small"
+                                        color="secondary"
+                                        class="mr-1 mb-1"
+                                        square
+                                        closeable
+                                        @update:modelValue="updateAuthorsArr('create', idx)"
+                                        >
+                                            {{ reqaa.name }}
+                                        </va-chip>
+                                    </template>
+                                </VaSelect>
                             </div>
-                    </form>
+                            <VaTextarea
+                            v-model="createThesis.data.abstract"
+                            label="Abstract *"
+                            class="w-full h-fit mb-2"
+                            :autosize="true"
+                            max-rows="7"
+                            min-rows="7"
+                            :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
+                            :error="createThesis.abstractEmpty"
+                            :error-messages="'The abstract field is required.'"
+                            @keyup="createThesis.AbstractEmpty = false"
+                            />
+                            <va-input
+                            v-model="createThesis.data.published_at"
+                            label="Publish date *"
+                            type="date"
+                            class="w-full mb-2"
+                            maxlength="500"
+                            :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
+                            :error="createThesis.abstractEmpty"
+                            :error-messages="'The publish date field is required.'"
+                            @keyup="createThesis.PublishedDateEmpty = false"
+                            />
+                            <input
+                            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" 
+                            type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
+                            <input
+                            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                            type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
+                                <div class="flex w-full gap-x-3 mt-[15px]">
+                                    <div class="flex w-1/2 justify-between">
+                                        <va-button
+                                        preset="secondary"
+                                        @click="
+                                            createThesis.data = { ...createThesis.resetData },
+                                            createThesis.TitleEmpty = false,
+                                            createThesis.AbstractEmptyEmpty = false,
+                                            createThesis.PublishedDateEmpty = false,
+                                            createThesis.saved = false,
+                                            createThesis.modal = !createThesis.modal
+                                        "
+                                        >
+                                            <p class="font-normal">Cancel</p>
+                                        </va-button>
+                                    </div>
+                                    <div class="flex w-1/2 justify-between">
+                                        <va-button
+                                        icon="save"
+                                        :loading="createThesis.saved"
+                                        :disabled="createThesis.saved"
+                                        @click="createThesis.saved = true, insertUpdateThesis('create')"
+                                        type="submit"
+                                        >
+                                            <p class="font-normal">Save</p>
+                                        </va-button>
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+                    
                 </div>
-                
-            </div>
+            </VaInnerLoading>
         </template>
     </va-modal>
 
@@ -364,172 +375,176 @@
     noPadding
     >
         <template #content>
-            <div class="w-full p-5 flex flex-center justify-center">
-                <div class=" justify-center pt-10">
-                    <div class="va-title mb-3">
-                        Edit Thesis
-                    </div>
-                    <va-input
-                    v-model="editThesis.data.title"
-                    label="Title *"
-                    class="w-full mb-2"
-                    maxlength="120"
-                    :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
-                    :error="editThesis.TitleEmpty"
-                    :error-messages="'The title field is required.'"
-                    @keyup="editThesis.TitleEmpty = false"
-                    />
-                    <div class="select w-full">
-                        <!-- Error in EditThesis.data.keywords IDK WHY -->
-                        <VaSelect
-                        v-model="editThesis.data.keywords"
-                        :options="keywordList"
-                        text-by="keyword"
-                        value-by="id"
-                        requiredMark
-                        class="w-1/2"
-                        label="Keywords to attach"
-                        multiple
-                        searchable
-                        clearable
-                        clearable-icon="backspace"
-                        :error="editThesis.keywordsEmpty"
-                        :error-messages="'The requirement(s) field is required.'"
-                        @update:modelValue="editThesis.key = 1"
-                        >
-                            <template #content="{ value }">
-                                <va-chip
-                                    v-for="(reqqs, idx) in value"
-                                    :key="idx"
+            <VaInnerLoading 
+            :loading="editThesis.isloading"
+            >
+                <div class="w-full p-5 flex flex-center justify-center">
+                    <div class=" justify-center pt-10">
+                        <div class="va-title mb-3">
+                            Edit Thesis
+                        </div>
+                        <va-input
+                        v-model="editThesis.data.title"
+                        label="Title *"
+                        class="w-full mb-2"
+                        maxlength="120"
+                        :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
+                        :error="editThesis.TitleEmpty"
+                        :error-messages="'The title field is required.'"
+                        @keyup="editThesis.TitleEmpty = false"
+                        />
+                        <div class="select w-full">
+                            <!-- Error in EditThesis.data.keywords IDK WHY -->
+                            <VaSelect
+                            v-model="editThesis.data.keywords"
+                            :options="keywordList"
+                            text-by="keyword"
+                            value-by="id"
+                            requiredMark
+                            class="w-1/2"
+                            label="Keywords to attach"
+                            multiple
+                            searchable
+                            clearable
+                            clearable-icon="backspace"
+                            :error="editThesis.keywordsEmpty"
+                            :error-messages="'The requirement(s) field is required.'"
+                            @update:modelValue="editThesis.key = 1"
+                            >
+                                <template #content="{ value }">
+                                    <va-chip
+                                        v-for="reqqs  in value"
+                                        size="small"
+                                        color="secondary"
+                                        class="mr-1 mb-1"
+                                        square
+                                        closeable
+                                    
+                                    >
+                                        {{ reqqs.keyword }}
+                                    </va-chip>
+                                </template>
+                            </VaSelect>
+                            <VaSelect
+                            v-model="editThesis.data.categories"
+                            :options="categoryList"
+                            text-by="category"
+                            value-by="id"
+                            requiredMark
+                            class="w-1/2"
+                            label="Category to attach"
+                            multiple
+                            searchable
+                            clearable-icon="backspace"
+                            :error="editThesis.categoryEmpty"
+                            :error-messages="'The category(s) field is required.'"
+                            @update:modelValue="editThesis.cate = 1"
+                            >
+                                <template #content="{ value }">
+                                    <VaChip
+                                    v-for="ww, in value"
                                     size="small"
                                     color="secondary"
                                     class="mr-1 mb-1"
                                     square
                                     closeable
-                                   
-                                >
-                                    {{ reqqs.keyword }}
-                                </va-chip>
-                            </template>
-                        </VaSelect>
-                        <VaSelect
-                        v-model="editThesis.data.categories"
-                        :options="categoryList"
-                        text-by="category"
-                        value-by="id"
-                        requiredMark
-                        class="w-1/2"
-                        label="Category to attach"
-                        multiple
-                        searchable
-                        clearable-icon="backspace"
-                        :error="editThesis.categoryEmpty"
-                        :error-messages="'The category(s) field is required.'"
-                        @update:modelValue="editThesis.cate = 1"
-                        >
-                            <template #content="{ value }">
-                                <VaChip
-                                v-for="(ww, idx) in value"
-                                :key="idx"
-                                size="small"
-                                color="secondary"
-                                class="mr-1 mb-1"
-                                square
-                                closeable
+                                    >
                                 
-                                >
-                               
-                                {{ ww.category }}
-                             
-                                </VaChip>
+                                    {{ ww.category }}
+                                
+                                    </VaChip>
 
-                            </template>
-                        </VaSelect>
-                        <VaSelect
-                        v-model="editThesis.data.authors"
-                        :options="authorList"
-                        text-by="name"
-                        value-by="id"
-                        requiredMark
-                        class="w-full"
-                        label="Author"
-                        multiple
-                        searchable
-                        clearable
-                        clearable-icon="backspace"
-                        @update:modelValue="editThesis.authr = 1"
-                        >
-                            <template #content="{ value }">
-                                <VaChip
-                                v-for="(author, id) in value"
-                                :key="idx"
-                                size="small"
-                                color="secondary"
-                                class="mr-1 mb-1"
-                                square
-                                closeable
-                                >
-                                   {{ author.name }}
-                                  
-                                </VaChip>
-                            </template>
-                        </VaSelect>
-                    </div>
-                    <VaTextarea
-                    v-model="editThesis.data.abstract"
-                    label="Abstract *"
-                    class="w-full mb-2"
-                    :autosize="true"
-                    max-rows="7"
-                    min-rows="7"
-                    :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
-                    :error="editThesis.abstractEmpty"
-                    :error-messages="'The abstract field is required.'"
-                    @keyup="editThesis.abstractEmpty = false"
-                    />
-                    <VaDateInput
-                    v-model="editThesis.data.published_at"
-                    label="Published date *"
-                    preset="bordered"
-                    class="w-full mb-2"
-                    :format="formatDatePicker"
-                    :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
-                    :error="editThesis.abstractEmpty"
-                    :error-messages="'The publish date field is required.'"
-                    @keyup="editThesis.publishedDateEmpty = false"
-                    />
-                    <input type="file" id="video"  ref="videoInput" accept="video/*" @onchange="uploadFile"> {{ editThesis.video }}</input>
-                    <input type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
-                    <div class="flex w-full gap-x-3 mt-[15px]">
-                        <div class="flex w-1/2 justify-between">
-                            <va-button
-                            preset="secondary"
-                            @click="
-                                editThesis.data = { ...createThesis.resetData },
-                            
-                                editThesis.TitleEmpty = false,
-                                editThesis.abstractEmptyEmpty = false,
-                                editThesis.publishedDateEmpty = false,
-                                editThesis.saved = false,
-                                editThesis.modal = !editThesis.modal
-                            ">
-                                <p class="font-normal">Cancel</p>
-                            </va-button>
-                        </div>
-                        <div class="flex w-1/2 justify-between">
-                            <va-button
-                            icon="save"
-                            :loading="editThesis.saved"
-                            :disabled="editThesis.saved"
-                            @click="editThesis.saved = true, insertUpdateThesis('save')"
+                                </template>
+                            </VaSelect>
+                            <VaSelect
+                            v-model="editThesis.data.authors"
+                            :options="authorList"
+                            text-by="name"
+                            value-by="id"
+                            requiredMark
+                            class="w-full"
+                            label="Author"
+                            multiple
+                            searchable
+                            clearable
+                            clearable-icon="backspace"
+                            @update:modelValue="editThesis.authr = 1"
                             >
-                                <p class="font-normal">Save</p>
-                            </va-button>
+                                <template #content="{ value }">
+                                    <VaChip
+                                    v-for="(author) in value"
+                                    size="small"
+                                    color="secondary"
+                                    class="mr-1 mb-1"
+                                    square
+                                    closeable
+                                    >
+                                    {{ author.name }}
+                                    
+                                    </VaChip>
+                                </template>
+                            </VaSelect>
+                        </div>
+                        <VaTextarea
+                        v-model="editThesis.data.abstract"
+                        label="Abstract *"
+                        class="w-full mb-2"
+                        :autosize="true"
+                        max-rows="7"
+                        min-rows="7"
+                        :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
+                        :error="editThesis.abstractEmpty"
+                        :error-messages="'The abstract field is required.'"
+                        @keyup="editThesis.abstractEmpty = false"
+                        />
+                        <VaDateInput
+                        v-model="editThesis.data.published_at"
+                        label="Published date *"
+                        preset="bordered"
+                        class="w-full mb-2"
+                     
+                        :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
+                        :error="editThesis.abstractEmpty"
+                        :error-messages="'The publish date field is required.'"
+                        @keyup="editThesis.publishedDateEmpty = false"
+                        />
+                        <input
+                        class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        type="file" id="editvideo"  ref="videoInput" accept="video/*" @onchange="uploadFile"> {{ editThesis.video }}</input>
+                        <input
+                        class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                        type="file" id="editpdf" name="file"  ref="pdfInput" accept=".pdf"/>
+                        <div class="flex w-full gap-x-3 mt-[15px]">
+                            <div class="flex w-1/2 justify-between">
+                                <va-button
+                                preset="secondary"
+                                @click="
+                                    editThesis.data = { ...createThesis.resetData },
+                                
+                                    editThesis.TitleEmpty = false,
+                                    editThesis.abstractEmptyEmpty = false,
+                                    editThesis.publishedDateEmpty = false,
+                                    editThesis.saved = false,
+                                    editThesis.modal = !editThesis.modal
+                                ">
+                                    <p class="font-normal">Cancel</p>
+                                </va-button>
+                            </div>
+                            <div class="flex w-1/2 justify-between">
+                                <va-button
+                                icon="save"
+                                :loading="editThesis.saved"
+                                :disabled="editThesis.saved"
+                                @click="editThesis.saved = true, insertUpdateThesis('save')"
+                                >
+                                    <p class="font-normal">Save</p>
+                                </va-button>
+                            </div>
                         </div>
                     </div>
+                    
                 </div>
-                
-            </div>
+            </VaInnerLoading>
         </template>
     </va-modal>
 
@@ -644,19 +659,22 @@
 
 <script>
 
+
+
+
 import formatDate from '@/functions/formatdate.js';
 import { VaChip } from 'vuestic-ui/web-components';
 const now = () => new Date();
 const newThesis = {
     title:null,
     abstract:null,
-    published_at: formatDate(now(),'yyyy-MM-dd'),
+    published_at: formatDate(now(),'YYYY-MM-DD', 'Invalid Date'),
     id: null,
     categories:[], 
     keywords:[],
     authors:[],
 };
-console.log(now());
+
 export default {
     data() {
         const keyconfig = {
@@ -670,6 +688,7 @@ export default {
         return {
             test: { keywords: {}, },
             files: [],
+            gettingThesis: false,
             uploadFiles: [],
             showProgress: false,
             keyconfig,
@@ -678,6 +697,7 @@ export default {
             categoryList: [],
             authorList: [],
             createThesis: {
+                isloading: false,
                 modal: false,
                 TitleEmpty: false,
                 AbstractEmpty: false,
@@ -690,6 +710,7 @@ export default {
                 data: { ...newThesis }
             },
             editThesis: {
+                isloading: false,
                 modal: false,
                 deleteModal: false,
                 statusModal: false,
@@ -738,7 +759,6 @@ export default {
            
         },
         updateAuthorIds() {
-            console.log(this.editThesis.data.authors);
             if (Array.isArray(this.editThesis.data.authors)) {
             this.editThesis.data.authors = this.editThesis.data.authors.map(authors => authors.id);
             }
@@ -763,7 +783,7 @@ export default {
                 if(method === 'create') {
                     this.createThesis.data.authors =
                         this.createThesis.data.authors.filter((v) => v !== this.createThesis.data.authors[selectedAuthors]);
-                    console.log(this.createThesis.data.authors);
+                    
                  }
                  else{
                     
@@ -909,14 +929,20 @@ export default {
                     formData.append('video', videofile);
                     formData.append('pdf', pdffile);
                 }
-                axios({
-                    method: 'POST',
-                    url: '/thesis/save',
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    data: formData,
-                }).then(response => {
+                const config = {
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                        
+
+                        if (percentCompleted === 100) {
+                            this.createThesis.isloading = false;
+                            this.editThesis.isloading = false;
+                        }
+                    }
+                }
+                this.createThesis.isloading = true;
+                this.editThesis.isloading = true;
+                axios.post('/thesis/save', formData, config).then(response => {
                     if (response.data.status == 1) {
                         this.$root.prompt(response.data.text);
                         method === 'create' ? (this.createThesis.data = { ...newThesis },
@@ -951,6 +977,7 @@ export default {
                                 this.getThesis();
                     }
                     this.getThesis();
+                    this.createThesis.isloading = false;
                 }).catch(error => {
                     // this.$root.prompt(error.response.data.message);
                     this.editThesis.saved = false;
@@ -993,6 +1020,7 @@ export default {
                 this.$root.prompt();
         },
         getThesis() {
+            this.gettingThesis = true;
             axios({
                 method: 'GET',
                 type: 'JSON',
@@ -1002,10 +1030,13 @@ export default {
                     this.thesisList = response.data.result;
                     
                 }
-                else
+                else{
                     this.$root.prompt(response.data.text);
+                }
+                this.gettingThesis = false;
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);
+                this.gettingThesis = false;
             });
         },
         getKeywords() {
@@ -1016,7 +1047,7 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.keywordList = response.data.result;
-                    console.log(this.keywordList);
+                  
                 }
                 else
                     this.$root.prompt(response.data.text);

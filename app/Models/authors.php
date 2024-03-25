@@ -11,8 +11,8 @@ class authors extends Model
     use HasFactory;
     use SoftDeletes;
 
-    public function theses()
-{
-    return $this->belongsToMany(Thesis::class, 'thesis_author', 'author_id', 'thesis_id');
-}
+    // public function theses()
+    // {
+    //     return $this->belongsToMany(thesis::class);
+    // }
 }

@@ -15,6 +15,7 @@
         <VaNavbarItem
          class="hidden sm:block bg-inherit justify-center items-center ">
           <VaButton
+          v-if="$root.auth && $root.auth.userType == 0"
           class=""
           preset="secondary"
           hover-behavior="opacity"
@@ -38,7 +39,7 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
-          v-if="$root.auth"
+          v-if="$root.auth && $root.auth.userType !== null"
           class=""
           preset="secondary"
           hover-behavior="opacity"

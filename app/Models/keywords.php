@@ -11,8 +11,5 @@ class keywords extends Model
     use HasFactory; 
     use SoftDeletes;
 
-    public function theses()
-    {
-        return $this->belongsToMany(Thesis::class, 'thesis_category', 'category_id', 'thesis_id');
-    }
+    
 }

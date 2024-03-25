@@ -129,9 +129,6 @@ class DatabaseController extends Controller
         keywords::truncate();
         thesis::truncate();
         Users::truncate();
-        DB::table('thesis_author')->truncate();
-        DB::table('thesis_keyword')->truncate();
-        DB::table('thesis_category')->truncate();
         DB::table('migrations')->truncate();
 
        

@@ -28,6 +28,7 @@
         animated
         striped
         class=""
+        :loading="gettingAccounts"
         >
             <template #headerAppend>
                     <tr class="table-crud__slot ">
@@ -433,6 +434,7 @@ export default {
 
         return {
             acc,
+            gettingAccounts: false,
             accounts: [],
             account: {},
             createAccount: {
@@ -690,6 +692,8 @@ export default {
             
         },
         getAccounts() {
+        this.gettingAccounts =true;
+
             axios({
                 method: 'GET',
                 type: 'JSON',
@@ -699,8 +703,11 @@ export default {
                     this.accounts = response.data.result;
                    
                 } else this.$root.prompt(response.data.text);
+            this.gettingAccounts = false;
+
             }).catch(error => {
                 this.$root.prompt(error.response.data.message);
+                this.gettingAccounts = false;
             });
         },
         formatDate,

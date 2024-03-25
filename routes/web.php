@@ -25,7 +25,7 @@ Route::get('/', [PageController::class, 'index']);
 Route::get('/login', [PageController::class, 'login']);
 Route::get('/logout', [UsersController::class, 'logout']);
 
-Route::get('thesis/search', [ThesisController::class, 'search']);
+Route::post('thesis/search', [ThesisController::class, 'search']);
 
 // for auth
 Route::post('/login', [UsersController::class, 'login']);

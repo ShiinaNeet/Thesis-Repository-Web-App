@@ -1,7 +1,7 @@
 <template>
     <navigation/>
     <div class="flex items-start min-h-[calc(100vh-62px)]">
-        <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden bg-white-500">
+        <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden">
             <div
             id="settings-wrapper"
             >

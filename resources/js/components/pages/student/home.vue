@@ -1,19 +1,67 @@
 <template>
     <div class="py-5 ">
-        <div class="h-[250px] lg:w-full sm:w-full flex justify-center bg-slate-100">
+        <div class="h-[250px] lg:w-full sm:w-full flex justify-center">
             <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center">
                 <div class="w-full flex flex-col items-center">
-                    <div class="w-1/2 mb-3">
+                    <div class="w-1/2 mb-3 flex-row">
                         <VaInput
-                            v-model="searchQuery"
+                            v-model="searchQuery.title"
                             placeholder="Search here"
-                            label="Search Thesis here"
+                            label="Title  "
                             inner-label
                             class="w-full max-w-md"
                             color="Info"
                             currentColor="Success"
-                            @keyup.enter="searchThesis('title')"
+                          
                         />
+                        <VaInput
+                            v-model="searchQuery.keyword"
+                            placeholder="Search here"
+                            label="Keyword  "
+                            inner-label
+                            class="w-full max-w-md"
+                            color="Info"
+                            currentColor="Success"
+                           
+                        />
+                        <VaInput
+                            v-model="searchQuery.author"
+                            placeholder="Search here"
+                            label="Author "
+                            inner-label
+                            class="w-full max-w-md"
+                            color="Info"
+                            currentColor="Success" 
+                        />
+                        <VaSelect
+                        v-model="searchQuery.category"
+                        placeholder="Search here"
+                        :options="categoryList"
+                        label="Category  "
+                        inner-label
+                        clearable
+                        searchable
+                        autocomplete
+                        text-by="category"
+                        value-by="category"
+                        highlight-matched-text
+                        clearable-icon="cancel"
+                        class="w-full max-w-md"
+                        color="Info"
+                        currentColor="Success"
+                        />
+                        <VaButton
+                        preset="secondary"
+                        hover-behavior="opacity"
+                        :hover-opacity="0.4"
+                        icon-color="#ffffff50"
+                        size="medium"
+                        class="w-full text-center"
+                        @click="searchThesis()"
+                        >
+                            SEARCH  
+                        </VaButton>
+                        
                     </div>
                     <!-- Can't find what you're looking for? -->
                     <div class="text-center text-blue-600 hover:underline">
@@ -52,9 +100,9 @@
                                             Authors:  
                                         </label>
                                         <div class="flex flex-wrap whitespace-normal"> <!-- Flex container for author tags -->
-                                            <span class="flex text-green-700 underline font-bold whitespace-pre" v-for="(author, index) in thesis.author" :key="index">
+                                            <span class="flex text-green-700 underline font-bold whitespace-pre" v-for="(author, index) in thesis.authors" :key="index">
                                                 {{ ' '+ author.name }}
-                                                <span v-if="index !== thesis.author.length - 1">, </span> <!-- Add comma for all authors except the last one -->
+                                                <span v-if="index !== thesis.authors.length - 1">, </span> <!-- Add comma for all authors except the last one -->
                                             </span>
                                         </div>
                                     </div>
@@ -76,7 +124,7 @@
                                         <label class="justify-center flex-center whitespace-pre-line font-bold">Category:</label>
                                     </div> 
                                     <div class="w-full md:flex-grow flex flex-wrap">
-                                        <div v-for="category in thesis.category" class="mr-1 mb-2">
+                                        <div v-for="category in thesis.categories" class="mr-1 mb-2">
                                             <VaChip 
                                                 square
                                                 color="success"
@@ -162,7 +210,13 @@ export default{
         return{
             showFullAbstract: false,
             truncatedAbstract: '',
-            searchQuery:"",
+            searchQuery:{
+                title: null,
+                keyword: null,
+                author: null,
+                category: null,
+            },
+            categoryList: [],
             data:{
                 search: "",
                 thesisList: [],
@@ -172,6 +226,7 @@ export default{
     mounted(){
         this.getThesis();
         this.truncateAbstract();
+        this.getCategory();
     },
     computed(){
         this.getThesis();
@@ -223,12 +278,27 @@ export default{
                 }
             })
         },
-        searchThesis(filt){
+        getCategory() {
+            axios({
+                method: 'GET',
+                type: 'JSON',
+                url: '/category/get'
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.categoryList = response.data.result;
+                }
+                else
+                    this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
+        searchThesis(){
             axios({
                 method: 'POST',
                 url: '/thesis/search',
                 type: 'JSON',
-                data: {searchQuery: this.searchQuery}
+                data:  this.searchQuery ,
             }).then(response => {
                 if(response.data.status == 1)
                 {

@@ -29,7 +29,7 @@ class PageController extends Controller
         
     //    end: return view('login', $data);
 
-        if(Auth::check()){
+        if($user){
             return redirect('/dashboard');
         }else{
             return view('/login', $data);

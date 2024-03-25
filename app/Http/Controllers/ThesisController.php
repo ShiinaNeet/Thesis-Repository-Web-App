@@ -17,54 +17,122 @@ use Illuminate\Support\Facades\Storage;
 class ThesisController extends Controller
 {
     public function search(Request $request){
-    
-        //Trashed = Outdated Thesis. Make sure to create Cron Job for Outdated Thesis Checking BG
+
+        $keyword = $request->keyword;
+        $author = $request->author;
+        $category = $request->category;
+        $title = $request->title;
+        $theses = Thesis::withTrashed();
+
+        if ($request->title  !== null || $request->title != '') {
+            $theses = $theses->where('title', 'like', '%' . $request->title . '%');
+        }
         
-        // This works
-        // $theses = Thesis::withTrashed()
-        //     ->with(['author', 'category', 'keywords'])
-        //     ->where(function ($query) use ($keyword) {
-        //         $query->where('title', 'like', "%$keyword%")
-        //             ->orWhereHas('category', function ($query) use ($keyword) {
-        //                 $query->where('category', 'like', "%$keyword%");
-        //             })
-        //             ->orWhereHas('keywords', function ($query) use ($keyword) {
-        //                 $query->where('keywords.keyword', 'like', "%$keyword%");
-        //             })
-        //             ->orWhereHas('author', function ($query) use ($keyword) {
-        //                 $query->where('name', 'like', "%$keyword%");
-        //             });
+      
+           $theses = thesis::get()->map(function($q) {
+                $arr = [];
+               
+                $authorIds = explode(',', trim($q->authors, '[]'));
+                
+                foreach ($authorIds as $authorId) {
+                    $author = authors::find($authorId);
+                    if ($author) {
+                        $arr[] = $author->toArray();
+                    }
+                }
+                $q->authors = $arr;
+
+                $arrC = [];
+               
+                $categoryIds = explode(',', trim($q->categories, '[]'));
+                
+                foreach ($categoryIds as $categoryId) {
+                    $category = category::find($categoryId);
+                    if ($category) {
+                        $arrC[] = $category->toArray();
+                    }
+                }
+                $q->categories = $arrC;
+                
+                $arrK = [];
+                $keywordIds = explode(',', trim($q->keywords, '[]'));
+                
+                foreach ($keywordIds as $keywordId) {
+                    $keyword = keywords::find($keywordId);
+                    if ($keyword) {
+                        $arrK[] = $keyword->toArray();
+                    }
+                }
+                $q->keywords = $arrK;
+
+                return $q;
+            });
+            $theses = $theses->filter(function ($thesis) use ($author,$category,$keyword) {
+               
+                $authorsCollection = collect($thesis->authors);
+                $categoryCollection = collect($thesis->categories);
+                $keywordsCollection = collect($thesis->keywords);
+
+                $authorMatch = $authorsCollection->contains(function ($authorItem) use ($author) {
+                    return strpos($authorItem['name'], $author) !== false;
+                });
+                $categoryMatch = $categoryCollection->contains(function ($categoryitem) use ($category) {
+                    return strpos($categoryitem['category'], $category) !== false;
+                });
+                $keywordMatch = $keywordsCollection->contains(function ($keywordItem) use ($keyword) {
+                    return strpos($keywordItem['keyword'], $keyword) !== false;
+                });
+                return $authorMatch && $categoryMatch && $keywordMatch;
+            });
+            
+        // $theses = $theses->get()
+        //     ->map(function($q) {
+        //         $arr = [];
+        //         $arrK = [];
+        //         $arrC = [];
+        //         $q = Thesis::where('id', $q->id)
+        //             ->first();
+        //         //  dd($q->authors);
+        //         $authorIds = explode(',', trim($q->authors, '[]'));
+                
+        //         foreach ($authorIds as $authorId) {
+        //             $author = authors::find($authorId);
+        //             if ($author) {
+        //                 $arr[] = $author->toArray();
+        //             }
+        //         }
+    
+        //         $keywordIds = explode(',', trim($q->keywords, '[]'));
+                
+        //         foreach ($keywordIds as $keywordId) {
+        //             $keyword = keywords::find($keywordId);
+        //             if ($keyword) {
+        //                 $arrK[] = $keyword->toArray();
+        //             }
+        //         }
+    
+        //         $categoryIds = explode(',', trim($q->categories, '[]'));
+                
+        //         foreach ($categoryIds as $categoryId) {
+        //             $category = category::find($categoryId);
+        //             if ($category) {
+        //                 $arrC[] = $category->toArray();
+        //             }
+        //         }
+        
+        //         $q->authors = $arr;
+        //         $q->keywords = $arrK;
+        //         $q->categories = $arrC;
+        //         return $q;
         //     })
-        //     ->get();
-        $keyword = "Peter Parker";
-        $theses = Thesis::withTrashed()
-            ->with(['author', 'category', 'keywords'])
-            ->where(function ($query) use ($request) {
-                if ($request->title) {
-                    $query->where('title', 'like', "%{$request->title}%");
-                }
-                if ($request->author) {
-                    $query->orWhereHas('author', function ($query) use ($request) {
-                        $query->where('name', 'like', "%{$request->author}%");
-                    });
-                }
-                if ($request->category) {
-                    $query->orWhereHas('category', function ($query) use ($request) {
-                        $query->where('category', 'like', "%{$request->category}%");
-                    });
-                }
-                if ($request->keyword) {
-                    $query->orWhereHas('keywords', function ($query) use ($request) {
-                        $query->where('keywords', 'like', "%{$request->keyword}%");
-                    });
-                }
-            })
-            ->get();
+        //     ->toArray();
+       
 
         $rs = SharedFunctions::success_msg('Success');
         $rs['result'] = $theses;
         return response()->json($rs);
     }
+
     public function getThesisById($id){
 
         $thesis = thesis::withTrashed()
@@ -165,9 +233,50 @@ class ThesisController extends Controller
 
     public function get_sorted($sort_by)
     {
-        $query = thesis::withTrashed()
-            ->orderBy('created_at', 'DESC')
-            ->get();
+        $query = Thesis::withTrashed()
+       
+        ->orderBy('created_at', 'DESC')
+        ->get()
+        ->map(function($q) {
+            $arr = [];
+            $arrK = [];
+            $arrC = [];
+            $q = Thesis::where('id', $q->id)
+                ->first();
+            //  dd($q->authors);
+            $authorIds = explode(',', trim($q->authors, '[]'));
+            
+            foreach ($authorIds as $authorId) {
+                $author = authors::find($authorId);
+                if ($author) {
+                    $arr[] = $author->toArray();
+                }
+            }
+
+            $keywordIds = explode(',', trim($q->keywords, '[]'));
+            
+            foreach ($keywordIds as $keywordId) {
+                $keyword = keywords::find($keywordId);
+                if ($keyword) {
+                    $arrK[] = $keyword->toArray();
+                }
+            }
+
+            $categoryIds = explode(',', trim($q->categories, '[]'));
+            
+            foreach ($categoryIds as $categoryId) {
+                $category = category::find($categoryId);
+                if ($category) {
+                    $arrC[] = $category->toArray();
+                }
+            }
+    
+            $q->authors = $arr;
+            $q->keywords = $arrK;
+            $q->categories = $arrC;
+            return $q;
+        })
+        ->toArray();
        
         $rs = SharedFunctions::success_msg('Success');
         $rs['result'] = $query;

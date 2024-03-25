@@ -135,13 +135,57 @@ class ThesisController extends Controller
 
     public function getThesisById($id){
 
-        $thesis = thesis::withTrashed()
-            ->with(['author', 'category', 'keywords'])
-            ->where('id','=',$id)
-            ->get();
-        $rs = SharedFunctions::success_msg('Success');
-        $rs['result'] = $thesis;
+        $thesis = Thesis::withTrashed()->find($id);
+
+        // Check if thesis with given ID exists
+        if ($thesis) {
+            // Perform your additional processing
+            $arr = [];
+            $arrK = [];
+            $arrC = [];
+        
+            // Process authors
+            $authorIds = explode(',', trim($thesis->authors, '[]'));
+            foreach ($authorIds as $authorId) {
+                $author = authors::find($authorId); // Assuming 'Author' is your author model
+                if ($author) {
+                    $arr[] = $author->toArray();
+                }
+            }
+        
+            // Process keywords
+            $keywordIds = explode(',', trim($thesis->keywords, '[]'));
+            foreach ($keywordIds as $keywordId) {
+                $keyword = keywords::find($keywordId); // Assuming 'Keyword' is your keyword model
+                if ($keyword) {
+                    $arrK[] = $keyword->toArray();
+                }
+            }
+        
+            // Process categories
+            $categoryIds = explode(',', trim($thesis->categories, '[]'));
+            foreach ($categoryIds as $categoryId) {
+                $category = Category::find($categoryId); // Assuming 'Category' is your category model
+                if ($category) {
+                    $arrC[] = $category->toArray();
+                }
+            }
+        
+            // Update thesis object with processed data
+            $thesis->authors = $arr;
+            $thesis->keywords = $arrK;
+            $thesis->categories = $arrC;
+        
+            // Return the modified thesis object
+            $rs = SharedFunctions::success_msg('Success');
+            $rs['result'] = $thesis->toArray();
+        } else {
+            // Thesis with given ID not found
+            $rs = SharedFunctions::prompt_msg('Thesis not found');
+        }
+        
         return response()->json($rs);
+        
     }
     public function delete(Request $request)
     {

@@ -3,7 +3,9 @@
         <div class="h-[250px] lg:w-full sm:w-full flex justify-center">
             <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center">
                 <div class="w-full flex flex-col items-center">
+                  
                     <div class="w-1/2 mb-3 flex-row">
+                        
                         <VaInput
                             v-model="searchQuery.title"
                             placeholder="Search here"
@@ -61,7 +63,9 @@
                         >
                             SEARCH  
                         </VaButton>
-                        
+                        <VaProgressBar  
+                        :indeterminate="isloading" 
+                        size="small" />
                     </div>
                     <!-- Can't find what you're looking for? -->
                     <div class="text-center text-blue-600 hover:underline">
@@ -210,6 +214,7 @@ export default{
         return{
             showFullAbstract: false,
             truncatedAbstract: '',
+            isloading: false,
             searchQuery:{
                 title: null,
                 keyword: null,
@@ -266,6 +271,7 @@ export default{
             }
         },
         getThesis(){
+            this.isloading = true;
             axios({
                 method: 'GET',
                 url: '/thesis/get',
@@ -275,7 +281,7 @@ export default{
                 {
                     this.data.thesisList = response.data.result;
                     
-                }
+                }this.isloading = false;
             })
         },
         getCategory() {
@@ -294,6 +300,7 @@ export default{
             });
         },
         searchThesis(){
+            this.isloading = true;
             axios({
                 method: 'POST',
                 url: '/thesis/search',
@@ -305,8 +312,10 @@ export default{
                     this.data.thesisList = response.data.result;
                     
                 }
+                this.isloading = false;
             }).catch(error => {
                 console.log("Error: " . error);
+                this.isloading = false;
             });
         },
         selectThesis(id) {

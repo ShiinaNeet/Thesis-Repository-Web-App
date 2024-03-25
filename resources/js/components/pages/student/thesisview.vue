@@ -1,13 +1,27 @@
 <template>
+   
     <div 
     class="px-10 flex flex-center justify-center bg-gray-400 text-white h-full"
     >
-        <div v-if="thesis"
+        <div 
         class=" w-1/2 mx-auto justify-center h-full"
         >
             <div
+            v-if="thesis"
             class="w-2/3 mx-auto justify-center px-5 bg-gray-800 shadow-xl h-full"
             >
+                <div transparent class="flex-start bg-inherit text-white h-fit">
+                    <VaButton
+                        class="w-fit text-white"
+                        preset="secondary"
+                        icon-right="home"
+                        icon-color="#FFFFFF"
+                        @click="$emit('home')"
+                        size="large"
+                        >
+                        
+                    </VaButton>
+                </div>
                 <div
                 class="w-full flex-wrap py-10 px-5 h-full text-wraps"
                 >
@@ -27,7 +41,7 @@
                             <ul 
                             class="text-white text-lg list-inside list-disc"
                             >
-                            <li v-for="author in thesis.author">{{ author.name }}</li>
+                            <li v-for="author in thesis.authors">{{ author.name }}</li>
                             </ul>
                         </VaList>
                         <VaList class="text-white">
@@ -38,7 +52,7 @@
                             class="text-white text-lg list-disc list-inside"
                             >
                                 <VaChip 
-                                v-for="category in thesis.category"
+                                v-for="category in thesis.categories"
                                 color="secondary"
                                 class="mr-2"
                                 size="large"
@@ -88,8 +102,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div v-else>
+            <div v-else>
             <div class="m-10">
                 <div class="flex flex-center justify-center mx-auto">
                     <p class="text-3xl flex justify-center font-serif">
@@ -98,6 +111,8 @@
                 </div>
             </div>
         </div>
+        </div>
+        
     </div>
     <!-- pdf -->
     <VaModal
@@ -162,7 +177,7 @@ export default {
                 url: '/thesisq/'+this.selectedID,
             }).then(response => {
                 if (response.data.status == 1) {
-                    this.thesis = response.data.result[0];
+                    this.thesis = response.data.result;
                     console.log(this.thesis);
                 
                 } else this.$root.prompt(response.data.text);

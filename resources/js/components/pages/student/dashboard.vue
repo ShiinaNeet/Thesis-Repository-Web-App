@@ -9,7 +9,7 @@
                     <home_tbl @thesisSelected="handleThesisSelected" />
                 </template>
                 <template v-if="activeSetting === 'ThesisView'">
-                    <thesis_tbl :selectedThesisId="selectedThesisId"/>
+                    <thesis_tbl :selectedThesisId="selectedThesisId" @home="goback"/>
                 </template>
                 
             </div>
@@ -52,6 +52,11 @@ export default {
             this.selectedThesisId = id;
           
             this.activeSetting = 'ThesisView';
+        },
+        goback() {
+            this.$root.config.tblCurrPage = 1;
+            this.activeSetting = 'Dashboard';
+            console.log('go back callback')
         },
     }
 }

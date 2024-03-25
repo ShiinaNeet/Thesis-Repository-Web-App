@@ -9,9 +9,13 @@
       </VaNavbarItem>
     </template>
     <template #right>
-      <div class="flex gap-0">
-        <VaNavbarItem class="hidden sm:block bg-inherit justify-center items-center ">
+      <div
+      v-if="$root.auth"
+      class="flex gap-0">
+        <VaNavbarItem
+         class="hidden sm:block bg-inherit justify-center items-center ">
           <VaButton
+          v-if="$root.auth && $root.auth.userType == 0"
           class=""
           preset="secondary"
           hover-behavior="opacity"
@@ -23,24 +27,26 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
+          v-if="$root.auth"
           class=""
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"
-          @click="$root.redirectToPage('/Users')"
+          @click="$root.redirectToPage('/search')"
           >
-            <span class="text-white">Users</span>
+            <span class="text-white">Thesis</span>
           </VaButton>
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
           <VaButton
+          v-if="$root.auth && $root.auth.userType !== null"
           class=""
           preset="secondary"
           hover-behavior="opacity"
           :hover-opacity="0.4"
-          @click="$root.redirectToPage('/Thesis')"
+          @click="$root.redirectToPage('/logout')"
           >
-            <span class="text-white">Thesis</span>
+            <span class="text-white">Logout</span>
           </VaButton>
         </VaNavbarItem>
       </div>
@@ -68,7 +74,42 @@ const darkNavbarColors = computed(() => {
     };
   }
 });
+
+
 </script>
+<script>
+export default {
+  data() {
+      return{
+
+      }
+      },
+  methods:{
+    logout(){
+      axios({
+        method: 'POST',
+        type: 'JSON',
+        url: '/logout',
+        data: {
+            userID: this.account.login.userId,
+        }
+      }).then(response => {
+          if (response.data.status == 1) {
+              setTimeout(() => {
+                  window.location = response.data.redirect;
+              }, this.loginDelay);
+          } else {
+            
+          }
+      }).catch(error => {
+        console.log("test");
+      
+      });
+    }
+  }
+}
+</script>
+
 
 <style scoped>
 .logo {

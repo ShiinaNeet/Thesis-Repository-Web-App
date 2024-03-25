@@ -21,7 +21,9 @@
                         label="User ID"
                         class="w-full mb-2 bg-[rgba(255,255,255,0.45)]"
                         :error="account.isInvalid"
+                        :error-messages="account.invalidMessage[0]"
                         :disabled="account.isLoading"
+                        immediate-validation
                         outline
                         />
                         <va-input
@@ -29,9 +31,11 @@
                         :type="account.isPasswordVisible ? 'text' : 'password'"
                         label="Password"
                         class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
-                        :error="account.isInvalid"
+                        
+                        :error="account.isInvalid && (account.login.password === '' || account.login.password === null)"
                         :error-messages="account.invalidMessage[0]"
                         :disabled="account.isLoading"
+                        immediate-validation
                         outline
                         >
                             <template #appendInner>
@@ -92,13 +96,18 @@
                     <h5 class="va-text-secondary">
                         Please register to continue
                     </h5>
-                    <div class="mt-10">
+                    <!-- <div class="flex-col bg-red-200 py-4 justify-center mt-4">
+                        <h3 class="font-bold text-black-900 justify-center flex-center" v-for="invalid in account.invalidMessage">{{ invalid }}</h3>
+                    </div> -->
+                    <div class="mt-3">
                         <va-input
                         v-model="account.register.userId"
                         label="User ID"
                         class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
                         :disabled="account.isLoading"
                         outline
+                        :error="account.register.isValidUserID"
+                        :error-messages="account.register.userIDError"
                         />
                     </div>
                     <div class="mt-1">
@@ -109,6 +118,8 @@
                         class="w-full mb-3 bg-[rgba(255,255,255,0.45)]"
                         :disabled="account.isLoading"
                         outline
+                        :error="account.register.invalidPassword"
+                        @keyup="account.register.invalidPassword = false"
                         >
                             <template #appendInner>
                                 <va-icon
@@ -119,6 +130,9 @@
                                 />
                             </template>
                         </va-input>
+                        <div class="text-sm" v-if="account.register.invalidPassword">
+                            <p class="text-red-700"> {{ account.register.passwordError }}</p>
+                        </div>
                     </div>
                     <div class="flex">
                         <va-checkbox
@@ -138,6 +152,7 @@
                     <div v-if="account.register.terms.isInvalid" class="text-red-500 text-sm">
                         {{ account.register.terms.invalidMessage }}
                     </div>
+                    
                     <div class="mt-6 mb-6">
                         <va-button
                         class="w-full"
@@ -226,6 +241,7 @@ export default {
                 invalidMessage: [
                     "Please check your credentials and try again.",
                     "",
+                    "",
                 ],
                 isPasswordVisible: false,
                 login: {
@@ -234,11 +250,11 @@ export default {
                 },
                 register: {
                     userId: 0,
-                    password: null,
+                    password: "",
                     passwordmatch:null,
                     invalidMessage: false,
                     invalidPassword: false,
-                    isValidUserID: true,
+                    isValidUserID: false,
                     idErrorMessage:"Wrong Login credential",
                     passwordMisMatch: [ "The password does not match.",
                                         "The User ID field is required.",
@@ -281,7 +297,7 @@ export default {
                 type: 'JSON',
                 url: '/register',
                 data: {
-                    userId: this.account.register.userId,
+                    userID: this.account.register.userId,
                     password: this.account.register.password,
                 },
             }).then(response => {
@@ -291,16 +307,28 @@ export default {
                     this.account.isValid = true;
                     this.account.validMessage = response.data.text;
                     this.account.isInvalid = false;
-
                     this.account.register.saved = false;
+                    this.setActiveWindow('Login');
                 } else {
                     this.account.invalidMessage[1] = response.data.text;
                     this.account.isInvalid = true;
-
+                    
+                    this.$root.prompt(response.data.text);
+                       
                     this.account.register.saved = false;
                 }
             }).catch(error => {
-                this.account.invalidMessage[1] = error.response.data.message;
+                let resDataError = Object.keys(error.response.data.errors);
+                console.log(resDataError);
+                if (resDataError[0]=== "userID") {
+                        this.account.register.isValidUserID = true;
+                        this.account.register.userIDError = "Invalid User ID";
+                }
+                if (resDataError.includes('password')) {
+                        this.account.register.invalidPassword = true;
+                        this.account.register.passwordError = "Invalid Password";
+                }     
+
                 this.account.isLoading = false;
                 this.account.isInvalid = true;
                 this.account.register.terms.isInvalid = false;
@@ -311,13 +339,23 @@ export default {
         loginAccount() {
             this.account.isLoading = true;
             this.account.isInvalid = false;
+            if(this.account.login.userId === 0)
+            {
+                
+                this.account.login.invalidUserID = true;
+                this.account.login.invalidUserIDMessage = "Password cannot be 0";
+            }
+            if(this.account.login.password === null)
+            {
+                this.account.login.invalidPassword = true;
+            }
 
             axios({
                 method: 'POST',
                 type: 'JSON',
                 url: '/login',
                 data: {
-                    userId: this.account.login.userId,
+                    userID: this.account.login.userId,
                     password: this.account.login.password,
                 }
             }).then(response => {
@@ -333,6 +371,12 @@ export default {
                 }
             }).catch(error => {
                 // this.$root.prompt(error.response.data.message);
+                let dataerror = Object.keys(error.response.data.errors)
+                dataerror.forEach(key =>{
+                    if(key === "userID"){
+                        console.log("user id error");
+                    }
+                })
                 this.account.isLoading = false;
                 this.account.isInvalid = true;
             });
@@ -369,6 +413,7 @@ export default {
                     } else this.forgotPassword.isInvalid = true;
                 }).catch(error => {
                     // this.$root.prompt(error.response.data.message);
+                    
                     this.forgotPassword.invalidMessage[0] = error.response.data.message;
                     this.forgotPassword.isLoading = false;
                     this.forgotPassword.isInvalid = true;

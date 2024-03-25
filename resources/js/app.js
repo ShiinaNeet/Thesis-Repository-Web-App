@@ -5,10 +5,10 @@ import { createApp } from "vue";
 import { createVuestic } from "vuestic-ui";
 import "vuestic-ui/css";
 
-import accountModule from "./components/pages/accounts.vue";
+import accountModule from "./components/pages/admin/accounts.vue";
 import LoginModule from "./components/login.vue";
 import dashboardModule from "./components/pages/admin/dashboard.vue";
-
+import studentDashboardModule from "./components/pages/student/dashboard.vue";
 
 const app = createApp({
     data () {
@@ -23,15 +23,10 @@ const app = createApp({
                 uploadSizeLimitInMBytes: 2,
                 minPasswordChars: 8,
                 strictPasswordUpdate: true,
-                contactEmail: 'drivingschool@wheelscapstone.site',
+                contactEmail: 'STICollege@balaya.sti.edu.ph',
                 contactNumberOne: '09493092321',
                 contactNumberTwo: '09123456789',
                 contactCountryCode: '+63',
-                calendar: {
-                    openTime: '08:00',
-                    closeTime: '17:00',
-                    days: [ 1, 2, 3, 4, 5, 6 ],
-                },
             },
         };
     },
@@ -39,6 +34,7 @@ const app = createApp({
         'login': LoginModule,
         'accounts': accountModule,
         'dashboard': dashboardModule,
+        'studentdashboard':studentDashboardModule,
         
     },
     methods: {

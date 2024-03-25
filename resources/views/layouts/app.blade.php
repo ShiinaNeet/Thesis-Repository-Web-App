@@ -1,3 +1,11 @@
+@php
+    $auth = \Illuminate\Support\Facades\Auth::class;
+    $user_type = $userID = null;
+    if ($auth::check()) {
+        $userID = $auth::user()->userID;
+        $user_type = $auth::user()->user_type;
+    }
+@endphp
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -7,7 +15,7 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Thesis Repository') }}</title>
 
         <!-- Styles -->
         <style>
@@ -19,7 +27,14 @@
 
         <!-- Script -->
         @vite('resources/js/app.js')
-       
+        
+        <script>
+            var auth = {
+                userID: {!! json_encode($userID) !!},
+                userType: {!! json_encode($user_type) !!},
+               
+            };
+        </script>
 
         <!-- Fonts -->
         {{-- <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet"> --}}

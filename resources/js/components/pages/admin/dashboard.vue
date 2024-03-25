@@ -85,7 +85,7 @@
                         })"
                         :key="idx"
                         :active="isSettingActive(setting)"
-                        @click="setSettingActive(setting)"
+                        @click="setSettingActive(setting), menu_open = !menu_open"
                         >
                             <va-sidebar-item-content class="min-h-[20px!important] p-[7px!important]">
                                 <va-sidebar-item-title class="text-sm select-none">
@@ -119,7 +119,7 @@
                         })"
                         :key="idx"
                         :active="isSettingActive(setting)"
-                        @click="setSettingActive(setting)"
+                        @click="setSettingActive(setting), setting === 'Thesis' ? menu_open = !menu_open : ''"
                         >
                             <va-sidebar-item-content class="min-h-[20px!important] p-[7px!important]">
                                 <va-sidebar-item-title class="text-sm select-none">
@@ -131,12 +131,30 @@
                     </div>
                 </div>
             </div>
-            <div class="flex w-full pt-8 min-h-[calc(100vh-62px)] overflow-x-hidden bg-white-500">
+            <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden bg-slate-700">
                 <div
                 id="settings-wrapper"
                 >
+                    <template v-if="activeSetting === 'Dashboard'">
+                       <home_tbl />
+                    </template>
                     <template v-if="activeSetting === 'Accounts'">
                        <accounts_tbl />
+                    </template>
+                    <template v-if="activeSetting === 'Keyword'">
+                       <keywords_tbl />
+                    </template>
+                    <template v-if="activeSetting === 'Author'">
+                       <authors_tble />
+                    </template>
+                    <template v-if="activeSetting === 'Category'">
+                       <category_tble />
+                    </template>
+                    <template v-if="activeSetting === 'Thesis'">
+                       <thesis_tbl />
+                    </template>
+                    <template v-if="activeSetting === 'Backup and Restore'">
+                       <backup_tbl />
                     </template>
                 </div>
             </div>
@@ -146,23 +164,35 @@
 
 <script>
 import navbar from '../../navbar.vue';
-import accountModule from '../accounts.vue';
+import authorModule from './author.vue';
+import categoryModule from './category.vue';
+import accountsModule from './accounts.vue';
+import keywordsModule from './keyword.vue';
+import thesisModule from './thesis.vue';
+import homeModule from './home.vue';
+import backupModule from './backup.vue';
 export default {
     data () {
         return {
             dashboard: ['Dashboard'],
             account_mngt: ['Accounts'],
-            thesis_mngt: ['Thesis','Keyword','Category','Author'],
+            thesis_mngt: ['Thesis','Keyword','Category','Author', 'Backup and Restore'],
             activeSetting: 'Dashboard',
-            menu_open: false,
+            menu_open: true,
         };
     },
     components: {
         navigation: navbar,
-        accounts_tbl: accountModule,
-       
-    },
+        accounts_tbl: accountsModule,
+        keywords_tbl: keywordsModule,
+        authors_tble: authorModule,
+        category_tble: categoryModule,
+        thesis_tbl: thesisModule,
+        home_tbl: homeModule,
+        backup_tbl: backupModule,
 
+    },
+    
     methods: {
         isSettingActive(setting) {
             return this.activeSetting === setting;

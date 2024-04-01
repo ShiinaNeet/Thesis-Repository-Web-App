@@ -98,11 +98,21 @@
                 id="table-row-d h-1/2 w-2/3"
                 >
                     <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg flex flex-center justify-center">
-                        <div>
-                            <video class="h-1/2 w-full " v-if="rowData.video !== null" controls>
-                                <source :src="rowData.video" type="video/mp4">       
+                        <div class="h-full">
+                            <video class="h-1/2 w-full "  v-if="rowData.video !== null" controls>
+                                <source :src="rowData.video"  type="video/mp4">  
+                                   
                             </video> 
-                            <div class="h-1/2 w-full flex flex-center justify-center">No video</div>
+                            <div
+                            v-else
+                            class="h-1/2 w-full"
+                            >
+                                <div 
+                                class="justify-center flex flex-center text-center"
+                                >
+                                    No video
+                                </div>
+                            </div>  
                         </div>
                            
                     </div>
@@ -138,7 +148,7 @@
                         </VaDivider>
                         <div class=" w-fit py-3 pt-4">
                             <div class="flex lg:flex-row flex-col gap-1">
-                                <h2>Tags: </h2>
+                               
                                 <span v-for="keywordList in rowData.keywords" class="flex items-center">
                                     <VaBadge
                                         :text="keywordList.keyword"
@@ -210,15 +220,13 @@
                             label="Title *"
                             class="w-full mb-2"
                             maxlength="120"
-                            :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
-                            :error="createThesis.TitleEmpty"
-                            :error-messages="'The title field is required.'"
-                            @keyup="createThesis.TitleEmpty = false"
+                            :error="createThesis.TitleEmpty && (createThesis.data.title === '' || createThesis.data.title === null)"
+                            :error-messages="'The Title field is required.'"
+                            immediate-validation
                             />
                             <div class="select w-full">
                                 <VaSelect
                                 class="w-1/2"
-                                requiredMark
                                 v-model="createThesis.data.keywords"
                                 label="Keywords to attach"
                                 :options="keywordList"
@@ -247,7 +255,6 @@
                                 </VaSelect>
                                 <VaSelect
                                 class="w-1/2"
-                                requiredMark
                                 v-model="createThesis.data.categories"
                                 label="Category to attach"
                                 :options="categoryList"
@@ -276,7 +283,6 @@
                                 </VaSelect>
                                 <VaSelect
                                 class="w-full"
-                                requiredMark
                                 multiple
                                 v-model="createThesis.data.authors"
                                 label="Author"
@@ -309,22 +315,23 @@
                             label="Abstract *"
                             class="w-full h-fit mb-2"
                             :autosize="true"
+                            :maxLength="500"
+                            counter
                             max-rows="7"
                             min-rows="7"
-                            :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
-                            :error="createThesis.abstractEmpty"
-                            :error-messages="'The abstract field is required.'"
-                            @keyup="createThesis.AbstractEmpty = false"
+                            :error="createThesis.AbstractEmpty && (createThesis.data.abstract === '' || createThesis.data.abstract === null)"
+                            :error-messages="'The Abstract field is required.'"
+                            immediate-validation
                             />
                             <va-input
                             v-model="createThesis.data.published_at"
                             label="Publish date *"
                             type="date"
                             class="w-full mb-2"
-                            maxlength="500"
-                            :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
-                            :error="createThesis.abstractEmpty"
-                            :error-messages="'The publish date field is required.'"
+                            
+                            :rules="[(v) => v && v.length > 0 || 'The Published Date field is required.']"
+                            :error="createThesis.PublishedDateEmpty && (createThesis.data.published_at === '' || createThesis.data.published_at === null)"
+                            :error-messages="'The Published Date field is required.'"
                             @keyup="createThesis.PublishedDateEmpty = false"
                             />
                             <input
@@ -388,10 +395,10 @@
                         label="Title *"
                         class="w-full mb-2"
                         maxlength="120"
-                        :rules="[(v) => v && v.length > 0 || 'The title field is required.']"
-                        :error="editThesis.TitleEmpty"
-                        :error-messages="'The title field is required.'"
+                        :error="editThesis.TitleEmpty && (editThesis.data.title == '' || editThesis.data.title == null)"
+                        :error-messages="'The Title field is required.'"
                         @keyup="editThesis.TitleEmpty = false"
+                        immediate-validation
                         />
                         <div class="select w-full">
                             <!-- Error in EditThesis.data.keywords IDK WHY -->
@@ -400,7 +407,6 @@
                             :options="keywordList"
                             text-by="keyword"
                             value-by="id"
-                            requiredMark
                             class="w-1/2"
                             label="Keywords to attach"
                             multiple
@@ -430,7 +436,6 @@
                             :options="categoryList"
                             text-by="category"
                             value-by="id"
-                            requiredMark
                             class="w-1/2"
                             label="Category to attach"
                             multiple
@@ -461,7 +466,6 @@
                             :options="authorList"
                             text-by="name"
                             value-by="id"
-                            requiredMark
                             class="w-full"
                             label="Author"
                             multiple
@@ -492,20 +496,19 @@
                         :autosize="true"
                         max-rows="7"
                         min-rows="7"
-                        :rules="[(v) => v && v.length > 0 || 'The abstract field is required.']"
-                        :error="editThesis.abstractEmpty"
-                        :error-messages="'The abstract field is required.'"
+                        :error="editThesis.AbstractEmpty && (editThesis.data.abstract === '' || editThesis.data.abstract === null )"
+                        :error-messages="'The Abstract field is required.'"
                         @keyup="editThesis.abstractEmpty = false"
+                        immediate-validation
                         />
                         <VaDateInput
                         v-model="editThesis.data.published_at"
                         label="Published date *"
                         preset="bordered"
                         class="w-full mb-2"
-                     
-                        :rules="[(v) => v && v.length > 0 || 'The publish date field is required.']"
+                        :rules="[(v) => v && v.length > 0 || 'The Published Date field is required.']"
                         :error="editThesis.abstractEmpty"
-                        :error-messages="'The publish date field is required.'"
+                        :error-messages="'The Published Date field is required.'"
                         @keyup="editThesis.publishedDateEmpty = false"
                         />
                         <input
@@ -666,8 +669,8 @@ import formatDate from '@/functions/formatdate.js';
 import { VaChip } from 'vuestic-ui/web-components';
 const now = () => new Date();
 const newThesis = {
-    title:null,
-    abstract:null,
+    title:'',
+    abstract:'',
     published_at: formatDate(now(),'YYYY-MM-DD', 'Invalid Date'),
     id: null,
     categories:[], 
@@ -932,8 +935,6 @@ export default {
                 const config = {
                     onUploadProgress: (progressEvent) => {
                         const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                        
-
                         if (percentCompleted === 100) {
                             this.createThesis.isloading = false;
                             this.editThesis.isloading = false;
@@ -979,10 +980,8 @@ export default {
                     this.getThesis();
                     this.createThesis.isloading = false;
                 }).catch(error => {
-                    // this.$root.prompt(error.response.data.message);
-                    this.editThesis.saved = false;
-                    this.editThesis.modal = false;
                     this.getThesis();
+
                     let resDataError = Object.keys(error.response.data.errors);
                     if (resDataError.filter(key => key == 'message').length > 0) {
                         method === 'create' ? (this.createThesis.data = { ...newThesis },
@@ -999,20 +998,22 @@ export default {
                                 this.editThesis.saved = false));
                                 this.getThesis();
                     }
-                    if (resDataError.filter(key => key == 'title').length) {
-                        method === 'create' ? this.createThesis.TitleEmpty = true
-                            : (method === 'save' && (this.editThesis.TitleEmpty = true));
+                    if (resDataError.includes('title')) {
+                        this.createThesis.TitleEmpty = true;
+                        this.editThesis.TitleEmpty = true;
                     }
-                    if (resDataError.filter(key => key == 'abstract').length) {
-                        method === 'create' ? this.createThesis.AbstractEmpty = true
-                            : (method === 'save' && (this.editThesis.AbstractEmpty = true));
+                    if (resDataError.includes('abstract')) {
+                        this.createThesis.AbstractEmpty = true;
+                        this.editThesis.AbstractEmpty = true;
                     }
-                    if (resDataError.filter(key => key == 'published_at').length) {
+                    if (resDataError.includes('published_at')) {
                         method === 'create' ? this.createThesis.PublishedDateEmpty = true
                             : (method === 'save' && (this.editThesis.PublishedDateEmpty = true));
                     }
-                    method === 'create' ? this.createThesis.saved = false
-                        : (method === 'save' && (this.editThesis.saved = false));
+                    if(method === 'create' ) this.createThesis.saved = false;
+                    else {
+                        this.editThesis.saved = false;
+                    }
                     this.getThesis();    
                 });
             }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\authors;
 use App\Models\thesis;
 use App\Models\Users;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,10 +61,12 @@ class PageController extends Controller
         $Users = Users::get()->count();
         $authors = authors::get()->count();
         $thesis = thesis::get()->count();
+        $thesisoutdated = thesis::get()->where('published_at','<', Carbon::now()->subYears(5))->count();
         $rs['result'] = [
             'users' => $Users,
             'authors' => $authors,
             'thesis' => $thesis,
+            'thesisoutdated' => $thesisoutdated,
         ];
         
         return $rs;

@@ -70,6 +70,7 @@ export default{
                     this.users.count = response.data.result.users;
                     this.authors.count = response.data.result.authors;
                     this.thesis.active.count = response.data.result.thesis;
+                    this.thesis.outdated.count = response.data.result.thesisoutdated;
                 }).catch(error => {
                     console.log("error: ". error);
                 });

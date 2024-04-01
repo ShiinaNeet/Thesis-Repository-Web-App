@@ -1,14 +1,14 @@
 <template>
-   
     <div 
-    class="px-10 flex flex-center justify-center bg-gray-400 text-white h-full"
+    class="px-10 flex flex-center justify-center text-white h-full transform-none"
     >
         <div 
         class=" w-1/2 mx-auto justify-center h-full"
         >
             <div
             v-if="thesis"
-            class="w-2/3 mx-auto justify-center px-5 bg-gray-800 shadow-xl h-full"
+            class="w-2/3 mx-auto justify-center px-5 bg-gray-800 shadow-xl
+            "
             >
                 <div transparent class="flex-start bg-inherit text-white h-fit">
                     <VaButton

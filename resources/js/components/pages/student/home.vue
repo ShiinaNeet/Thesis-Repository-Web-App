@@ -5,13 +5,12 @@
                 <div class="w-full flex flex-col items-center">
                   
                     <div class="w-1/2 mb-3 flex-row">
-                        
                         <VaInput
                             v-model="searchQuery.title"
                             placeholder="Search here"
                             label="Title  "
                             inner-label
-                            class="w-full max-w-md"
+                            class="w-full max-w-md shadow-md py-2"
                             color="Info"
                             currentColor="Success"
                           
@@ -21,7 +20,7 @@
                             placeholder="Search here"
                             label="Keyword  "
                             inner-label
-                            class="w-full max-w-md"
+                            class="w-full max-w-md shadow-md py-2"
                             color="Info"
                             currentColor="Success"
                            
@@ -31,7 +30,7 @@
                             placeholder="Search here"
                             label="Author "
                             inner-label
-                            class="w-full max-w-md"
+                            class="w-full max-w-md shadow-md py-2"
                             color="Info"
                             currentColor="Success" 
                         />
@@ -48,17 +47,18 @@
                         value-by="category"
                         highlight-matched-text
                         clearable-icon="cancel"
-                        class="w-full max-w-md"
+                        class="w-full max-w-md shadow-md py-2"
                         color="Info"
                         currentColor="Success"
                         />
                         <VaButton
                         preset="secondary"
+                        border-color="primary"
                         hover-behavior="opacity"
                         :hover-opacity="0.4"
                         icon-color="#ffffff50"
                         size="medium"
-                        class="w-full text-center"
+                        class="w-full text-center transition-opacity shadow-md py-2 hover:-translate-y-1 hover:scale-170 duration-350 ease-in-out"
                         @click="searchThesis()"
                         >
                             SEARCH  
@@ -76,19 +76,24 @@
         </div>
 
         <div class="bg-white-500 w-full h-full">
-            <div class="flex flex-center justify-center flex-col">
-                <VaCard
-                square
-                outlined
+            <div class="flex flex-center justify-center flex-col ">
+                <div 
                 v-for="thesis in data.thesisList"
-                class="mb-3 h-full w-1/2 "
+                class="mb-3 h-full w-1/2 shadow-2xl shadow-red-400
+                
+                "
+                :key="thesis.id"
                 >
+                    <VaCard
+                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 shadow-2xl shadow-red-400"
+                    >
                     <VaCardTitle>
                         <div class="flex w-full ">
                             <h2 
                             @click="selectThesis(thesis.id)"
                             lang="en"
-                            class="break-words hyphens-auto text-2xl font-bold underline text-blue-700 hover:bg-slate-400 hover:text-white w-full md:flex-grow text-wrap">
+                            class="break-words hyphens-auto text-2xl font-bold underline text-black-700  text-center
+                            hover:bg-slate-100 hover:text-blue hover:cursor-pointer w-full md:flex-grow text-wrap">
                             {{ thesis.title }}
                             </h2> 
                             <br/>
@@ -160,22 +165,22 @@
                             </div>
                         </div>
                         
-                        <div>
+                        <div :key="thesis.id">
                             <div class="max-h-[150px] overflow-hidden">
-                            <p class="text-gray-700 leading-relaxed text-sm md:text-base" v-show="!showFullAbstract">
-                                {{ truncatedAbstract }}
-                            </p>
-                            <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap text-justify" v-show="showFullAbstract" ref="fullAbstract">
-                                {{ thesis.abstract  }}
-                            </p>
-                            <button 
-                                class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline mt-2 inline-block"
-                                @click="toggleAbstract"
-                            >
-                                {{ showFullAbstract ? 'Read less' : 'Read more' }}
-                            </button>
+                                <p class="text-gray-700 leading-relaxed text-sm md:text-base" v-show="!isAbstractOpen(thesis.id)">
+                                    {{ getTruncatedAbstract(thesis.id) }}
+                                </p>
+                                <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap text-justify" 
+                                v-show="isAbstractOpen(thesis.id)" >
+                                    {{ thesis.abstract }}
+                                </p>
+                                <button class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline mt-2 inline-block" 
+                                @click="toggleAbstract(thesis.id)">
+                                    {{ isAbstractOpen(thesis.id) ? 'Read less' : 'Read more' }}
+                                </button>
                             </div>
                         </div>
+
                         
                         <div class="files flex flex-center w-fit gap-5 pt-5 ">
                             <VaButton
@@ -183,6 +188,7 @@
                             icon="download"
                             color="info"
                             :href="thesis.pdf"
+                            class="hover:animate-bounce ease-in-out"
                             >
                             Download PDF here
                             </VaButton>
@@ -191,6 +197,7 @@
                             icon="download"
                             color="info"
                             :href="thesis.video"
+                            class="hover:animate-bounce ease-in-out"
                             >
                             Download Video here
                             </VaButton>
@@ -199,6 +206,8 @@
                         
                     </VaCardContent>
                 </VaCard>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -225,50 +234,38 @@ export default{
             data:{
                 search: "",
                 thesisList: [],
-            }
+                expandedThesisId: null,
+            },
+            
+
         }
     },
     mounted(){
         this.getThesis();
-        this.truncateAbstract();
         this.getCategory();
     },
     computed(){
         this.getThesis();
+        this. getTruncatedAbstract();
     },
     methods:{
-        toggleAbstract() {
-            this.showFullAbstract = !this.showFullAbstract;
-        },
-        findTruncationIndex(text) {
-            // Binary search to find the index at which the abstract should be truncated
-            let start = 0;
-            let end = text.length - 1;
-            while (start <= end) {
-                const mid = Math.floor((start + end) / 2);
-                this.$refs.fullAbstract.textContent = text.substring(0, mid);
-                if (this.$refs.fullAbstract.clientHeight <= 150) {
-                start = mid + 1;
-                } else {
-                end = mid - 1;
-                }
+        toggleAbstract(thesisId) {
+            if (this.data.expandedThesisId === thesisId) {
+                this.data.expandedThesisId = null;
+            } else {
+                this.data.expandedThesisId = thesisId;
             }
-            return end;
         },
-        truncateAbstract() {
-            const abstractElement = this.$refs.fullAbstract;
-            if (abstractElement) {
-                // Get the original abstract text
-                const originalAbstract = abstractElement.textContent.trim();
-                // Check if the original abstract exceeds 150px in height
-                if (abstractElement.clientHeight > 150) {
-                // Truncate the abstract and append ellipsis
-                this.truncatedAbstract = originalAbstract.substring(0, this.findTruncationIndex(originalAbstract)) + '...';
-                } else {
-                // If the abstract doesn't need truncation, display the original text
-                this.truncatedAbstract = originalAbstract;
-                }
+        isAbstractOpen(thesisId) {
+            return this.data.expandedThesisId === thesisId;
+        },
+        getTruncatedAbstract(thesisId) {
+            if (!Array.isArray(this.data.thesisList)) {
+                return '';
             }
+            const thesis = this.data.thesisList.find(item => item.id === thesisId);
+            if (!thesis) return '';
+            return thesis.abstract.slice(0, 150);
         },
         getThesis(){
             this.isloading = true;

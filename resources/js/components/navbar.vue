@@ -4,8 +4,12 @@
     class="h-24"
   >
     <template #left>
-      <VaNavbarItem class="logo">
-        Thesis Repository
+      <VaNavbarItem class="logo" >
+        <div
+        @click="$root.redirectToPage('/dashboard')"
+        >
+          Thesis Repository
+        </div>
       </VaNavbarItem>
     </template>
     <template #right>
@@ -55,28 +59,6 @@
   
 </template>
 
-<script setup>
-import { computed } from "vue";
-import { useColors } from "vuestic-ui";
-
-const { currentPresetName } = useColors();
-
-const darkNavbarColors = computed(() => {
-  if (currentPresetName.value === "light") {
-    return {
-      color: "#111111",
-      textColor: "#BAFFC5",
-    };
-  } else {
-    return {
-      color: "#FBCAF6",
-      textColor: "#481269",
-    };
-  }
-});
-
-
-</script>
 <script>
 export default {
   data() {

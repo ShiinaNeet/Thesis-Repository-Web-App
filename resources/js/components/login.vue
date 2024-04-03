@@ -1,14 +1,14 @@
 <template>
     <div class="h-screen">
         <navigation />
-        <div class="flex items-start min-h-[calc(100vh-62px)]">
-            <div class="flex items-center w-9/12 py-8 min-h-[calc(100vh-62px)]" style="position: sticky; top:62px;">
+        <div class="flex items-start min-h-[calc(100vh-62px)] bg-black-300">
+            <div class="flex items-center w-9/12 py-8 min-h-[calc(100vh-62px)] " style="position: sticky; top:62px;">
                 <div
                 v-if="activeWindow === 'Login'"
-                class="shrink m-auto w-[min(400px,75vw)]"
+                class="shrink m-auto p-5 w-[min(500px,75vw)] shadow-2xl shadow-red-400 rounded-lg"
                 id="login-form-wrapper"
                 >
-                    <h5 class="va-h5">
+                    <h5 class="va-h5 text-center pb-3">
                         Welcome to Thesis Repository
                     </h5>
                     <h5 class="va-text-secondary">
@@ -87,10 +87,10 @@
                 </div>
                 <div
                 v-if="activeWindow === 'Register'"
-                class="shrink m-auto w-[min(400px,75vw)]"
+                class="shrink m-auto w-[min(500px,75vw)] p-5  shadow-2xl shadow-red-400 rounded-lg"
                 id="register-form-wrapper"
                 >
-                    <h5 class="va-h5">
+                    <h5 class="va-h5 text-center pb-3">
                         Welcome, Guest User
                     </h5>
                     <h5 class="va-text-secondary">
@@ -121,7 +121,7 @@
                         :error="account.register.invalidPassword"
                         @keyup="account.register.invalidPassword = false"
                         >
-                            <template #appendInner>
+                        <template #appendInner>
                                 <va-icon
                                 :name="account.register.isPasswordVisible ? 'visibility_off' : 'visibility'"
                                 size="small"

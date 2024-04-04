@@ -51,24 +51,44 @@
                         color="Info"
                         currentColor="Success"
                         />
-                        <VaButton
-                        preset="secondary"
-                        border-color="primary"
-                        hover-behavior="opacity"
-                        :hover-opacity="0.4"
-                        icon-color="#ffffff50"
-                        size="medium"
-                        class="w-full text-center transition-opacity shadow-md py-2 hover:-translate-y-1 hover:scale-170 duration-350 ease-in-out"
-                        @click="searchThesis()"
-                        >
-                            SEARCH  
-                        </VaButton>
+                        <div class="flex">
+                            <VaButton
+                            preset="secondary"
+                            border-color="primary"
+                            hover-behavior="opacity"
+                            :hover-opacity="0.4"
+                            icon-color="#ffffff50"
+                            size="medium"
+                            class="w-2/3 text-center transition-opacity shadow-md py-2 hover:-translate-y-1 hover:scale-170 duration-350 ease-in-out"
+                            @click="searchThesis()"
+                            >
+                                SEARCH  
+                            </VaButton>
+                            <VaSelect
+                            v-model="searchQuery.sort"
+                            placeholder="A-Z"
+                            :options="sortList"
+                            label="Sort"
+                            inner-label
+                            clearable
+                            searchable
+                            autocomplete
+                            text-by="name"
+                            value-by="value"
+                            highlight-matched-text
+                            clearable-icon="cancel"
+                            class="w-1/3 max-w-md shadow-md ps-1 "
+                            color="Info"
+                            currentColor="Success"
+                            />
+                        </div>
+                       
                         <VaProgressBar  
                         :indeterminate="isloading" 
                         size="small" />
                     </div>
                     <!-- Can't find what you're looking for? -->
-                    <div class="text-center text-blue-600 hover:underline">
+                    <div class="pb-5 text-center text-blue-600 hover:underline">
                         <span @click="$root.redirectToPage('/login')">Can't find what you're looking for?</span>
                     </div>
                 </div>
@@ -79,20 +99,22 @@
             <div class="flex flex-center justify-center flex-col ">
                 <div 
                 v-for="thesis in data.thesisList"
-                class="mb-3 h-full w-1/2 shadow-2xl shadow-red-400
+                class="mb-3 h-full w-1/2 shadow-2xl shadow-red-400 
                 
                 "
                 :key="thesis.id"
                 >
                     <VaCard
-                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 shadow-2xl shadow-red-400"
+                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 shadow-2xl shadow-red-400
+                            translate-x-50 
+                    "
                     >
                     <VaCardTitle>
                         <div class="flex w-full ">
                             <h2 
                             @click="selectThesis(thesis.id)"
                             lang="en"
-                            class="break-words hyphens-auto text-2xl font-bold underline text-black-700  text-center
+                            class="break-words hyphens-auto text-2xl font-bold hover:underline text-black-700  text-center
                             hover:bg-slate-100 hover:text-blue hover:cursor-pointer w-full md:flex-grow text-wrap">
                             {{ thesis.title }}
                             </h2> 
@@ -105,7 +127,7 @@
                             <div class="w-fit pb-3 h-1/5">
                                 <div class="">
                                     <div class="flex items-center"> <!-- Flex container for label and paragraph -->
-                                        <label class="text-lg font-bold mr-2"> <!-- Label -->
+                                        <label class="text-lg font-bold mr-2 flex-wrap"> <!-- Label -->
                                             Authors:  
                                         </label>
                                         <div class="flex flex-wrap whitespace-normal"> <!-- Flex container for author tags -->
@@ -182,24 +204,30 @@
                         </div>
 
                         
-                        <div class="files flex flex-center w-fit gap-5 pt-5 ">
+                        <div class="files flex sm:flex-row lg:grid lg:grid-cols-2 gap-5 pt-5 flex-wrap ">
+                            <div>
+                                <VaButton
+                                :disabled="thesis.pdf === '' || thesis.pdf === null"
+                                icon="download"
+                                color="info"
+                                :href="thesis.pdf"
+                                class="hover:animate-bounce ease-in-out w-full"
+                                >
+                                    <span>
+                                        {{ thesis.pdf === '' || thesis.pdf === null ? 'PDF Unvailable' :' Download PDF'}}
+                                    </span>
+                                </VaButton>
+                            </div>
                             <VaButton
-                            :disabled="thesis.pdf === ''"
-                            icon="download"
-                            color="info"
-                            :href="thesis.pdf"
-                            class="hover:animate-bounce ease-in-out"
-                            >
-                            Download PDF here
-                            </VaButton>
-                            <VaButton
-                            :disabled="thesis.video === ''"
+                            :disabled="thesis.video === '' || thesis.video === null"
                             icon="download"
                             color="info"
                             :href="thesis.video"
-                            class="hover:animate-bounce ease-in-out"
+                            class="hover:animate-bounce ease-in-out w-full"
                             >
-                            Download Video here
+                                <span>
+                                    {{ thesis.video === '' || thesis.video === null ? 'Video Unavailable' :' Download Video'}}
+                                </span>
                             </VaButton>
                            
                         </div>
@@ -214,9 +242,15 @@
 
 </template>
 
+<style>
+.hover:text-transparent {
+    visibility: hidden;
+}
+</style>
 
 <script>
 import formatDate from '@/functions/formatdate.js';
+import { ref, computed, onMounted } from 'vue'
 
 export default{
     data(){
@@ -229,6 +263,7 @@ export default{
                 keyword: null,
                 author: null,
                 category: null,
+                sort: null,
             },
             categoryList: [],
             data:{
@@ -236,7 +271,24 @@ export default{
                 thesisList: [],
                 expandedThesisId: null,
             },
-            
+            sortList:[
+                {
+                    name: 'A-Z',
+                    value: '0'
+                },
+                {
+                    name: 'a-Z',
+                    value: '1'
+                },
+                {
+                    name: 'Ascending',
+                    value: '2'
+                },
+                {
+                    name: 'Descending',
+                    value: '3'
+                },
+            ],
 
         }
     },
@@ -246,7 +298,7 @@ export default{
     },
     computed(){
         this.getThesis();
-        this. getTruncatedAbstract();
+        this.getTruncatedAbstract();
     },
     methods:{
         toggleAbstract(thesisId) {

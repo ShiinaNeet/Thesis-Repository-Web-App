@@ -129,12 +129,6 @@
             <div class="header"> 
                 <h1>Add Account</h1>
             </div>
-            <div 
-            v-if="createAccount.repasswordErrorMessage"
-            class="my-2 py-5 bg-red-300 rounded-lg text-black flex flex-cventer justify-center"
-            >
-                <h1 class="justify-center flex-center">Password Mismatch! Please Retry!</h1>
-            </div>
             <div class="flex flex-col text-wrap py-5 text-red-600">
                 <VaInput
                 class="py-2"
@@ -174,7 +168,7 @@
                 preset="bordered"
                 immediate-validation
                 :error="createAccount.passwordEmpty"
-                :error-messages="createAccount.passwordErrorMessage[0]"
+                :error-messages="createAccount.passwordErrorMessage"
                 />
                 <VaInput
                 class="py-2"
@@ -183,7 +177,8 @@
                 placeholder="Password"
                 label="Password"
                 preset="bordered"
-                :error="createAccount.repasswordEmpty"                
+                :error="createAccount.repasswordEmpty"
+                :error-messages="createAccount.repasswordErrorMessage"                
                 />
             </div>
             <div class="flex flex-center justify-center">
@@ -233,8 +228,8 @@
                 <VaInput
                 class="py-2"
                 v-model="editAccount.data.email"
-                placeholder="Email Addresss"
-                label="Email"
+                :placeholder="editAccount.data.email === null || editAccount.data.email === '' ? 'No Email Registered' : editAccount.data.email"
+                label="Email Address"
                 preset="bordered"
                 immediate-validation
                 :error="editAccount.emailEmpty"
@@ -616,11 +611,11 @@ export default {
                     }
                     if (key === 'password') {
                         this.createAccount.passwordEmpty = true;
-                        this.createAccount.passwordErrorMessage = error.response.data.errors.password;
+                        this.createAccount.passwordErrorMessage = error.response.data.errors.password[0];
                     }
                     if (key === 'repassword') {
-                        this.createAccount.passwordMismatch = true;
-                        this.createAccount.repasswordErrorMessage = error.response.data.errors.repassword;
+                        this.createAccount.repasswordEmpty = true;
+                        this.createAccount.repasswordErrorMessage = error.response.data.errors.repassword[0];
                     }
                     this.createAccount.saved = false;    
                 });

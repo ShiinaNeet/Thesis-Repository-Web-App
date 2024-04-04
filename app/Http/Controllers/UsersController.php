@@ -102,7 +102,11 @@ class UsersController extends Controller
             'repassword' => 'required',
         ]);
        
-
+        $currentUser = Users::where('UserID','=', $request->userID)->first();
+        if($currentUser){
+            $rs = SharedFunctions::prompt_msg("User ID Taken! Please Try Again!");
+            goto end;
+        }
         $user = new Users(); $new_account = true; 
         $password = $request->password;
         $repassword = $request->repassword;
@@ -131,26 +135,30 @@ class UsersController extends Controller
         $rs = SharedFunctions::default_msg();
         $this->validate($request, [
             'userID' => 'required|numeric',
-            'email' => 'required',
             'user_type' => 'required',
         ]);
-       
-        $user = Users::find($request->id);
-        if(!$user){
-            $rs = SharedFunctions::prompt_msg("Cannot found the account with User ID: "+$request->id);
-        }
-        
-        $user->userID = $request->userID;
-        $user->email = $request->email;
-        $user->user_type = $request->user_type;
-       
 
-        if (!$user->save()) {
-            $rs = SharedFunctions::prompt_msg("Account Update Failed!");
-           
+        $authUser = Auth::user()->userID;
+        $user = Users::where('userID','=', $request->userID)->first();
+
+        if ($user && $user->id !== $request->id) {
+            // If a user with the new userID already exists (excluding the current user), return appropriate error message
+            $rs = SharedFunctions::prompt_msg("User ID already taken! Please choose a different one.");
+            return response()->json($rs);
         }
-        $rs = SharedFunctions::success_msg("Account saved");
-        return response()->json($rs);
+
+        $userToUpdate = Users::find($request->id);
+
+        $userToUpdate->userID = $request->userID;
+        $userToUpdate->email = $request->email;
+        $userToUpdate->user_type = $request->user_type;  
+
+        if (!$userToUpdate->save()) {
+            $rs = SharedFunctions::prompt_msg("Account Update Failed!");
+            goto end;
+        }
+        $rs = SharedFunctions::success_msg("Account Updated");
+        end: return response()->json($rs);
     }
 
     public function generate_password(Request $request)

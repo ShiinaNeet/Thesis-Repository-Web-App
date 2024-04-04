@@ -116,20 +116,26 @@
                         </div>
                            
                     </div>
-                    <div class="w-1/2 max-w-1/2 p-3 h-full justify-center bg-blue-100 rounded-lg">
-                        <h1 class="text-2xl text-wrap break-all">
-                         Title: {{ rowData.title }}   
+                    <div class="w-1/2 max-w-1/2 p-3 h-full justify-center rounded-lg">
+                        <h1 class="text-2xl text-wrap break-all text-center">
+                        {{ rowData.title }}   
                         </h1>
                         <div class="w-fit py-3 pt-4 overflow-hidden">
                             <div class="flex lg:flex-row flex-col gap-1">
-                                <h3 class="text-2xl">Author:</h3> 
-                            <span v-for="authore in rowData.author" class="flex flex-wrap text-wrap items-center">
-                                <VaBadge
+                                <h3 class="text-lg">Author:</h3> 
+                            <span v-for="authore in rowData.authors" class="flex flex-wrap text-wrap items-center">
+                                    <VaBadge
                                         :text="authore.name"
                                         color="info"
                                         text-color="#812E9E"
+                                        size="large"
                                     />
+                                    
                             </span>
+                            <span 
+                            v-if="rowData.authors == ''"
+                            class="flex flex-wrap text-wrap items-center"
+                            > No registered author</span>
                             </div>
                         </div>
                         <h3>
@@ -140,7 +146,7 @@
                         </VaDivider>
                         <div class="bg-white-500 w-full py-3 pt-4">
                             <p class="text-wrap break-all">
-                                {{ rowData.abstract }}
+                                {{ rowData.abstract === 'null' || rowData.abstract === '' ||rowData.abstract === null ? 'Abstract Missing!' : rowData.abstract }}
                             </p>
                         </div>
                         <VaDivider>
@@ -156,6 +162,10 @@
                                         text-color="#812E9E"
                                     />
                                 </span>
+                                <span 
+                                v-if="rowData.keywords == ''"
+                                class="flex flex-wrap text-wrap items-center"
+                                > No Keyword Tagged</span>
                             </div>
                         </div>
                         <VaDivider>
@@ -166,15 +176,12 @@
                                 PDF : <a 
                                             class="text-blue-500 underline py-2"
                                             :href="rowData.pdf">
-                                                Download
+                                                {{ rowData.pdf !== null ? 'Download' : 'Unavailable'}}
                                             </a>
                             </h2>
-                            
                         </div>
-                        
                     </div>
                 </div>
-
             </template>
             <template #bodyAppend>
                 <tr v-if="$root.tblPagination(thesisList)">

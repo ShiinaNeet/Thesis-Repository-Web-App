@@ -163,23 +163,43 @@
                 <VaInput
                 class="py-2"
                 v-model="createAccount.data.password"
+                :type="createAccount.isPasswordVisible ? 'text' : 'password'"
                 placeholder="Password"
                 label="Password"
                 preset="bordered"
                 immediate-validation
                 :error="createAccount.passwordEmpty"
                 :error-messages="createAccount.passwordErrorMessage"
-                />
+                >
+                    <template #appendInner>
+                        <va-icon
+                                :name="createAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                size="small"
+                                color="#154EC1"
+                                @click="createAccount.isPasswordVisible = !createAccount.isPasswordVisible"
+                                />
+                    </template>
+                </VaInput>
                 <VaInput
                 class="py-2"
                 immediate-validation
                 v-model="createAccount.data.repassword"
+                :type="createAccount.isRepasswordVisible ? 'text' : 'password'"
                 placeholder="Password"
                 label="Password"
                 preset="bordered"
                 :error="createAccount.repasswordEmpty"
                 :error-messages="createAccount.repasswordErrorMessage"                
-                />
+                >
+                <template #appendInner>
+                        <va-icon
+                                :name="createAccount.isRepasswordVisible ? 'visibility_off' : 'visibility'"
+                                size="small"
+                                color="#154EC1"
+                                @click="createAccount.isRepasswordVisible = !createAccount.isRepasswordVisible"
+                                />
+                    </template>
+                </VaInput>
             </div>
             <div class="flex flex-center justify-center">
                 <VaButton
@@ -434,6 +454,8 @@ export default {
             account: {},
             createAccount: {
                 modal: false,
+                isPasswordVisible: false,
+                isRepasswordVisible : false,
                 userIDEmpty: false,
                 emailEmpty: false,
                 userTypeEmpty: false,

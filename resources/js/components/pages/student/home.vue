@@ -98,7 +98,7 @@
         <div class="bg-white-500 w-full h-full">
             <div class="flex flex-center justify-center flex-col ">
                 <div 
-                v-for="thesis in data.thesisList"
+                v-for="thesis in displayedThesis"
                 class="mb-3 h-full w-1/2 shadow-2xl shadow-red-400 
                 
                 "
@@ -125,37 +125,31 @@
                     <VaCardContent>
                         <div class="title">
                             <div class="w-fit pb-3 h-1/5">
-                                <div class="">
-                                    <div class="flex items-center"> <!-- Flex container for label and paragraph -->
-                                        <label class="text-lg font-bold mr-2 flex-wrap"> <!-- Label -->
-                                            Authors:  
-                                        </label>
-                                        <div class="flex flex-wrap whitespace-normal"> <!-- Flex container for author tags -->
-                                            <span class="flex text-green-700 underline font-bold whitespace-pre" v-for="(author, index) in thesis.authors" :key="index">
-                                                {{ ' '+ author.name }}
-                                                <span v-if="index !== thesis.authors.length - 1">, </span> <!-- Add comma for all authors except the last one -->
+                                    <div class="flex sm:flex-col sm:self-center lg:items-start"> 
+                                        <div class="flex text-lg font-bold flex-wrap whitespace-pre">Author:   
+                                            <span class="flex text-green-700 font-bold whitespace-pre text-base flex-center justify-center" v-for="(author, index) in thesis.authors" :key="index">
+                                                {{ ''+ author.name }}
+                                                <span v-if="index !== thesis.authors.length - 1">, </span>
                                             </span>
                                         </div>
-                                    </div>
-
-                                </div>
+                                    </div>                
                                 <div>
                                     <!-- date here import formatdate here-->
                                 <label
                                 class="text-lg font-bold"
                                 for="thesis.published_at">
                                     Published Date: 
-                                </label>{{ formatDate(thesis.published_at, 'MMM. Do YYYY', 'Invalid Date')}}
+                                </label>{{ formatDate(thesis.published_at, 'MMM. Do, YYYY', 'Invalid Date')}}
                                 </div>
                             </div>
                             <!-- Place tags here -->
                             <div class="w-fit pb-3">
-                                <div class="flex flex-col md:flex-row items-center md:items-start gap-1">
-                                    <div class="w-full md:w-auto flex-shrink-0 flex-center md:mr-2">
-                                        <label class="justify-center flex-center whitespace-pre-line font-bold">Category:</label>
+                                <div class="flex flex-col md:flex-row justify-center md:items-start gap-1">
+                                    <div class="w-full sm:w-auto flex-shrink-0 flex-center md:mr-2">
+                                        <label class="flex text-center whitespace-pre-line font-bold">Category:</label>
                                     </div> 
                                     <div class="w-full md:flex-grow flex flex-wrap">
-                                        <div v-for="category in thesis.categories" class="mr-1 mb-2">
+                                        <div v-for="category in thesis.categories" class="mr-1 mb-2 flex flex-center justify-center">
                                             <VaChip 
                                                 square
                                                 color="success"
@@ -173,7 +167,7 @@
                                         <label class="justify-center flex-center whitespace-pre-line font-bold">Keywords:</label>
                                     </div> 
                                     <div class="w-full md:flex-grow flex flex-wrap">
-                                        <div v-for="keyword in thesis.keywords" class="mr-1 mb-2">
+                                        <div v-for="keyword in thesis.keywords" class="mr-1 mb-2 flex flex-center justify-center">
                                             <VaChip 
                                                 square
                                                 color="success"
@@ -188,11 +182,11 @@
                         </div>
                         
                         <div :key="thesis.id">
-                            <div class="max-h-[150px] overflow-hidden">
+                            <div class="max-h-[150px] overflow-hidden text-justify">
                                 <p class="text-gray-700 leading-relaxed text-sm md:text-base" v-show="!isAbstractOpen(thesis.id)">
                                     {{ getTruncatedAbstract(thesis.id) }}
                                 </p>
-                                <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap text-justify" 
+                                <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap " 
                                 v-show="isAbstractOpen(thesis.id)" >
                                     {{ thesis.abstract }}
                                 </p>
@@ -204,7 +198,9 @@
                         </div>
 
                         
-                        <div class="files flex sm:flex-row lg:grid lg:grid-cols-2 gap-5 pt-5 flex-wrap ">
+                        <div
+                        v-if="false"
+                        class="files flex sm:flex-row lg:grid lg:grid-cols-2 gap-5 pt-5 flex-wrap ">
                             <div>
                                 <VaButton
                                 :disabled="thesis.pdf === '' || thesis.pdf === null"
@@ -235,26 +231,57 @@
                     </VaCardContent>
                 </VaCard>
                 </div>
-                
+                <div class="flex gap-2 py-5">
+                    <VaButton
+                    v-if="page > 0"
+                    @click="decrementPage"
+                    preset="secondary"
+                    hover-behavior="opacity"
+                    :hover-opacity="0.4"
+                    icon="arrow_back_ios"
+                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
+                            translate-x-50  w-full"
+                    />
+                        
+                    <VaButton
+                    v-for="(pageNumber, index) in pages.slice(page-1, page+3)" 
+                    @click="page = pageNumber"
+                    :color=" page == pageNumber ? 'Focus' : 'BackgroundElement'"
+                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
+                            translate-x-50  w-full"
+                    :key="index"
+                   
+                    >
+                        <span :class="page == pageNumber ? 'text-white' : 'text-black'">
+                            {{ pageNumber }}
+                        </span>
+                    </VaButton>
+                    <VaButton
+                    v-if="page < pages.length || !pages.length == 1"
+                    @click="page++" 
+                    preset="secondary"
+                    hover-behavior="opacity"
+                    :hover-opacity="0.4"
+                    icon="arrow_forward_ios"
+                    class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
+                            translate-x-50  w-full"
+                    />
+                </div>
             </div>
         </div>
     </div>
 
 </template>
 
-<style>
-.hover:text-transparent {
-    visibility: hidden;
-}
-</style>
-
 <script>
 import formatDate from '@/functions/formatdate.js';
-import { ref, computed, onMounted } from 'vue'
 
 export default{
     data(){
         return{
+            page: 1,
+            perPage: 2,
+            pages: [],
             showFullAbstract: false,
             truncatedAbstract: '',
             isloading: false,
@@ -273,34 +300,60 @@ export default{
             },
             sortList:[
                 {
-                    name: 'A-Z',
+                    name: 'a-z',
                     value: '0'
                 },
                 {
-                    name: 'a-Z',
+                    name: 'Published Date (ASC)',
                     value: '1'
                 },
                 {
-                    name: 'Ascending',
+                    name: 'Published Date (DESC)',
                     value: '2'
                 },
-                {
-                    name: 'Descending',
-                    value: '3'
-                },
             ],
+            filtered: null,
 
         }
     },
-    mounted(){
+    created(){
         this.getThesis();
         this.getCategory();
     },
-    computed(){
-        this.getThesis();
-        this.getTruncatedAbstract();
+    computed:{
+        displayedThesis() {
+            return this.paginate(this.data.thesisList);
+        },
     },
-    methods:{
+    watch: {
+        'data.thesisList'() {
+            this.setPages();
+        }
+    },
+    methods:{ 
+        decrementPage() {
+            if (this.page !== 1) {
+                this.page--; // Decrement page only if it's not already 1
+            }
+            if(this.page === 0)
+            {
+                return;
+            }
+        },
+        setPages() {
+            let numberOfPages = Math.ceil(this.data.thesisList.length / this.perPage);
+            for (let index = 1; index <= numberOfPages; index++) {
+                this.pages.push(index);
+            }
+        },
+        paginate (thesis) {
+            let page = this.page;
+            let perPage = this.perPage;
+            let from = (page * perPage) - perPage;
+            let to = (page * perPage);
+            
+            return  thesis.slice(from, to);
+        },
         toggleAbstract(thesisId) {
             if (this.data.expandedThesisId === thesisId) {
                 this.data.expandedThesisId = null;
@@ -311,14 +364,7 @@ export default{
         isAbstractOpen(thesisId) {
             return this.data.expandedThesisId === thesisId;
         },
-        getTruncatedAbstract(thesisId) {
-            if (!Array.isArray(this.data.thesisList)) {
-                return '';
-            }
-            const thesis = this.data.thesisList.find(item => item.id === thesisId);
-            if (!thesis) return '';
-            return thesis.abstract.slice(0, 150);
-        },
+        
         getThesis(){
             this.isloading = true;
             axios({
@@ -332,6 +378,14 @@ export default{
                     
                 }this.isloading = false;
             })
+        },
+        getTruncatedAbstract(thesisId) {
+            if (!Array.isArray(this.data.thesisList)) {
+                return '';
+            }
+            const thesis = this.data.thesisList.find(item => item.id === thesisId);
+            if (!thesis) return '';
+            return thesis.abstract.slice(0, 150);
         },
         getCategory() {
             axios({
@@ -358,8 +412,23 @@ export default{
             }).then(response => {
                 if(response.data.status == 1)
                 {
-                    this.data.thesisList = response.data.result;
-                    
+                    if (Array.isArray(response.data.result)) {
+                        this.data.thesisList = response.data.result;
+                        this.pages = []
+                        this.page = 1;
+                        this.perPage = 4
+                    } else {
+                        
+                        this.data.thesisList= Object.values(response.data.result);
+                        this.pages = [];
+                        this.page--;
+                        this.perPage = 4;
+
+                        if(this.data.thesisList.length > 1){
+                            this.page++;
+                          
+                        }
+                    }
                 }
                 this.isloading = false;
             }).catch(error => {
@@ -369,7 +438,7 @@ export default{
         },
         selectThesis(id) {
             this.$emit('thesisSelected', id);
-            console.log(id) // Emit event with selected ID
+           
         },
         formatDate,
     },

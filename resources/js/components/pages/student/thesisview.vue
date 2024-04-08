@@ -84,18 +84,20 @@
                     <div class="downloads py-5">
                         <div class="flex gap-2">
                             <VaButton
+                            :disabled="thesis.pdf === '' || thesis.pdf === null ? true : false"
                             icon-right="arrow_forward"
                             icon-color="#ffffff50"
                             @click="openPdf()"
                             >
-                            PDF
+                             {{ thesis.pdf === '' || thesis.pdf === null ? 'No PDF attached' : 'PDF' }}
                             </VaButton>
                             <VaButton
+                            :disabled="thesis.video === '' || thesis.video === null ? true : false"
                             icon-right="arrow_forward"
                             icon-color="#ffffff50"
                             @click="openVideo()"
                             >
-                            Video
+                             {{ thesis.video === '' || thesis.video === null ? 'No Video attached' : 'Video' }}
                             </VaButton>
                         </div>
                         

@@ -99,19 +99,16 @@
                 >
                     <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg flex flex-center justify-center">
                         <div class="h-full">
-                            <video class="h-1/2 w-full "  v-if="rowData.video !== null" controls>
+                            <video class="h-1/2 w-full md:h-[300px] sm:h-[250px] lg:h-1/2 justify-center flex flex-center text-center "  v-if="rowData.video !== null" controls>
                                 <source :src="rowData.video"  type="video/mp4">  
                                    
                             </video> 
                             <div
                             v-else
-                            class="h-1/2 w-full"
+                            class="md:h-[300px] sm:h-[300px] lg:h-[250px] w-full justify-center flex flex-center text-center"
                             >
-                                <div 
-                                class="justify-center flex flex-center text-center"
-                                >
                                     No video
-                                </div>
+                               
                             </div>  
                         </div>
                            
@@ -127,14 +124,14 @@
                                     <VaBadge
                                         :text="authore.name"
                                         color="info"
-                                        text-color="#812E9E"
+                                        text-color="BackgroundPrimary"
                                         size="large"
                                     />
                                     
                             </span>
                             <span 
                             v-if="rowData.authors == ''"
-                            class="flex flex-wrap text-wrap items-center"
+                            class="flex flex-wrap text-wrap items-center py-2"
                             > No registered author</span>
                             </div>
                         </div>
@@ -142,18 +139,20 @@
                          Published Date: {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
                         </h3>
                         <VaDivider>
-                            <span class="px-2 font-bold text-lg py-3">Abstract</span>
+                            <span class="px-2 font-bold text-lg py-5">Abstract</span>
                         </VaDivider>
-                        <div class="bg-white-500 w-full py-3 pt-4">
-                            <p class="text-wrap break-all">
+                        <div class="bg-white-500 w-full py-3 pt-5">
+                            <p class="text-wrap break-all text-justify py-2">
                                 {{ rowData.abstract === 'null' || rowData.abstract === '' ||rowData.abstract === null ? 'Abstract Missing!' : rowData.abstract }}
                             </p>
                         </div>
                         <VaDivider>
-                            <span class="px-2 py-3 font-bold text-lg">Tags</span>
-                        </VaDivider>
-                        <div class=" w-fit py-3 pt-4">
-                            <div class="flex lg:flex-row flex-col gap-1">
+                            <span class="px-2 font-bold text-lg py-5">Tags</span>
+                        </VaDivider
+                        class="lg:py-5 sm:py-5"
+                        >
+                        <div class=" w-fit py-2">
+                            <div class="flex lg:flex-row flex-col gap-1 py-5">
                                
                                 <span v-for="keywordList in rowData.keywords" class="flex items-center">
                                     <VaBadge
@@ -168,10 +167,13 @@
                                 > No Keyword Tagged</span>
                             </div>
                         </div>
-                        <VaDivider>
+                        <VaDivider
+                        class="lg:py-5 sm:py-5"
+                        >
                             <span class="px-2 font-bold text-lg">Files</span>
                         </VaDivider>
-                        <div>
+                        <div
+                        class="py-2">
                             <h2 class="pdf py-2">
                                 PDF : <a 
                                             class="text-blue-500 underline py-2"
@@ -341,12 +343,24 @@
                             :error-messages="'The Published Date field is required.'"
                             @keyup="createThesis.PublishedDateEmpty = false"
                             />
-                            <input
-                            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" 
-                            type="file" id="video" name="file"  ref="videoInput" accept="video/*" @onchange="uploadFile"/>
-                            <input
-                            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                            type="file" id="pdf" name="file"  ref="pdfInput" accept=".pdf"/>
+                            <VaFileUpload
+                            v-model="createThesis.data.video"
+                            file-types="mp4"
+                            dropZoneText="Drop your video here."
+                            dropzone
+                            id="editvideo"  
+                            ref="videoInput"
+                            name="file" 
+                            />
+                            <VaFileUpload
+                            v-model="createThesis.data.pdf"
+                            file-types="pdf"
+                            dropZoneText="Drop your pdf here."
+                            dropzone
+                            id="editvideo"  
+                            ref="pdfInput"
+                            name="file" 
+                            />
                                 <div class="flex w-full gap-x-3 mt-[15px]">
                                     <div class="flex w-1/2 justify-between">
                                         <va-button
@@ -518,12 +532,24 @@
                         :error-messages="'The Published Date field is required.'"
                         @keyup="editThesis.publishedDateEmpty = false"
                         />
-                        <input
-                        class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                        type="file" id="editvideo"  ref="videoInput" accept="video/*" @onchange="uploadFile"> {{ editThesis.video }}</input>
-                        <input
-                        class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                        type="file" id="editpdf" name="file"  ref="pdfInput" accept=".pdf"/>
+                        <VaFileUpload
+                        v-model="editThesis.data.video"
+                        file-types="mp4"
+                        dropZoneText="Drop your video here."
+                        dropzone
+                        id="editvideo"  
+                        ref="videoInput"
+                        name="file" 
+                        />
+                        <VaFileUpload
+                        v-model="editThesis.data.pdf"
+                        file-types="pdf"
+                        dropZoneText="Drop your pdf here."
+                        dropzone
+                        id="editvideo"  
+                        ref="pdfInput"
+                        name="file" 
+                        />
                         <div class="flex w-full gap-x-3 mt-[15px]">
                             <div class="flex w-1/2 justify-between">
                                 <va-button
@@ -683,6 +709,7 @@ const newThesis = {
     categories:[], 
     keywords:[],
     authors:[],
+ 
 };
 
 export default {
@@ -902,8 +929,9 @@ export default {
                     formData.append('title', this.createThesis.data.title);
                     formData.append('abstract', this.createThesis.data.abstract);
                     formData.append('published_at', this.createThesis.data.published_at);
-                    let videofile = this.$refs.videoInput.files[0];
-                    let pdffile = this.$refs.pdfInput.files[0];
+                    const file = this.createThesis.data.video[0];
+                    let videofile = file;
+                    const pdffile = this.createThesis.data.pdf[0];
                     formData.append('authors', JSON.stringify(this.createThesis.data.authors));
                     formData.append('categories', JSON.stringify(this.createThesis.data.categories));
                     formData.append('keywords', JSON.stringify(this.createThesis.data.keywords));
@@ -914,8 +942,9 @@ export default {
                     formData.append('id', this.editThesis.data.id);
                     formData.append('title', this.editThesis.data.title);
                     formData.append('abstract', this.editThesis.data.abstract);
-                    let videofile = this.$refs.videoInput.files[0];
-                    let pdffile = this.$refs.pdfInput.files[0];
+                    const file = this.editThesis.data.video[0];
+                    let videofile = file;
+                    const pdffile = this.editThesis.data.pdf[0];
                     var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
                     formData.append('published_at',newDate); 
                    

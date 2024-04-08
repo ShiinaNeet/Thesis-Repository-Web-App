@@ -23,24 +23,29 @@ class PageController extends Controller
           
             return view('student.dashboard', $data);
         }
-    //     elseif(Auth::check() && $user->user_type == Users::TYPE_ADMIN){
-          
-    //         return redirect(url('/dashboard'));
-    //     }
-        
-    //    end: return view('login', $data);
 
         if($user){
             return redirect('/dashboard');
         }else{
-            return view('/login', $data);
+            return redirect('/login');
         }
 
 
     }
     function login(){
         $data['css'] = ['global'];
-        return view('login', $data);
+        $user = Auth::user();
+        if (Auth::check() && $user->user_type == Users::TYPE_STUDENT){
+          
+            return view('student.dashboard', $data);
+        }
+
+        if($user){
+            return redirect('/dashboard');
+        }else{
+            return redirect('/login');
+        }
+
 
     }
     

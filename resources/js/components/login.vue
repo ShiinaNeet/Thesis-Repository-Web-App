@@ -269,7 +269,7 @@ export default {
                 },
             },
             activeWindow: 'Login',
-            loginDelay: 250,
+            loginDelay: 200,
         };
     },
     components: {
@@ -371,7 +371,7 @@ export default {
                     this.account.isInvalid = true;
                 }
             }).catch(error => {
-                // this.$root.prompt(error.response.data.message);
+                 this.$root.prompt(error.response.data.message);
                 let dataerror = Object.keys(error.response.data.errors)
                 dataerror.forEach(key =>{
                     if(key === "userID"){

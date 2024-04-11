@@ -292,7 +292,7 @@
     blur
     :mobile-fullscreen=true
     hide-default-actions
-    size="auto"
+    size="small"
     close-button
     >
         <div class="w-full h-full">
@@ -309,7 +309,7 @@
                     label="User ID"
                     readonly
                     preset="bordered"
-                    class="flex w-full pb-5"
+                    class="flex w-full pb-2"
                     />
                     <br />
                     <VaInput
@@ -318,7 +318,7 @@
                     label="Email"
                     readonly
                     preset="bordered"
-                    class="flex w-full"
+                    class="flex w-full pt-2"
                     />
                 </div>
                 <div v-else-if="editAccount.isPasswordWindow == true"

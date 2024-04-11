@@ -91,11 +91,10 @@ class UsersController extends Controller
                 $rs['redirect'] = '/sdashboard';
                 goto end;
             }
-            
+            $rs = SharedFunctions::success_msg('Login success');
+            $rs['redirect'] = '/sdashboard';
         }
-
-        $rs = SharedFunctions::success_msg('Login success');
-        $rs['redirect'] = '/dashboard';
+        
         
         end: return response()->json($rs);
     }
@@ -185,7 +184,7 @@ class UsersController extends Controller
             goto end;
         }
         // Generate password here
-        $randomString = Str::random(15);
+        $randomString = Str::random(5);
         // Assign
         $user->password = bcrypt($randomString);
 
@@ -194,6 +193,7 @@ class UsersController extends Controller
             
             $rs = SharedFunctions::success_msg("Password Successfully Generated");
             $rs['result'] = $result;
+            // DD($result);
             goto end;
         }
         $rs = SharedFunctions::prompt_msg("Save Failed. Please refresh and try again!");

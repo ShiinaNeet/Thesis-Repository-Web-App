@@ -6,7 +6,7 @@
     <template #left>
       <VaNavbarItem class="logo" >
         <div
-        @click="$root.redirectToPage('/dashboard')"
+        @click="$root.auth && $root.auth.userType === 3 ? null : $root.redirectToPage('/dashboard')"
         >
           Thesis Repository
         </div>
@@ -19,7 +19,7 @@
         <VaNavbarItem
          class="hidden sm:block justify-center items-center ">
           <div
-          v-if="$root.auth && $root.auth.userType == 3"
+          v-if="$root.auth && $root.auth.userType !== 3"
           :class="{'rounded bg-blue-600 active': $root.isActivePage('/dashboard')}"
           @click="$root.redirectToPage('/dashboard')"
           >
@@ -75,7 +75,7 @@ export default {
             
           }
       }).catch(error => {
-        console.log("test");
+        console.log(error);
       
       });
     }

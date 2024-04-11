@@ -19,15 +19,15 @@ class PageController extends Controller
     function index(){
         $data['css'] = ['global'];
         $user = Auth::user();
-        if (Auth::check() && $user->user_type == Users::TYPE_STUDENT){
+        // if (Auth::check() && $user->user_type == Users::TYPE_STUDENT){
           
-            return view('student.dashboard', $data);
-        }
+        //     return view('student.dashboard', $data);
+        // }
 
         if($user){
             return redirect('/dashboard');
         }else{
-            return redirect('/login');
+            return view('/login', $data);
         }
 
 
@@ -35,17 +35,17 @@ class PageController extends Controller
     function login(){
         $data['css'] = ['global'];
         $user = Auth::user();
-        if (Auth::check() && $user->user_type == Users::TYPE_STUDENT){
-          
-            return view('student.dashboard', $data);
-        }
-
-        if($user){
+       
+      
+        if($user !== null){
+            if ($user->user_type === Users::TYPE_STUDENT){
+                return view('student.dashboard', $data);
+            }
             return redirect('/dashboard');
         }else{
-            return redirect('/login');
+            return view('/login', $data);
         }
-
+        return view('/login', $data);
 
     }
     

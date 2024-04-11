@@ -83,12 +83,21 @@ class UsersController extends Controller
             'userID'     => $request->userID,
             'password'  => $request->password
         ]);
-    
+        
         if (Auth::check()) {
-            $rs = SharedFunctions::success_msg('Login success');
-            $rs['redirect'] = '/dashboard';
+            $activeUser = Auth::user();
+            if($activeUser->user_type === Users::TYPE_STUDENT){
+                $rs = SharedFunctions::success_msg('Login success');
+                $rs['redirect'] = '/sdashboard';
+                goto end;
+            }
+            
         }
-        return response()->json($rs);
+
+        $rs = SharedFunctions::success_msg('Login success');
+        $rs['redirect'] = '/dashboard';
+        
+        end: return response()->json($rs);
     }
 
     public function save(Request $request)
@@ -195,7 +204,7 @@ class UsersController extends Controller
     public function logout(){
         Auth::logout();
         FacadesSession::flush();
-        return redirect('/login');
+        return redirect('/');
     }
     
 }

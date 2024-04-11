@@ -35,6 +35,7 @@ Route::post('/register', [UsersController::class, 'register']);
 
 Route::group(['middleware' => 'check_auth'], function () {
     Route::get('/dashboard', [PageController::class, 'dashboard']);
+    Route::get('/sdashboard', [PageController::class, 'studentdashboard']);
     Route::get('search', [PageController::class, 'thesisSearch']);
     Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);

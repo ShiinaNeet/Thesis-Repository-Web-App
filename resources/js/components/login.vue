@@ -363,7 +363,8 @@ export default {
 
                 if (response.data.status == 1) {
                     setTimeout(() => {
-                        window.location = response.data.redirect;
+                        const ToPage =  response.data.redirect;
+                        this.$root.redirectToPage(ToPage);
                     }, this.loginDelay);
                 } else {
                     // this.$root.prompt(response.data.text);

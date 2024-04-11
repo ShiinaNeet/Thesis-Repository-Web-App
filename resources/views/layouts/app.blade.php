@@ -15,7 +15,10 @@
         <!-- CSRF Token -->
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Thesis Repository') }}</title>
+        <title>Thesis Repository</title>
+
+           <!-- Favicon -->
+        <link rel="shortcut icon" sizes="180x180" href="/android-chrome-512x512.png">
 
         <!-- Styles -->
         <style>
@@ -37,7 +40,6 @@
         </script>
 
         <!-- Fonts -->
-        {{-- <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Text&display=swap" rel="stylesheet"> --}}
         <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>

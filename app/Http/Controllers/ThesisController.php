@@ -22,13 +22,24 @@ class ThesisController extends Controller
         $author = $request->author;
         $category = $request->category;
         $title = $request->title;
-        $theses = Thesis::withTrashed()->get();
+        $sortFilter = $request->sort;
+        
+        $query = Thesis::withTrashed();
 
+        if ($sortFilter === "1") {
+            $query->orderBy('published_at', 'ASC');
+        } elseif ($sortFilter === "2") {
+            $query->orderBy('published_at', 'DESC');
+        } else {
+            // Default sorting or no sorting specified
+            $query->orderBy('id', 'desc');
+        }
+        $theses = Thesis::withTrashed()->orderBy('id', 'desc')->get();
         if ($request->title  !== null || $request->title != '') {
-            $theses = $theses->where('title', 'like', '%' . $request->title . '%');
+           // $theses = $query->where('title', 'like', '%' . $request->title . '%')->orderBy('published_at', 'DESC');
         }
              
-           $theses = thesis::get()->map(function($q) {
+           $theses = $query->get()->map(function($q) {
                 $arr = [];
                
                 $authorIds = explode(',', trim($q->authors, '[]'));

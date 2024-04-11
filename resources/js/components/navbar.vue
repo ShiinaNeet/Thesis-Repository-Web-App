@@ -15,43 +15,34 @@
     <template #right>
       <div
       v-if="$root.auth"
-      class="flex gap-0">
+      class="flex gap-2">
         <VaNavbarItem
-         class="hidden sm:block bg-inherit justify-center items-center ">
-          <VaButton
-          v-if="$root.auth && $root.auth.userType == 0"
-          class=""
-          preset="secondary"
-          hover-behavior="opacity"
-          :hover-opacity="0.4"
+         class="hidden sm:block justify-center items-center ">
+          <div
+          v-if="$root.auth && $root.auth.userType == 3"
+          :class="{'rounded bg-blue-600 active': $root.isActivePage('/dashboard')}"
           @click="$root.redirectToPage('/dashboard')"
           >
-            <span class="text-white">Dashboard</span>
-          </VaButton>
+            <span class="text-white rounded bg-inherit py-3 px-3 hover:bg-blue-600">Dashboard</span>
+          </div>
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
-          <VaButton
+          <div
           v-if="$root.auth"
-          class=""
-          preset="secondary"
-          hover-behavior="opacity"
-          :hover-opacity="0.4"
+          :class="{'rounded bg-blue-600 active': $root.isActivePage('/search')}"
           @click="$root.redirectToPage('/search')"
           >
-            <span class="text-white">Thesis</span>
-          </VaButton>
+            <span class="text-white rounded bg-inherit py-3 px-3 hover:bg-blue-600">Thesis</span>
+          </div>
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block">
-          <VaButton
+          <div
           v-if="$root.auth && $root.auth.userType !== null"
-          class=""
-          preset="secondary"
-          hover-behavior="opacity"
-          :hover-opacity="0.4"
+          :class="{'rounded bg-blue-600 active': $root.isActivePage('/logout')}"
           @click="$root.redirectToPage('/logout')"
           >
-            <span class="text-white">Logout</span>
-          </VaButton>
+            <span class="text-white rounded bg-inherit py-3 px-3 hover:bg-blue-600">Logout</span>
+          </div>
         </VaNavbarItem>
       </div>
     </template>
@@ -63,7 +54,7 @@
 export default {
   data() {
       return{
-
+        loginDelay: 100,
       }
       },
   methods:{

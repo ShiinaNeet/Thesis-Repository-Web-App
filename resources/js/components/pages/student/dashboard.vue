@@ -27,8 +27,6 @@ export default {
     data () {
         return {
             dashboard: ['Dashboard'],
-            account_mngt: ['Accounts'],
-            thesis_mngt: ['Thesis','Keyword','Category','Author'],
             activeSetting: 'Dashboard',
             menu_open: true,
             selectedThesisId: null,

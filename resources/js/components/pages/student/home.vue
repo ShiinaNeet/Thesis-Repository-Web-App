@@ -68,7 +68,7 @@
                             v-model="searchQuery.sort"
                             placeholder="A-Z"
                             :options="sortList"
-                            label="Sort"
+                            label="Sort by Published Date"
                             inner-label
                             clearable
                             searchable
@@ -300,15 +300,11 @@ export default{
             },
             sortList:[
                 {
-                    name: 'a-z',
-                    value: '0'
-                },
-                {
-                    name: 'Published Date (ASC)',
+                    name: 'ASC',
                     value: '1'
                 },
                 {
-                    name: 'Published Date (DESC)',
+                    name: 'DESC',
                     value: '2'
                 },
             ],
@@ -421,12 +417,11 @@ export default{
                         
                         this.data.thesisList= Object.values(response.data.result);
                         this.pages = [];
-                        this.page--;
+                        this.page = 0;
                         this.perPage = 4;
 
                         if(this.data.thesisList.length > 1){
                             this.page++;
-                          
                         }
                     }
                 }

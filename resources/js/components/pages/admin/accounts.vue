@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded text-wrap">
+    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded text-wrap ">
         
         <div class="grid place-content-end ">
             <div class="flex flex-center justify-content py-2">
@@ -16,8 +16,8 @@
                 </VaButton>
             </div>
         </div>
-        <va-data-table
-        id="data-table"
+        
+        <VaDataTable
         :items="accounts"
         :columns="acc.tblColumns"
         :per-page="$root.config.tblPerPage"
@@ -25,10 +25,11 @@
         no-data-html="No account(s) to show"
         :filter="filter"
         @filtered="filtered = $event.items"
-        animated
         striped
-        class=""
         :loading="gettingAccounts"
+        virtual-scroller
+        :wrapper-size="400"
+        :item-size="46"
         >
             <template #headerAppend>
                     <tr class="table-crud__slot ">
@@ -113,7 +114,7 @@
                 </td>
             </tr>
             </template>
-        </va-data-table>
+        </VaDataTable>
     </div>
     <!-- Create -->
     <VaModal

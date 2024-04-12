@@ -1,18 +1,19 @@
 <template>
-    <div class="px-10 text-white transform-none h-screen">
+    <div class="px-10 max-sm:p-0 text-white transform-none h-full">
         <div
             v-if="thesis"
-            class="w-2/3 mx-auto justify-center h-full px-5 bg-gray-800 shadow-xl overflow-y-hidden"
+            class="w-2/3 mx-auto max-sm:w-full justify-center h-full px-5 bg-gray-800 shadow-xl overflow-y-hidden"
         >
-            <div transparent class="flex-start bg-inherit text-white h-fit">
+            <div class="flex-start bg-inherit text-white h-fit justify-center">
                 <VaButton
-                    class="w-fit text-white"
+                    class="w-fit text-white my-5 hover:bg-blue-200"
                     preset="secondary"
-                    icon-right="home"
+                    icon="arrow_back_ios_new"
                     icon-color="#FFFFFF"
                     @click="$emit('home')"
                     size="large"
                 >
+                    <span class="text-white">Back</span>
                 </VaButton>
             </div>
             <div class="w-full flex-wrap py-10 px-5 h-full text-wraps">
@@ -78,7 +79,7 @@
                     </div>
                 </div>
                 <div class="downloads py-5">
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 max-sm:flex-col">
                         <VaButton
                             :disabled="
                                 thesis.pdf === '' || thesis.pdf === null

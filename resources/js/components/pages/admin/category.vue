@@ -71,6 +71,7 @@
                 @click="editKeyword.data = { ...rowData }, editKeyword.statusModal = !editKeyword.statusModal"
                 />
                 <va-button
+                v-if="$root.auth.userType !== 1 && $root.auth.userType !== 3"
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
                 title="Delete"
                 preset="plain"

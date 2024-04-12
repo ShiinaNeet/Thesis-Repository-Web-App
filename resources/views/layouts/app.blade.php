@@ -1,9 +1,10 @@
 @php
     $auth = \Illuminate\Support\Facades\Auth::class;
-    $user_type = $userID = null;
+    $user_type = $userID = $name = null;
     if ($auth::check()) {
         $userID = $auth::user()->userID;
         $user_type = $auth::user()->user_type;
+        $name = $auth::user()->name;
     }
 @endphp
 <!doctype html>
@@ -35,6 +36,7 @@
             var auth = {
                 userID: {!! json_encode($userID) !!},
                 userType: {!! json_encode($user_type) !!},
+                name: {!! json_encode($name) !!},
                
             };
         </script>

@@ -34,7 +34,9 @@
                 </div>
                 <va-divider class="pr-1" />
 
-                <div>
+                <div
+                v-if="$root.auth.userType == 2 || $root.auth.userType == 0 "
+                >
                     <div
                     v-if="!menu_open"
                     class="va-title mx-3 my-2"
@@ -62,8 +64,12 @@
                     </va-sidebar-item>
                     <va-divider class="pr-1" />
                 </div>
-                <div>
-                    <div class="va-title mx-3 my-2">
+                <div
+                v-if="$root.auth.userType == 2 || $root.auth.userType == 0 "
+                >
+                    <div 
+                    class="va-title mx-3 my-2"
+                    >
                         <va-icon
                         name="tag"
                         size="small"
@@ -129,6 +135,41 @@
                     </va-sidebar-item>
                     <va-divider class="pr-1" />
                 </div>
+                <div
+                v-if="$root.auth.userType !== 1 && $root.auth.userType !== 3"
+                >
+                    <div class="va-title mx-3 my-2">
+                        <va-icon
+                        name="storage"
+                        size="small"
+                        title="database"
+                        class="ml-[2px] my-[3px]"
+                        :class="menu_open && ('mr-1')"
+                        />
+                        <span
+                        class="align-middle tracking-wider"
+                        :class="!menu_open && ('hidden')"
+                        >
+                            System
+                        </span>
+                    </div>
+                    <va-sidebar-item
+                    v-if="menu_open"
+                    v-for="(setting, idx) in system_mngt.filter(item => {
+                        return true
+                    })"
+                    :key="idx"
+                    :active="isSettingActive(setting)"
+                    @click="setSettingActive(setting), setting === 'Backup and Restore' ? menu_open = !menu_open : ''"
+                    >
+                        <va-sidebar-item-content class="min-h-[20px!important] p-[7px!important]">
+                            <va-sidebar-item-title class="text-sm select-none">
+                                {{ setting }}
+                            </va-sidebar-item-title>
+                        </va-sidebar-item-content>
+                    </va-sidebar-item>
+                    <va-divider class="pr-1" />
+                </div>
             </div>
         </div>
         <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden">
@@ -175,7 +216,8 @@ export default {
         return {
             dashboard: ['Dashboard'],
             account_mngt: ['Accounts'],
-            thesis_mngt: ['Thesis','Keyword','Category','Author', 'Backup and Restore'],
+            thesis_mngt: ['Thesis','Keyword','Category','Author'],
+            system_mngt: ['Backup and Restore'],
             activeSetting: 'Dashboard',
             menu_open: true,
         };

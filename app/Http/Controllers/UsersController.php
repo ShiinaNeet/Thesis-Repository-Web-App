@@ -92,7 +92,7 @@ class UsersController extends Controller
                 goto end;
             }
             $rs = SharedFunctions::success_msg('Login success');
-            $rs['redirect'] = '/sdashboard';
+            $rs['redirect'] = '/dashboard';
         }
         
         

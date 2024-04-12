@@ -64,7 +64,9 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [KeywordsController::class, 'enable']);
       
     });
-    Route::post('database/import', [DatabaseController::class, 'import']);
+    Route::middleware('admin_only')->group(function(){
+        Route::post('database/import', [DatabaseController::class, 'import']);
+    });
     Route::get('database/export', [DatabaseController::class, 'export']);
     Route::prefix('author')->group(function () {
         Route::post('delete', [AuthorsController::class, 'delete']);

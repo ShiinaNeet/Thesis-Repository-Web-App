@@ -14,7 +14,7 @@
     </template>
     <template #right>
       <div
-      v-if="$root.auth && $root.auth.userType"
+      v-if="$root.auth !== null || $root.auth.userType !== null"
       class="flex gap-2">
         <VaNavbarItem
          class="hidden sm:block justify-center items-center ">
@@ -37,7 +37,7 @@
         </VaNavbarItem>
         <VaNavbarItem class="hidden sm:block mr-3 max-sm:m-0">
           <div
-          v-if="$root.auth && $root.auth.userType !== null"
+          v-if="$root.auth !== null || $root.auth.userType !== null"
           >
             <VaDropdown>
               <template #anchor>

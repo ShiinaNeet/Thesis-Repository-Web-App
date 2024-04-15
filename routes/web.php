@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditTrailController;
 use App\Http\Controllers\AuthorsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DatabaseController;
@@ -34,11 +35,12 @@ Route::post('/register', [UsersController::class, 'register']);
 
 
 Route::group(['middleware' => 'check_auth'], function () {
-    Route::get('/dashboard', [PageController::class, 'dashboard']);
+    Route::get('/access_denied', [PageController::class, 'access_denied']);
     Route::get('/sdashboard', [PageController::class, 'studentdashboard']);
     Route::get('search', [PageController::class, 'thesisSearch']);
     Route::get('accounts/get', [UsersController::class, 'GetUsers']);
     Route::get('author/get', [AuthorsController::class, 'get']);
+    Route::get('audittrail/get', [AuditTrailController::class, 'get']);
     Route::get('keyword/get', [KeywordsController::class, 'get']);
     Route::get('category/get', [CategoryController::class, 'get']);
     Route::get('thesis/get', [ThesisController::class, 'get']);
@@ -66,8 +68,9 @@ Route::group(['middleware' => 'check_auth'], function () {
     });
     Route::middleware('admin_only')->group(function(){
         Route::post('database/import', [DatabaseController::class, 'import']);
+        Route::get('database/export', [DatabaseController::class, 'export']);
     });
-    Route::get('database/export', [DatabaseController::class, 'export']);
+   
     Route::prefix('author')->group(function () {
         Route::post('delete', [AuthorsController::class, 'delete']);
         Route::post('disable', [AuthorsController::class, 'disable']);
@@ -83,7 +86,9 @@ Route::group(['middleware' => 'check_auth'], function () {
         Route::post('enable', [CategoryController::class, 'enable']);
       
     });
- 
+    Route::group(['middleware' => 'school.staff'], function () {
+        Route::get('/dashboard', [PageController::class, 'dashboard']);
+    });
 
     Route::post('abc', [ThesisController::class, 'upload']);
     Route::post('logout',[UsersController::class, 'logout']);

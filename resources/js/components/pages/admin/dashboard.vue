@@ -65,7 +65,7 @@
                     <va-divider class="pr-1" />
                 </div>
                 <div
-                v-if="$root.auth.userType == 2 || $root.auth.userType == 0 "
+                v-if="$root.auth.userType == 0 "
                 >
                     <div 
                     class="va-title mx-3 my-2"
@@ -136,7 +136,7 @@
                     <va-divider class="pr-1" />
                 </div>
                 <div
-                v-if="$root.auth.userType !== 1 && $root.auth.userType !== 3"
+                v-if="$root.auth.userType === 0"
                 >
                     <div class="va-title mx-3 my-2">
                         <va-icon
@@ -197,6 +197,9 @@
                 <template v-if="activeSetting === 'Backup and Restore'">
                     <backup_tbl />
                 </template>
+                <template v-if="activeSetting === 'Audit Trail'">
+                    <audit_tbl />
+                </template>
             </div>
         </div>
     </div>
@@ -211,11 +214,12 @@ import keywordsModule from './keyword.vue';
 import thesisModule from './thesis.vue';
 import homeModule from './home.vue';
 import backupModule from './backup.vue';
+import auditModule from './auditlogs.vue';
 export default {
     data () {
         return {
             dashboard: ['Dashboard'],
-            account_mngt: ['Accounts'],
+            account_mngt: ['Accounts', 'Audit Trail'],
             thesis_mngt: ['Thesis','Keyword','Category','Author'],
             system_mngt: ['Backup and Restore'],
             activeSetting: 'Dashboard',
@@ -231,7 +235,7 @@ export default {
         thesis_tbl: thesisModule,
         home_tbl: homeModule,
         backup_tbl: backupModule,
-
+        Audit_tbl: auditModule,
     },
     
     methods: {

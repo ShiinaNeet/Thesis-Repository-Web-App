@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\authors;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,9 @@ class AuthorsController extends Controller
         $query = authors::find($request->id);
         if ($query->forceDelete()) {
             $rs = SharedFunctions::success_msg("Authors deleted");
-    
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_AUTHORS, AuditTrail::ACTION_DELETE,
+            );
         }
         return response()->json($rs);
     }
@@ -27,7 +30,9 @@ class AuthorsController extends Controller
 
         if ($query->delete()) {
             $rs = SharedFunctions::success_msg('Authors disabled');
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_AUTHORS, AuditTrail::ACTION_DISABLE,
+            );
         }
 
        
@@ -40,6 +45,10 @@ class AuthorsController extends Controller
         authors::withTrashed()->find($request->id)->restore();
 
         $rs = SharedFunctions::success_msg('Authors enabled');
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_AUTHORS, AuditTrail::ACTION_ENABLE,
+        );
+
         return response()->json($rs);
     }
 
@@ -80,6 +89,9 @@ class AuthorsController extends Controller
     
         if ($author->save()) {
             $rs = SharedFunctions::success_msg("Authors saved");
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_AUTHORS,  $new_help == true ? AuditTrail::ACTION_CREATE : AuditTrail::ACTION_UPDATE,
+            );
         }
         return response()->json($rs);
     }

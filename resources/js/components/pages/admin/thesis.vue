@@ -62,7 +62,15 @@
                 title="Edit"
                 preset="plain"
                 icon="edit"
-                @click="editThesis.data = { ...rowData }, editThesis.modal = !editThesis.modal"
+                :disabled="rowData.deleted_at !== null"
+                @click="editThesis.data.title = rowData.title,
+                        editThesis.data.abstract = rowData.abstract,
+                        editThesis.data.published_at = rowData.published_at,
+                        editThesis.data.authors = rowData.authors,
+                        editThesis.data.keywords = rowData.keywords,
+                        editThesis.data.categories = rowData.categories,
+                        editThesis.data.id = rowData.id,
+                        editThesis.modal = !editThesis.modal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
@@ -78,7 +86,7 @@
                 title="Delete"
                 preset="plain"
                 icon="delete"
-                :disabled="rowData.deleted_at"
+                :disabled="rowData.deleted_at !== null"
                 @click="editThesis.data = { ...rowData }, editThesis.deleteModal = !editThesis.deleteModal"
                 />
             </template>
@@ -115,30 +123,33 @@
                            
                     </div>
                     <div class="w-1/2 max-w-1/2 p-3 h-full justify-center rounded-lg">
-                        <h1 class="text-2xl text-wrap break-all text-center">
+                        <h1 class="text-2xl text-wrap break-all text-center font-mono uppercase">
                         {{ rowData.title }}   
                         </h1>
                         <div class="w-fit py-3 pt-4 overflow-hidden">
                             <div class="flex lg:flex-row flex-col gap-1">
-                                <h3 class="text-lg">Author:</h3> 
+                                <h3 class="text-lg uppercase font-sans">Author:</h3> 
                             <span v-for="authore in rowData.authors" class="flex flex-wrap text-wrap items-center">
-                                    <VaBadge
+                                    <VaChip
                                         :text="authore.name"
                                         color="info"
                                         text-color="BackgroundPrimary"
-                                        size="large"
-                                    />
+                                        size="medium"
+                                        square
+                                    >
+                                    {{authore.name}}
+                                    </VaChip>
                                     
                             </span>
                             <span 
                             v-if="rowData.authors == ''"
-                            class="flex flex-wrap text-wrap items-center py-2"
+                            class="flex flex-wrap text-wrap items-center py-2 uppercase font-sans text-bold"
                             > No registered author</span>
                             </div>
                         </div>
-                        <h3>
-                         Published Date: {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
-                        </h3>
+                        <span class="uppercase font-sans">
+                            <strong>Published Date:</strong> {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
+                        </span>
                         <VaDivider>
                             <span class="px-2 font-bold text-lg py-5">Abstract</span>
                         </VaDivider>
@@ -156,11 +167,15 @@
                             <div class="flex lg:flex-row flex-col gap-1 py-5">
                                
                                 <span v-for="keywordList in rowData.keywords" class="flex items-center">
-                                    <VaBadge
-                                        :text="keywordList.keyword"
+                                    <VaChip
+                                        text-color="BackgroundPrimary"
+                                        size="medium"
+                                        square
                                         color="warning"
-                                        text-color="#812E9E"
-                                    />
+                                        :icon="tags"
+                                    >
+                                    {{ keywordList.keyword }}
+                                    </VaChip>
                                 </span>
                                 <span 
                                 v-if="rowData.keywords == ''"
@@ -338,7 +353,7 @@
                             label="Publish date *"
                             type="date"
                             class="w-full mb-2"
-                            
+                            :format="formatDatePicker"
                             :rules="[(v) => v && v.length > 0 || 'The Published Date field is required.']"
                             :error="createThesis.PublishedDateEmpty && (createThesis.data.published_at === '' || createThesis.data.published_at === null)"
                             :error-messages="'The Published Date field is required.'"
@@ -710,6 +725,7 @@ const newThesis = {
     categories:[], 
     keywords:[],
     authors:[],
+   
  
 };
 
@@ -929,25 +945,38 @@ export default {
                 if (method == 'create') {
                     formData.append('title', this.createThesis.data.title);
                     formData.append('abstract', this.createThesis.data.abstract);
-                    formData.append('published_at', this.createThesis.data.published_at);
-                    const file = this.createThesis.data.video[0];
-                    let videofile = file;
-                    const pdffile = this.createThesis.data.pdf[0];
+                    var newDate = this.formatDate(this.createThesis.data.published_at, 'YYYY-MM-DD');
+                    formData.append('published_at', newDate);
+                    if (this.createThesis.data.video && this.createThesis.data.video.length > 0) {
+                        const file = this.createThesis.data.video[0];
+                        formData.append('video', file);
+                    }
+                    if (this.createThesis.data.pdf && this.createThesis.data.pdf.length > 0) {
+                        const pdffile = this.createThesis.data.pdf[0];
+                        formData.append('pdf', pdffile);
+                    }
+                   
                     formData.append('authors', JSON.stringify(this.createThesis.data.authors));
                     formData.append('categories', JSON.stringify(this.createThesis.data.categories));
                     formData.append('keywords', JSON.stringify(this.createThesis.data.keywords));
-                    formData.append('video', videofile);
-                    formData.append('pdf', pdffile);
+               
                 }
                 else {
                     formData.append('id', this.editThesis.data.id);
                     formData.append('title', this.editThesis.data.title);
                     formData.append('abstract', this.editThesis.data.abstract);
-                    const file = this.editThesis.data.video[0];
-                    let videofile = file;
+                    if (this.editThesis.data.video && this.editThesis.data.video.length > 0) {
+                        const file = this.editThesis.data.video[0];
+                        formData.append('video', file);
+                    }
+                    if (this.editThesis.data.pdf && this.editThesis.data.pdf.length > 0) {
+                        const pdffile = this.editThesis.data.pdf[0];
+                        formData.append('pdf', pdffile);
+                    }
+                  
                     const pdffile = this.editThesis.data.pdf[0];
                     var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
-                    formData.append('published_at',newDate); 
+                    formData.append('published_at', newDate); 
                    
                     if(this.editThesis.key == 0)
                     {
@@ -966,8 +995,7 @@ export default {
                     formData.append('authors', JSON.stringify(this.editThesis.data.authors));
                     formData.append('categories', JSON.stringify(this.editThesis.data.categories));
                     formData.append('keywords', JSON.stringify(this.editThesis.data.keywords));
-                    formData.append('video', videofile);
-                    formData.append('pdf', pdffile);
+                
                 }
                 const config = {
                     onUploadProgress: (progressEvent) => {
@@ -994,6 +1022,7 @@ export default {
                                 this.createThesis.TitleEmpty = false,
                                 this.createThesis.AbstractEmpty = false,
                                 this.createThesis.PublishedDateEmpty = false,
+                                this.editThesis.data = {},
                                 this.editThesis.saved = false));
                                 this.getThesis();
                     }

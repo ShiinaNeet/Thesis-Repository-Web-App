@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\authors;
 use App\Models\category;
 use App\Models\keywords;
@@ -72,6 +73,9 @@ class DatabaseController extends Controller
                 fclose($f_handle);
                 $rs = SharedFunctions::success_msg("Database export ready");
                 $rs['blob'] = base64_encode(file_get_contents($filename));
+                SharedFunctions::create_audit_log(
+                    AuditTrail::MODULE_DATABASE,  AuditTrail::ACTION_CREATE
+                );
                 
             } else {
                 $rs = SharedFunctions::prompt_msg("Database export failed");
@@ -106,7 +110,9 @@ class DatabaseController extends Controller
                 Schema::enableForeignKeyConstraints();
 
                 $rs = SharedFunctions::success_msg("Database import success");
-                
+                SharedFunctions::create_audit_log(
+                    AuditTrail::MODULE_DATABASE,  AuditTrail::ACTION_UPDATE
+                );
                 Auth::logout();
             } else {
                 $rs = SharedFunctions::prompt_msg("Database import failed");
@@ -124,6 +130,7 @@ class DatabaseController extends Controller
 
     private function truncate_tables()
     {
+        AuditTrail::truncate();
         authors::truncate();
         category::truncate();
         keywords::truncate();

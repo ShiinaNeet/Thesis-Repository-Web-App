@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\keywords;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,9 @@ class KeywordsController extends Controller
         $query = keywords::find($request->id);
         if ($query->forceDelete()) {
             $rs = SharedFunctions::success_msg("Keyword deleted");
-    
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_KEYWORDS, AuditTrail::ACTION_DELETE,
+            );
         }
         return response()->json($rs);
     }
@@ -27,7 +30,9 @@ class KeywordsController extends Controller
 
         if ($query->delete()) {
             $rs = SharedFunctions::success_msg('Keyword disabled');
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_KEYWORDS, AuditTrail::ACTION_DISABLE,
+            );
         }
 
        
@@ -40,6 +45,10 @@ class KeywordsController extends Controller
         keywords::withTrashed()->find($request->id)->restore();
 
         $rs = SharedFunctions::success_msg('Keyword enabled');
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_KEYWORDS, AuditTrail::ACTION_ENABLE,
+        );
+
         return response()->json($rs);
     }
 
@@ -80,6 +89,9 @@ class KeywordsController extends Controller
     
         if ($keyword->save()) {
             $rs = SharedFunctions::success_msg("Keywords saved");
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_KEYWORDS,  $new_help == true ? AuditTrail::ACTION_CREATE : AuditTrail::ACTION_UPDATE,
+            );
         }
         return response()->json($rs);
     }

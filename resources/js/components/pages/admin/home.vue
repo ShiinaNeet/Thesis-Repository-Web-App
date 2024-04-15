@@ -1,36 +1,59 @@
 <template>
     <div class="h-screen p-5 bg-slate-200">
-        <div class="flex flex-wrap gap-5">
-            <VaCard :bordered="false">
-                <VaCardTitle>
-                    Users
-                </VaCardTitle>
-                <VaCardContent class="text-6xl">
-                    {{ users.count }}
-                </VaCardContent>
-            </VaCard>
-
-            <VaCard :bordered="false">
-            <VaCardTitle>Thesis</VaCardTitle>
-            <VaCardContent class="text-6xl">
-                {{ thesis.active.count }}
-            </VaCardContent>
-            </VaCard>
-
-            <VaCard :bordered="false">
-            <VaCardTitle>Outdated Thesis</VaCardTitle>
-            <VaCardContent class="text-6xl">
-                {{ thesis.outdated.count }}
-            </VaCardContent>
-            </VaCard>
+        <div class="flex flex-wrap items-stretch gap-5 py-5 w-auto">
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit min-w-1/3">
+                <VaCard :bordered="false" color="Primary" gradient>
+                    <VaCardTitle>
+                        Users
+                    </VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ users.count }}
+                    </VaCardContent>
+                </VaCard>
+            </div>
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit">
+                <VaCard :bordered="false" color="Danger" gradient>
+                    <VaCardTitle>Thesis</VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ thesis.active.count }}
+                    </VaCardContent>
+                </VaCard>
+            </div>
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit">
+                <VaCard :bordered="false" color="Warning" gradient>
+                    <VaCardTitle>Outdated Thesis (Less than 3 Years)</VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ thesis.outdated.count }}
+                    </VaCardContent>
+                </VaCard>
+            </div>
         </div>
-        <div class="flex flex-wrap gap-5 py-5">
-            <VaCard :bordered="false">
-            <VaCardTitle>Authors</VaCardTitle>
-            <VaCardContent class="text-6xl">
-                {{ authors.count }}
-            </VaCardContent>
-            </VaCard>
+        <div class="flex flex-wrap items-stretch gap-5 py-5 ">
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit">
+                <VaCard :bordered="false" color="Primary" gradient>
+                    <VaCardTitle >Authors</VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ authors.count }}
+                    </VaCardContent>
+                </VaCard>
+            </div>
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit text-black">
+                <VaCard :bordered="false" color="Danger" gradient>
+                    <VaCardTitle class="">PDF Storage Size</VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ storage.pdf + ' MB'}}
+                    </VaCardContent>
+                </VaCard>
+            </div>
+            <div class="shadow-2xl shadow-indigo-500/40 w-fit">
+                <VaCard :bordered="false" color="Warning" gradient>
+                    <VaCardTitle>Videos Storage Size</VaCardTitle>
+                    <VaCardContent class="text-6xl">
+                        {{ storage.videos + ' MB'}}
+                    </VaCardContent>
+                </VaCard>
+            </div>
+            
         </div>
     </div>
 </template>
@@ -54,6 +77,10 @@ export default{
             authors:{
                 count:0,
             },
+            storage:{
+                pdf: null,
+                videos: null,
+            }
             
         }
     },
@@ -71,6 +98,8 @@ export default{
                     this.authors.count = response.data.result.authors;
                     this.thesis.active.count = response.data.result.thesis;
                     this.thesis.outdated.count = response.data.result.thesisoutdated;
+                    this.storage.pdf = response.data.result.pdf;
+                    this.storage.videos = response.data.result.video;
                 }).catch(error => {
                     console.log("error: ". error);
                 });

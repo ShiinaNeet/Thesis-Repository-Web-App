@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\thesis;
 use App\Models\authors;
 use App\Models\category;
@@ -160,7 +161,9 @@ class ThesisController extends Controller
         $query = thesis::find($request->id);
         if ($query->forceDelete()) {
             $rs = SharedFunctions::success_msg("Thesis Deleted");
-    
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_THESIS, AuditTrail::ACTION_DELETE 
+            );
         }
         return response()->json($rs);
     }
@@ -173,7 +176,9 @@ class ThesisController extends Controller
 
         if ($query->delete()) {
             $rs = SharedFunctions::success_msg('Thesis Disabled');
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_THESIS, AuditTrail::ACTION_DISABLE 
+            );
         }
 
        
@@ -186,6 +191,9 @@ class ThesisController extends Controller
         thesis::withTrashed()->find($request->id)->restore();
 
         $rs = SharedFunctions::success_msg('Thesis Enabled');
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_THESIS, AuditTrail::ACTION_ENABLE 
+        );
         return response()->json($rs);
     }
 
@@ -193,16 +201,14 @@ class ThesisController extends Controller
     {
         
         $query = Thesis::withTrashed()
-       
         ->orderBy('created_at', 'DESC')
         ->get()
         ->map(function($q) {
             $arr = [];
             $arrK = [];
             $arrC = [];
-            $q = Thesis::where('id', $q->id)
-                ->first();
-            //  dd($q->authors);
+            
+            // DD($q);
             $authorIds = explode(',', trim($q->authors, '[]'));
             
             foreach ($authorIds as $authorId) {
@@ -364,7 +370,9 @@ class ThesisController extends Controller
 
         if($thesis->save()){
             $rs = SharedFunctions::success_msg("Thesis Saved!");
-
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_THESIS,  $new_help == true ? AuditTrail::ACTION_CREATE : AuditTrail::ACTION_UPDATE,
+            );
         }
 
         return response()->json($rs);

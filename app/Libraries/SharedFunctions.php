@@ -2,7 +2,7 @@
 
 namespace App\Libraries;
 
-
+use App\Models\AuditTrail;
 use Illuminate\Support\Facades\Auth;
 
 class SharedFunctions
@@ -45,6 +45,14 @@ class SharedFunctions
         return false;
     }
 
-  
+    public static function create_audit_log($module, $action_type)
+    {
+        $query                     = new AuditTrail();
+        $query->action_user_id     = Auth::id() ? Auth::id() : AuditTrail::USER_SYSTEM;
+        $query->module           = $module;
+        $query->action_type        = $action_type;
+ 
+        $query->save();
+    }
     
 }

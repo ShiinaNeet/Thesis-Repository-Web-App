@@ -7,7 +7,7 @@
                     <div class="w-1/2 max-sm:w-full p-2 mb-3 flex-row">
                         <VaInput v-model="searchQuery.title" placeholder="Search here" label="Title  " inner-label
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
-                        <VaInput v-model="searchQuery.keyword" placeholder="Search here" label="Keyword  " inner-label
+                        <VaSelect v-model="searchQuery.keyword" placeholder="Search here" label="Keyword" :options="keywordList" inner-label clearable searchable autocomplete text-by="keyword" value-by="keyword" highlight-matched-text clearable-icon="cancel"
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
                         <VaInput v-model="searchQuery.author" placeholder="Search here" label="Author " inner-label
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
@@ -192,6 +192,7 @@ export default {
                 sort: null,
             },
             categoryList: [],
+            keywordList:[],
             data: {
                 search: "",
                 thesisList: [],
@@ -214,6 +215,7 @@ export default {
     created() {
         this.getThesis();
         this.getCategory();
+        this.getKeywords();
     },
     computed: {
         displayedThesis() {
@@ -288,6 +290,21 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.categoryList = response.data.result;
+                }
+                else
+                    this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
+        getKeywords() {
+            axios({
+                method: 'GET',
+                type: 'JSON',
+                url: '/keyword/get'
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.keywordList = response.data.result;
                 }
                 else
                     this.$root.prompt(response.data.text);

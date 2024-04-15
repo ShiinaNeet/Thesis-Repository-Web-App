@@ -9,7 +9,7 @@ import accountModule from "./components/pages/admin/accounts.vue";
 import LoginModule from "./components/login.vue";
 import dashboardModule from "./components/pages/admin/dashboard.vue";
 import studentDashboardModule from "./components/pages/student/dashboard.vue";
-
+import AccessDenyModule from "./components/accessdenied.vue";
 const app = createApp({
     data () {
         return {
@@ -35,7 +35,7 @@ const app = createApp({
         'accounts': accountModule,
         'dashboard': dashboardModule,
         'studentdashboard':studentDashboardModule,
-        
+        'accessdeny': AccessDenyModule
     },
     methods: {
         arrayFind(array, condition) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\Users;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
@@ -21,7 +22,9 @@ class UsersController extends Controller
 
         if ($query->delete()) {
             $rs = SharedFunctions::success_msg('Account disabled');
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_ACCOUNT, AuditTrail::ACTION_DISABLE,
+            );
         }
 
        
@@ -34,6 +37,9 @@ class UsersController extends Controller
         Users::withTrashed()->find($request->id)->restore();
 
         $rs = SharedFunctions::success_msg('Account enabled');
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_ACCOUNT,AuditTrail::ACTION_ENABLE,
+        );
         return response()->json($rs);
     }
 
@@ -50,7 +56,11 @@ class UsersController extends Controller
     public function register(Request $request)
     {
         $rs = SharedFunctions::default_msg();
-        
+        if(Str::length($request->password) < 5)
+        {
+            $rs = SharedFunctions::prompt_msg("Password must be longer than 5 characters!");
+            goto end;
+        }
         $this->validate($request, [
             'userID' => 'required',
             'password' => 'required',
@@ -67,8 +77,15 @@ class UsersController extends Controller
         $newUser->userID = $request->userID;
         $newUser->password = bcrypt($request->password);
         $rs = SharedFunctions::success_msg('Account successfully created.');
-        if(!$newUser->save()) $rs = SharedFunctions::prompt_msg('Invalid Account Credentials');
 
+        
+        if(!$newUser->save()){
+            $rs = SharedFunctions::prompt_msg('Invalid Account Credentials');
+            goto end;
+        }
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_ACCOUNT, AuditTrail::ACTION_CREATE,
+        );
         end: return response()->json($rs);
     }
 
@@ -79,6 +96,7 @@ class UsersController extends Controller
             'userID' => 'required',
             'password' => 'required'
         ]);
+       
         Auth::attempt([
             'userID'     => $request->userID,
             'password'  => $request->password
@@ -109,7 +127,11 @@ class UsersController extends Controller
             'password' => 'required',
             'repassword' => 'required',
         ]);
-       
+        if(Str::length($request->password) < 5)
+        {
+            $rs = SharedFunctions::prompt_msg("Password must be longer than 5 characters!");
+            goto end;
+        }
         $currentUser = Users::where('UserID','=', $request->userID)->first();
         if($currentUser){
             $rs = SharedFunctions::prompt_msg("User ID Taken! Please Try Again!");
@@ -132,8 +154,9 @@ class UsersController extends Controller
  
         if ($user->save()) {
             $rs = SharedFunctions::success_msg("Account created");
-           
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_ACCOUNT, AuditTrail::ACTION_CREATE
+            );
         }
         end: return response()->json($rs);
     }
@@ -166,6 +189,9 @@ class UsersController extends Controller
             goto end;
         }
         $rs = SharedFunctions::success_msg("Account Updated");
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_ACCOUNT, AuditTrail::ACTION_UPDATE,
+        );
         end: return response()->json($rs);
     }
 
@@ -193,6 +219,9 @@ class UsersController extends Controller
             
             $rs = SharedFunctions::success_msg("Password Successfully Generated");
             $rs['result'] = $result;
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_ACCOUNT, AuditTrail::ACTION_UPDATE,
+            );
             // DD($result);
             goto end;
         }

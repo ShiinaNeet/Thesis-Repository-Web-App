@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\SharedFunctions;
+use App\Models\AuditTrail;
 use App\Models\category;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,9 @@ class CategoryController extends Controller
         $query = category::find($request->id);
         if ($query->forceDelete()) {
             $rs = SharedFunctions::success_msg("Category deleted");
-    
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_CATEGORY, AuditTrail::ACTION_DELETE,
+            );
         }
         return response()->json($rs);
     }
@@ -27,7 +30,9 @@ class CategoryController extends Controller
 
         if ($query->delete()) {
             $rs = SharedFunctions::success_msg('Category disabled');
-            
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_CATEGORY, AuditTrail::ACTION_DISABLE,
+            );
         }
 
        
@@ -40,6 +45,9 @@ class CategoryController extends Controller
         category::withTrashed()->find($request->id)->restore();
 
         $rs = SharedFunctions::success_msg('Category enabled');
+        SharedFunctions::create_audit_log(
+            AuditTrail::MODULE_CATEGORY, AuditTrail::ACTION_ENABLE,
+        );
         return response()->json($rs);
     }
 
@@ -80,6 +88,9 @@ class CategoryController extends Controller
     
         if ($category->save()) {
             $rs = SharedFunctions::success_msg("Category saved");
+            SharedFunctions::create_audit_log(
+                AuditTrail::MODULE_CATEGORY,  $new_help == true ? AuditTrail::ACTION_CREATE : AuditTrail::ACTION_UPDATE,
+            );
         }
         return response()->json($rs);
     }

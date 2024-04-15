@@ -615,7 +615,12 @@ export default {
                     this.createAccount.saved = false;
                     this.createAccount.modal = false;
                     this.getAccounts();
-                } else this.$root.prompt(response.data.text);
+                } else 
+                {
+                    this.$root.prompt(response.data.text);
+                    this.createAccount.saved = false;
+                }
+               
             }).catch(error => {
                 let resDataError = Object.keys(error.response.data.errors);
 
@@ -642,7 +647,6 @@ export default {
                     }
                     this.createAccount.saved = false;    
                 });
-
             }
             );
         },

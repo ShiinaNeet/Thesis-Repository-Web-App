@@ -8,9 +8,15 @@ use App\Models\Users;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class PageController extends Controller
 {
+    public function access_denied(){
+        $data['css'] = ['global'];
+        return view('student.accessdenied',$data);
+    }
     public function thesisSearch(){
         $data['css'] = ['global'];
         return view('student.dashboard', $data);
@@ -63,6 +69,10 @@ class PageController extends Controller
 
     function dashboardData(){
         
+        $PdfStorageSize = $this->getFolderSize(storage_path('app/pdf'));
+        $VideoStorageSize = $this->getFolderSize(storage_path('app/videos'));
+
+    
         $Users = Users::get()->count();
         $authors = authors::get()->count();
         $thesis = thesis::get()->count();
@@ -72,8 +82,23 @@ class PageController extends Controller
             'authors' => $authors,
             'thesis' => $thesis,
             'thesisoutdated' => $thesisoutdated,
+            'pdf' => $PdfStorageSize,
+            'video' => $VideoStorageSize
         ];
         
         return $rs;
+    }
+    function getFolderSize($path)
+    {
+        $totalSize = 0;
+
+        // Get all files and directories within the specified path
+        $items = File::allFiles($path);
+    
+        foreach ($items as $item) {
+            $totalSize += $item->getSize(); // Add the size of each file
+        }
+    
+        return number_format($totalSize / 1048576, 2); 
     }
 }

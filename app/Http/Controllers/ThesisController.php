@@ -83,17 +83,42 @@ class ThesisController extends Controller
                 $authorsCollection = collect($thesis->authors);
                 $categoryCollection = collect($thesis->categories);
                 $keywordsCollection = collect($thesis->keywords);
+                $categoryMatch = false;
+                $authorMatch = false;
+                $keywordMatch = false;
 
-                $authorMatch = $authorsCollection->contains(function ($authorItem) use ($author) {
-                    return strpos($authorItem['name'], $author) !== false;
-                });
-                $categoryMatch = $categoryCollection->contains(function ($categoryitem) use ($category) {
-                    return strpos($categoryitem['category'], $category) !== false;
-                });
-                $keywordMatch = $keywordsCollection->contains(function ($keywordItem) use ($keyword) {
-                    return strpos($keywordItem['keyword'], $keyword) !== false;
-                });
-                return $authorMatch && $categoryMatch && $keywordMatch;
+           
+            foreach ($author as $auth) {
+                if ($authorsCollection->contains(function ($authorItem) use ($auth) {
+                    return strpos($authorItem['name'], $auth) !== false;
+                })) {
+                    $authorMatch = true;
+                    break;
+                }
+            }
+             
+            if($category !== null || $category === []){
+                foreach ($category as $cat) {
+                    if ($categoryCollection->contains(function ($categoryItem) use ($cat) {
+                        return strpos($categoryItem['category'], $cat) !== false;
+                    })) {
+                        $categoryMatch = true;
+                        break;
+                    }
+                }
+            }
+            if($keyword !== null || $keyword[0] === ''){
+                foreach ($keyword as $key) {
+                    if ($keywordsCollection->contains(function ($keywordItem) use ($key) {
+                        return strpos($keywordItem['keyword'], $key) !== false;
+                        dd("hello");
+                    })) {
+                        $keywordMatch = true;
+                        break;
+                    }
+                }
+            }
+                return $authorMatch || $categoryMatch || $keywordMatch;
             });
             
         $rs = SharedFunctions::success_msg('Success');

@@ -7,11 +7,11 @@
                     <div class="w-1/2 max-sm:w-full p-2 mb-3 flex-row">
                         <VaInput v-model="searchQuery.title" placeholder="Search here" label="Title  " inner-label
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
-                        <VaSelect v-model="searchQuery.keyword" placeholder="Search here" label="Keyword" :options="keywordList" inner-label clearable searchable autocomplete text-by="keyword" value-by="keyword" highlight-matched-text clearable-icon="cancel"
+                        <VaSelect v-model="searchQuery.keyword" placeholder="Search here" label="Keyword" :options="keywordList" inner-label clearable searchable autocomplete text-by="keyword" value-by="keyword" highlight-matched-text clearable-icon="cancel" multiple
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
-                        <VaInput v-model="searchQuery.author" placeholder="Search here" label="Author " inner-label
-                            class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
-                        <VaSelect v-model="searchQuery.category" placeholder="Search here" :options="categoryList"
+                        <VaSelect v-model="searchQuery.author" placeholder="Search here" label="Author " :options="authorList" inner-label clearable searchable autocomplete text-by="name" value-by="name" highlight-matched-text clearable-icon="cancel" multiple
+                        class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
+                        <VaSelect v-model="searchQuery.category" placeholder="Search here" :options="categoryList" multiple
                             label="Category  " inner-label clearable searchable autocomplete text-by="category"
                             value-by="category" highlight-matched-text clearable-icon="cancel"
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
@@ -61,10 +61,15 @@
                                     <div class="flex sm:flex-col sm:self-center lg:items-start">
                                         <div class="flex text-lg font-bold flex-wrap whitespace-pre">Author:
                                             <span
-                                                class="flex text-green-700 font-bold whitespace-pre text-base flex-center justify-center"
+                                               v-if="thesis.authors && thesis.authors.length !== 0"
+                                                class="flex text-green-700 whitespace-pre text-base flex-center justify-center"
                                                 v-for="(author, index) in thesis.authors" :key="index">
                                                 {{ '' + author.name }}
+                                               
                                                 <span v-if="index !== thesis.authors.length - 1">, </span>
+                                            </span>
+                                            <span v-else>
+                                                No Author
                                             </span>
                                         </div>
                                     </div>
@@ -191,6 +196,7 @@ export default {
                 category: null,
                 sort: null,
             },
+            authorList:[],
             categoryList: [],
             keywordList:[],
             data: {
@@ -216,6 +222,7 @@ export default {
         this.getThesis();
         this.getCategory();
         this.getKeywords();
+        this.getAuthor();
     },
     computed: {
         displayedThesis() {
@@ -305,6 +312,21 @@ export default {
             }).then(response => {
                 if (response.data.status == 1) {
                     this.keywordList = response.data.result;
+                }
+                else
+                    this.$root.prompt(response.data.text);
+            }).catch(error => {
+                this.$root.prompt(error.response.data.message);
+            });
+        },
+        getAuthor() {
+            axios({
+                method: 'GET',
+                type: 'JSON',
+                url: '/author/get'
+            }).then(response => {
+                if (response.data.status == 1) {
+                    this.authorList = response.data.result;
                 }
                 else
                     this.$root.prompt(response.data.text);

@@ -134,8 +134,8 @@
         class="w-full"
         close-button
     >
-        <div class="w-screen h-fit">
-            <iframe :src="thesis.pdf" class="w-screen h-screen"></iframe>
+        <div class="w-full h-screen">
+            <iframe :src="thesis.pdf" class="w-full h-full"></iframe>
         </div>
     </VaModal>
     <!-- video -->

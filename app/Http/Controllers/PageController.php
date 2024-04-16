@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\authors;
+use App\Models\category;
+use App\Models\keywords;
 use App\Models\thesis;
 use App\Models\Users;
 use Carbon\Carbon;
@@ -75,15 +77,19 @@ class PageController extends Controller
     
         $Users = Users::get()->count();
         $authors = authors::get()->count();
+        $categories = category::get()->count();
+        $keywords = keywords::get()->count();
         $thesis = thesis::get()->count();
         $thesisoutdated = thesis::get()->where('published_at','<', Carbon::now()->subYears(5))->count();
         $rs['result'] = [
             'users' => $Users,
             'authors' => $authors,
+            'categories' => $categories,
+            'keywords' => $keywords,
             'thesis' => $thesis,
             'thesisoutdated' => $thesisoutdated,
             'pdf' => $PdfStorageSize,
-            'video' => $VideoStorageSize
+            'video' => $VideoStorageSize,
         ];
         
         return $rs;

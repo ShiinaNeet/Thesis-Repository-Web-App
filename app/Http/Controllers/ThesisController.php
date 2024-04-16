@@ -37,7 +37,7 @@ class ThesisController extends Controller
         }
         $theses = Thesis::withTrashed()->orderBy('id', 'desc')->get();
         if ($request->title  !== null || $request->title != '') {
-           // $theses = $query->where('title', 'like', '%' . $request->title . '%')->orderBy('published_at', 'DESC');
+            $theses = $query->where('title', 'like', '%' . $request->title . '%')->orderBy('published_at', 'DESC');
         }
              
            $theses = $query->get()->map(function($q) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 px-2.5 py-2.5 flex flex-center bg-white rounded">
+    <div class="mx-5 mb-2 px-2.5 py-5 pb-2.5 bg-white rounded">
         <va-data-table
         id="data-table"
         :items="auditTrail"
@@ -27,18 +27,6 @@
                                 <va-icon name="search" color="#C2C2C2" />
                             </template>
                         </va-input>
-                    </th>
-                    <th
-                    v-for="key in Object.keys(auds.tblColumns).slice(0, 3)"
-                    :key="key"
-                    class="py-1 pr-1"
-                    >
-                        <va-button
-                        v-if="key.includes(5)"
-                        class="invisible"
-                        preset="primary"
-                        disabled
-                        />
                     </th>
                 </tr>
             </template>
@@ -89,6 +77,13 @@
                 "
                 />
             </template>
+            <template #cell(user_type)="{ value }">
+                <va-badge 
+                :text="auds.types[value].label"
+                :color="auds.types[value].color"
+                />
+                <!-- {{ acc.types[value].label }} -->
+            </template>
             <template #cell(created_at)="{ value }">
                 {{ formatDate(value, 'MMM. Do YYYY', 'Invalid Date') }}
             </template>
@@ -116,7 +111,7 @@
 
 <style lang="scss" scoped>
 .table-crud {
-    --va-form-element-default-width: 100%;
+ 
 
     .va-input {
         display: block;
@@ -138,11 +133,11 @@ export default {
     data () {
         const auds = {
             tblColumns: [
-                { key: "module", label: "Module", width: "30%", sortable: false },
+                { key: "module", label: "Module", width: "20%", sortable: false },
                 { key: "userID", label: "User ID", width: "20%", sortable: true },
+                { key: "user_type", label: "Role", width: "20%", sortable: true },
                 { key: "action_type", label: "Action", width: "20%", sortable: false },
-                { key: "", label: "", width: "20%", sortable: false },
-                { key: "created_at", label: "Created On",width: "30%", sortable: true }
+                { key: "created_at", label: "Created On",width: "50%", thAlign: "start", tdVerticalAlign: "middle", sortable: true }
             ],
             auditCategory: [
                 { label: "Account", value: 0 },
@@ -157,9 +152,15 @@ export default {
                 { label: "Create", color: "success", value: 0 },
                 { label: "Update", color: "warning", value: 1 },
                 { label: "Delete", color: "danger", value: 2 },
-                { label: "Enable", color: "secondary", value: 3 },
-                { label: "Disable", color: "secondary", value: 4 }
+                { label: "Enable", color: "primary", value: 3 },
+                { label: "Disable", color: "info", value: 4 }
             ],
+            types: [
+                { label: "Administrator", value: 0, color: "warning" },
+                { label: "AssistantLibrarian", value: 1, color: "primary" },
+                { label: "Librarian", value: 2, color: "info"},
+                { label: "Student", value: 3, color: "success" }
+            ]
         };
 
         return {

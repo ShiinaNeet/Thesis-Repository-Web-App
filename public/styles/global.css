@@ -1,5 +1,5 @@
 html, body {
-    zoom: 1.025;
+    zoom: 1.1;
 }
 .logo {
     font-weight: 600;
@@ -12,7 +12,7 @@ html, body {
     /* border-bottom-left-radius: 0; */
 }
 
-/* #dashboard-wrapper #hmenu .va-tabs {
+ #dashboard-wrapper #hmenu .va-tabs {
     position: absolute;
     background-color: #FFF;
     flex-direction: column;
@@ -22,7 +22,7 @@ html, body {
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
     box-shadow: 0 3px #CCCCCC!important;
-} */
+} 
 
 #dashboard-wrapper #hmenu .va-tabs .va-tab[aria-selected="true"] {
     /* color: inherit!important; */

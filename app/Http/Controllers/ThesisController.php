@@ -25,22 +25,10 @@ class ThesisController extends Controller
         $title = $request->title;
         $sortFilter = $request->sort;
         
-        $query = Thesis::withTrashed();
-
-        if ($sortFilter === "1") {
-            $query->orderBy('published_at', 'ASC');
-        } elseif ($sortFilter === "2") {
-            $query->orderBy('published_at', 'DESC');
-        } else {
-            // Default sorting or no sorting specified
-            $query->orderBy('id', 'desc');
-        }
-        $theses = Thesis::withTrashed()->orderBy('id', 'desc')->get();
-        if ($request->title  !== null || $request->title != '') {
-            $theses = $query->where('title', 'like', '%' . $request->title . '%')->orderBy('published_at', 'DESC');
-        }
-             
-           $theses = $query->get()->map(function($q) {
+        $theses = Thesis::withTrashed();
+        
+       
+           $theses = $theses->get()->map(function($q) {
                 $arr = [];
                
                 $authorIds = explode(',', trim($q->authors, '[]'));
@@ -78,49 +66,64 @@ class ThesisController extends Controller
 
                 return $q;
             });
-            $theses = $theses->filter(function ($thesis) use ($author,$category,$keyword) {
-               
-                $authorsCollection = collect($thesis->authors);
-                $categoryCollection = collect($thesis->categories);
-                $keywordsCollection = collect($thesis->keywords);
-                $categoryMatch = false;
-                $authorMatch = false;
-                $keywordMatch = false;
+        if ($sortFilter === "1") {
+            $theses = $theses->sortBy('published_at');
+        } elseif ($sortFilter === "2") {
+        
+            $theses = $theses->sortByDesc('published_at');
+        }
+        else{
+            $theses = $theses->sortByDesc('created_at');
+        }
+        $theses = $theses->filter(function ($thesis) use ($author,$category,$keyword, $title) {
+            
+            $authorsCollection = collect($thesis->authors);
+            $categoryCollection = collect($thesis->categories);
+            $keywordsCollection = collect($thesis->keywords);
+            $categoryMatch = true;
+            $authorMatch = true;
+            $keywordMatch = true;
+            $titleMatch = true;
 
-           
-            foreach ($author as $auth) {
-                if ($authorsCollection->contains(function ($authorItem) use ($auth) {
-                    return strpos($authorItem['name'], $auth) !== false;
-                })) {
-                    $authorMatch = true;
-                    break;
-                }
+            if ($title !== null && $title !== '') {
+                $titleMatch = stripos($thesis->title, $title) !== false;
             }
-             
+            if($author !== null || $author === []){
+                foreach ($author as $auth) {
+                    if ($authorsCollection->contains(function ($authorItem) use ($auth) {
+                        return stripos($authorItem['name'], $auth) !== false;
+                    })) {
+                        $authorMatch = true;
+                        break;
+                    }
+                }
+            } 
             if($category !== null || $category === []){
                 foreach ($category as $cat) {
                     if ($categoryCollection->contains(function ($categoryItem) use ($cat) {
-                        return strpos($categoryItem['category'], $cat) !== false;
+                        return stripos($categoryItem['category'], $cat) !== false;
                     })) {
                         $categoryMatch = true;
                         break;
                     }
                 }
             }
-            if($keyword !== null || $keyword[0] === ''){
+            if($keyword !== null || $keyword === ''){
                 foreach ($keyword as $key) {
                     if ($keywordsCollection->contains(function ($keywordItem) use ($key) {
-                        return strpos($keywordItem['keyword'], $key) !== false;
-                        dd("hello");
+                        return stripos($keywordItem['keyword'], $key) !== false;
+                        
                     })) {
                         $keywordMatch = true;
                         break;
                     }
                 }
             }
-                return $authorMatch || $categoryMatch || $keywordMatch;
-            });
-            
+                return $authorMatch & $categoryMatch & $keywordMatch & $titleMatch;
+        });
+
+        $theses = $theses->values()->all();
+        //$theses = $theses->values()->all();
         $rs = SharedFunctions::success_msg('Success');
         $rs['result'] = $theses;
         return response()->json($rs);
@@ -367,31 +370,16 @@ class ThesisController extends Controller
             }
         }
         
-        if (is_string($request->authors)) {
-            $authors = [$request->authors];
-        } else if (is_array($request->authors)) {
-            $authors = $request->authors;
-        } else {
-            $authors = [];
-        }
-        if (is_string($request->categories)) {
-            $categories = [$request->categories];
-        } else if (is_array($request->categories)) {
-            $categories = $request->categories;
-        } else {
-            $categories = [];
-        }
-        if (is_string($request->keywords)) {
-            $keywords = [$request->keywords];
-        } else if (is_array($request->keywords)) {
-            $keywords = $request->keywords;
-        } else {
-            $keywords = [];
-        }
+        $keywordsArray = json_decode($request->keywords, true);
+        $keywords = array_unique(array_column($keywordsArray, 'id'));
+        $authorsarray = json_decode($request->authors, true);
+        $authors = array_unique(array_column($authorsarray, 'id'));
+        $categoriesarray = json_decode($request->categories, true);
+        $categories = array_unique(array_column($categoriesarray, 'id'));
         
-        $thesis->authors = implode('|', $authors);
-        $thesis->categories = implode('|', $categories);
-        $thesis->keywords = implode('|', $keywords);
+        $thesis->authors = '[' . implode(',', $authors) . ']';
+        $thesis->categories = '[' . implode(',', $categories) . ']';
+        $thesis->keywords = '[' . implode(',', $keywords) . ']';
 
         if($thesis->save()){
             $rs = SharedFunctions::success_msg("Thesis Saved!");

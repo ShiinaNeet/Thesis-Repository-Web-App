@@ -256,7 +256,6 @@
                                 label="Keywords to attach"
                                 :options="keywordList"
                                 text-by="keyword"
-                                value-by="id"
                                 multiple
                                 searchable
                                 clearable
@@ -293,14 +292,14 @@
                                 >
                                     <template #content="{ value }">
                                         <va-chip
-                                        v-for="(reqw, idx) in value"
-                                        :key="idx"
+                                        v-for="reqw in value"
+                                        :key="reqw"
                                         size="small"
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
-                                        closeable
-                                        @update:modelValue="updateCategoryArr('create', value)"
+                                        
+                                        @update:modelValue="DeleteChipCreateCategory(reqw)"
                                         >
                                             {{ reqw.category }}
                                         </va-chip>
@@ -327,8 +326,8 @@
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
-                                        closeable
-                                        @update:modelValue="updateAuthorsArr('create', idx)"
+                                        
+                                        @update:modelValue="deleteChipCreateAuthor(reqaa)"
                                         >
                                             {{ reqaa.name }}
                                         </va-chip>
@@ -439,40 +438,40 @@
                         />
                         <div class="select w-full">
                             <!-- Error in EditThesis.data.keywords IDK WHY -->
-                            <VaSelect
+                            <va-select
                             v-model="editThesis.data.keywords"
                             :options="keywordList"
                             text-by="keyword"
-                            value-by="id"
                             class="w-1/2"
                             label="Keywords to attach"
                             multiple
                             searchable
-                            clearable
-                            clearable-icon="backspace"
+                            
                             :error="editThesis.keywordsEmpty"
                             :error-messages="'The requirement(s) field is required.'"
                             @update:modelValue="editThesis.key = 1"
                             >
                                 <template #content="{ value }">
                                     <va-chip
-                                        v-for="reqqs  in value"
+                                        v-for="reqqsk in value"
+                                        :key="reqqsk"
                                         size="small"
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
                                         closeable
-                                    
+                                        @update:modelValue="deleteChipKeyword(reqqsk)"
+                                       
                                     >
-                                        {{ reqqs.keyword }}
+                                        {{ reqqsk.keyword }}
                                     </va-chip>
                                 </template>
-                            </VaSelect>
+                            </va-select>
                             <VaSelect
                             v-model="editThesis.data.categories"
                             :options="categoryList"
                             text-by="category"
-                            value-by="id"
+                            
                             class="w-1/2"
                             label="Category to attach"
                             multiple
@@ -484,12 +483,13 @@
                             >
                                 <template #content="{ value }">
                                     <VaChip
-                                    v-for="ww, in value"
+                                    v-for="ww in value"
                                     size="small"
                                     color="secondary"
                                     class="mr-1 mb-1"
                                     square
                                     closeable
+                                    @update:modelValue="DeleteChipCategory(ww)"
                                     >
                                 
                                     {{ ww.category }}
@@ -502,7 +502,7 @@
                             v-model="editThesis.data.authors"
                             :options="authorList"
                             text-by="name"
-                            value-by="id"
+                            
                             class="w-full"
                             label="Author"
                             multiple
@@ -513,14 +513,16 @@
                             >
                                 <template #content="{ value }">
                                     <VaChip
-                                    v-for="(author) in value"
+                                    v-for="authorzx in value"
+                                    :key="authorzx"
                                     size="small"
                                     color="secondary"
                                     class="mr-1 mb-1"
                                     square
                                     closeable
+                                    @update:modelValue="deleteChipAuthor(authorzx) "
                                     >
-                                    {{ author.name }}
+                                    {{ authorzx.name }}
                                     
                                     </VaChip>
                                 </template>
@@ -800,6 +802,39 @@ export default {
         this.getAuthor();
     },
     methods: {
+        deleteChipAuthor(author) {
+           
+            this.editThesis.data.authors = this.editThesis.data.authors.filter((authors) => authors !== author);
+        },
+        deleteChipKeyword(keyword) {
+       
+            const updatedKeywords = this.editThesis.data.keywords.filter(item => item.id !== keyword.id);
+            this.editThesis.data.keywords = updatedKeywords;
+          
+        },
+        DeleteChipCategory(category) {
+            
+            const updatedCategories = this.editThesis.data.categories.filter(item => item.id !== category.id);
+            this.editThesis.data.categories = updatedCategories;
+           
+        },
+        //Create Chip Celete below
+        deleteChipCreateAuthor(author) {
+           
+           this.createThesis.data.authors = this.createThesis.data.authors.filter((authors) => authors !== author);
+        },
+        deleteChipCreateKeyword(keyword) {
+        
+            const updatedKeywords = this.createThesis.data.keywords.filter(item => item.id !== keyword.id);
+            this.createThesis.data.keywords = updatedKeywords;
+            
+        },
+        DeleteChipCreateCategory(category) {
+            
+            const updatedCategories = this.createThesis.data.categories.filter(item => item.id !== category.id);
+            this.createThesis.data.categories = updatedCategories;
+            
+        },
         updateKeywordIds() {
             if (Array.isArray(this.editThesis.data.keywords)) {
             this.editThesis.data.keywords = this.editThesis.data.keywords.map(keywords => keywords.id);
@@ -974,7 +1009,7 @@ export default {
                         formData.append('pdf', pdffile);
                     }
                   
-                    const pdffile = this.editThesis.data.pdf[0];
+                   
                     var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
                     formData.append('published_at', newDate); 
                    

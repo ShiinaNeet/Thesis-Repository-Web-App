@@ -4,7 +4,7 @@
             <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center">
                 <div class="w-full flex flex-col items-center">
 
-                    <div class="w-1/2 max-sm:w-full p-2 mb-3 flex-row">
+                    <div class="w-1/2 max-sm:w-full pb-2 pt-5 mb-3 flex-row">
                         <VaInput v-model="searchQuery.title" placeholder="Search here" label="Title  " inner-label
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
                         <VaSelect v-model="searchQuery.keyword" placeholder="Search here" label="Keyword" :options="keywordList" inner-label clearable searchable autocomplete text-by="keyword" value-by="keyword" highlight-matched-text clearable-icon="cancel" multiple
@@ -349,15 +349,15 @@ export default {
                         this.page = 1;
                         this.perPage = 4
                     } else {
-
+                        console.log(response.data.result)
                         this.data.thesisList = Object.values(response.data.result);
                         this.pages = [];
-                        this.page = 0;
+                        this.page = 1;
                         this.perPage = 4;
 
-                        if (this.data.thesisList.length > 1) {
-                            this.page++;
-                        }
+                        // if (this.data.thesisList.length > 1) {
+                        //     this.page++;
+                        // }
                     }
                 }
                 this.isloading = false;

@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 px-2.5 pb-2.5 bg-white rounded">
+    <div class="mx-5 mb-2 my-5 px-2.5 pb-2.5 bg-white rounded">
         <va-data-table
         id="data-table"
         :items="keywordList"

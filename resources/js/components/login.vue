@@ -62,7 +62,7 @@
                     <h5 class="va-h5 text-center pb-3">
                         Welcome, Guest User
                     </h5>
-                    <h5 class="va-text-secondary">
+                    <h5 class="text-black">
                         Please register to continue
                     </h5>
                     <!-- <div class="flex-col bg-red-200 py-4 justify-center mt-4">
@@ -88,8 +88,28 @@
                             <p class="text-red-700"> {{ account.register.passwordError }}</p>
                         </div>
                     </div>
+                    <div class="mt-1">
+                        <va-input v-model="account.register.repassword"
+                            :type="account.register.isPasswordVisible ? 'text' : 'password'" label="Password"
+                            class="w-full mb-3 bg-[rgba(255,255,255,0.45)]" :disabled="account.isLoading" outline
+                            :error="account.register.invalidPassword" @keyup="account.register.invalidPassword = false"
+                            :error-messages="account.register.passwordMisMatch[0]">
+                            <template #appendInner>
+                                <va-icon :name="account.register.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                    size="small" color="#154EC1"
+                                    @click="account.register.isPasswordVisible = !account.register.isPasswordVisible" />
+                            </template>
+                        </va-input>
+                    </div>
                     <div class="flex">
-                        <va-checkbox v-model="account.register.terms.checked" class="mr-2 w-full z-[3]" />
+                        <va-checkbox 
+                        v-model="account.register.terms.checked"
+                        :error="account.register.terms.isInvalid"
+                        :errorMessages="account.register.terms.invalidMessage"
+                        immediateValidation="false"
+                        
+                        
+                         class="mr-2 w-full z-[3]" />
                         <label class="absolute pt-[0.15rem] pl-[1.75rem] text-[15px] z-[1]">
                             I have read and agree to the
                             <a class="va-link hover:underline" href="javascript:void(0)"
@@ -98,10 +118,6 @@
                             </a>
                         </label>
                     </div>
-                    <div v-if="account.register.terms.isInvalid" class="text-red-500 text-sm">
-                        {{ account.register.terms.invalidMessage }}
-                    </div>
-
                     <div class="mt-6 mb-6">
                         <va-button class="w-full" :loading="account.isLoading"
                             :disabled="account.register.saved || account.isValid"
@@ -197,6 +213,7 @@ export default {
                 register: {
                     userId: 0,
                     password: "",
+                    repassword:"",
                     passwordmatch: null,
                     invalidMessage: false,
                     invalidPassword: false,
@@ -234,9 +251,21 @@ export default {
                 this.account.isInvalid = false;
                 return;
             }
+            else{
+                this.account.register.terms.isInvalid = false;
+            }
+           
             if (this.account.register.userId === 0) {
                 this.account.register.isValidUserID = false;
                 this.account.register.idErrorMessage = "Incorrect Account Credential";
+            }
+            if(this.account.register.password !== this.account.register.repassword){
+                this.account.register.invalidPassword = true;
+                this.account.register.passwordMisMatch[0] = "Password does not match!"
+                this.account.isLoading = false;
+                this.account.register.saved = false;
+                this.account.isInvalid = false;
+                return;
             }
             axios({
                 method: 'POST',

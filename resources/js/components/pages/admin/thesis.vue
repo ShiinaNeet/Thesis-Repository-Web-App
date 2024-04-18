@@ -1,6 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">
-                
+    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">       
         <va-data-table
         id="data-table"
         :items="thesisList"
@@ -128,18 +127,41 @@
                         </h1>
                         <div class="w-fit py-3 pt-4 overflow-hidden">
                             <div class="flex lg:flex-row flex-col gap-1">
-                                <h3 class="text-lg uppercase font-sans">Author:</h3> 
-                            <span v-for="authore in rowData.authors" class="flex flex-wrap text-wrap items-center">
+                                <h3 class="text-lg uppercase font-sans flex flex-center justify-center">Author:</h3> 
+                                <span class="flex flex-wrap items-center gap-1">
+                                <!-- Loop through the first three authors -->
+                                <template v-for="(author, index) in rowData.authors.slice(0, 2)" :key="author.id">
                                     <VaChip
-                                        :text="authore.name"
+                                        :text="author.name"
                                         color="info"
                                         text-color="BackgroundPrimary"
-                                        size="medium"
+                                        size="small"
                                         square
+                                        class="p-0.5"
                                     >
-                                    {{authore.name}}
+                                        <span  class="p-1">{{ author.name }}</span>
                                     </VaChip>
-                                    
+                                </template>
+
+                                <!-- Check if there are remaining authors -->
+                                <template v-if="rowData.authors.length > 2">
+                                  
+                                    <VaDropdown trigger="hover">
+                                        <template #anchor>
+                                            <VaButton class="mr-2 font-serif" size="small" color="info">
+                                                <span class="text-large p-0.5 font-sans" >+{{ rowData.authors.length - 2 }} more</span>
+                                            </VaButton>
+                                        </template>
+
+                                        <VaDropdownContent 
+                                        v-for="(author, index) in rowData.authors.slice(2)"
+                                        >
+                                           <span class="flex flex-center justify-center">
+                                            {{ author.name }}
+                                           </span> 
+                                        </VaDropdownContent>
+                                    </VaDropdown>
+                                </template>
                             </span>
                             <span 
                             v-if="rowData.authors == ''"
@@ -151,20 +173,18 @@
                             <strong>Published Date:</strong> {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
                         </span>
                         <VaDivider>
-                            <span class="px-2 font-bold text-lg py-5">Abstract</span>
+                           
                         </VaDivider>
-                        <div class="bg-white-500 w-full py-3 pt-5">
+                        <span class="px-2 font-bold text-lg p1-5 flex-center justify-center">Abstract</span>
+                        <div class="bg-white-500 w-full py-1 pt-3">
                             <p class="text-wrap break-all text-justify py-2">
                                 {{ rowData.abstract === 'null' || rowData.abstract === '' ||rowData.abstract === null ? 'Abstract Missing!' : rowData.abstract }}
                             </p>
                         </div>
-                        <VaDivider>
-                            <span class="px-2 font-bold text-lg py-5">Tags</span>
-                        </VaDivider
-                        class="lg:py-5 sm:py-5"
-                        >
+                        <VaDivider> </VaDivider class="lg:py-5 sm:py-5">
+                        <span class="px-2 font-bold text-lg py-1 text-center flex-center">Tags</span>
                         <div class=" w-fit py-2">
-                            <div class="flex lg:flex-row flex-col gap-1 py-5">
+                            <div class="flex lg:flex-row flex-col gap-1 py-1">
                                
                                 <span v-for="keywordList in rowData.keywords" class="flex items-center">
                                     <VaChip
@@ -172,7 +192,7 @@
                                         size="medium"
                                         square
                                         color="warning"
-                                        :icon="tags"
+                                       
                                     >
                                     {{ keywordList.keyword }}
                                     </VaChip>
@@ -183,6 +203,29 @@
                                 > No Keyword Tagged</span>
                             </div>
                         </div>
+                        <VaDivider>
+                        </VaDivider class="lg:py-0 sm:py-0">
+                        <span class="px-2 font-bold text-lg py-1 text-center flex-center">Category</span>
+                        <div class=" w-fit py-2">
+                            <div class="flex lg:flex-row flex-col gap-1 py-1">
+                               
+                                <span v-for="categoryList in rowData.categories" class="flex items-center">
+                                    <VaChip
+                                        text-color="BackgroundPrimary"
+                                        size="medium"
+                                        square
+                                        color="warning"
+                                       
+                                    >
+                                    {{ categoryList.category }}
+                                    </VaChip>
+                                </span>
+                                <span 
+                                v-if="rowData.categoryList == ''"
+                                class="flex flex-wrap text-wrap items-center"
+                                > No Category Tagged</span>
+                            </div>
+                        </div>
                         <VaDivider
                         class="lg:py-5 sm:py-5"
                         >
@@ -190,12 +233,12 @@
                         </VaDivider>
                         <div
                         class="py-2">
-                            <h2 class="pdf py-2">
-                                PDF : <a 
-                                            class="text-blue-500 underline py-2"
-                                            :href="rowData.pdf">
-                                                {{ rowData.pdf !== null ? 'Download' : 'Unavailable'}}
-                                            </a>
+                            <h2 class="text-lg pdf py-2">
+                                PDF :   <a 
+                                        class="text-blue-500 underline py-2"
+                                        :href="rowData.pdf">
+                                            {{ rowData.pdf !== null ? 'Download' : 'Unavailable'}}
+                                        </a>
                             </h2>
                         </div>
                     </div>
@@ -221,13 +264,11 @@
         </va-data-table>
     </div>
 
-
     <va-modal
     v-model="createThesis.modal"
     noOutsideDismiss
     noPadding
     >
-       
         <template #content>
             <VaProgressBar  :indeterminate="createThesis.isloading" />
             <VaInnerLoading 
@@ -446,7 +487,8 @@
                             label="Keywords to attach"
                             multiple
                             searchable
-                            
+                            clearable
+                            clearable-icon="backspace"
                             :error="editThesis.keywordsEmpty"
                             :error-messages="'The requirement(s) field is required.'"
                             @update:modelValue="editThesis.key = 1"
@@ -471,12 +513,12 @@
                             v-model="editThesis.data.categories"
                             :options="categoryList"
                             text-by="category"
-                            
                             class="w-1/2"
                             label="Category to attach"
                             multiple
                             searchable
                             clearable-icon="backspace"
+                            clearable
                             :error="editThesis.categoryEmpty"
                             :error-messages="'The category(s) field is required.'"
                             @update:modelValue="editThesis.cate = 1"
@@ -695,20 +737,20 @@
 </template>
 
 <style lang="scss" scoped>
-.table-crud {
-    //--va-form-element-default-width: 80%;
+    .table-crud {
+        //--va-form-element-default-width: 80%;
 
-    .va-input {
-        display: block;
-    }
+        .va-input {
+            display: block;
+        }
 
-    &__slot {
-        th {
-            vertical-align: middle;
-            width: max-content;
+        &__slot {
+            th {
+                vertical-align: middle;
+                width: max-content;
+            }
         }
     }
-}
 </style>
 
 <script>
@@ -742,6 +784,9 @@ export default {
             ]
         };
         return {
+            visibleAuthors: [],
+            showRemainingAuthors: false,
+            remainingAuthorsCount: 0,
             test: { keywords: {}, },
             files: [],
             gettingThesis: false,

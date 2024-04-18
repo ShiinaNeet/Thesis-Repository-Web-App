@@ -154,6 +154,7 @@
                 />
                 <VaSelect
                 class="py-2"
+                label="User Role"
                 v-model="createAccount.data.user_type"
                 placeholder="User Role"
                 :options="userTypes"

@@ -60,7 +60,7 @@ class PageController extends Controller
     function dashboard(){
         $data['css'] = ['global'];
         return view('dashboard', $data);
-
+        
     }
 
     function studentDashboard(){

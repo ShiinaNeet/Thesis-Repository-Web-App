@@ -156,14 +156,19 @@
                         </VaCardContent>
                     </VaCard>
                 </div>
+                <div v-if="data.thesisList == null || data.thesisList.length === 0"
+                class="py-5 max-sm:py-10"
+                >
+                    <h1>No thesis found.</h1>
+                </div>
                 <div class="flex gap-2 py-5">
                     <VaButton v-if="pages.length !== 1" @click="decrementPage" :disabled="pageNumber == 1"
                         preset="secondary" hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_back_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
 
-                    <VaButton v-for="(pageNumber, index) in pages.slice(page - 1, page+3)" @click="page = pageNumber"
+                    <VaButton v-for="pageNumber in pages.slice(page - 1, page+3)" @click="page = pageNumber"
                         :color="page == pageNumber ? 'Focus' : 'BackgroundElement'" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
-                            translate-x-50  w-full" :key="index">
+                            translate-x-50  w-full" :key="pageNumber">
                         <span :class="page == pageNumber ? 'text-white' : 'text-black'">
                             {{ pageNumber }}
                         </span>

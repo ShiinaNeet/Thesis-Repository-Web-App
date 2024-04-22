@@ -618,7 +618,7 @@
                         <VaTextarea
                         v-model="editThesis.data.abstract"
                         label="Abstract *"
-                        class="w-full mb-2"
+                        class="w-full mb-2 whitespace-pre-line"
                         :autosize="true"
                         max-rows="7"
                         min-rows="7"

@@ -34,7 +34,7 @@
                     </p>
                 </div>
                 <div>
-                    <p class="text-lg text-justify flex-wrap py-3">
+                    <p class="text-lg text-justify flex-wrap py-3 whitespace-pre-line">
                         {{ thesis.abstract }}
                     </p>
                 </div>
@@ -56,7 +56,7 @@
                             <VaChip
                                 v-for="category in thesis.categories"
                                 color="secondary"
-                                class="mr-2"
+                                class="mr-2 mb-2"
                                 size="large"
                                 square
                             >
@@ -71,7 +71,7 @@
                                 square
                                 v-for="keyword in thesis.keywords"
                                 color="secondary"
-                                class="mr-2"
+                                class="mr-2 mb-2"
                                 size="large"
                                 >{{ keyword.keyword }}</VaChip
                             >

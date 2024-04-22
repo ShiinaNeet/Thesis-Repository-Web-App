@@ -162,7 +162,7 @@
                                         </VaDropdownContent>
                                     </VaDropdown>
                                 </template>
-                            </span>
+                                </span>
                             <span 
                             v-if="rowData.authors == ''"
                             class="flex flex-wrap text-wrap items-center py-2 uppercase font-sans text-bold"
@@ -186,21 +186,45 @@
                         <div class=" w-fit py-2">
                             <div class="flex lg:flex-row flex-col gap-1 py-1">
                                
-                                <span v-for="keywordList in rowData.keywords" class="flex items-center">
+                                <span class="flex flex-wrap items-center gap-1">
+                                <!-- Loop through the first three authors -->
+                                <template v-for="(keyword, index) in rowData.keywords.slice(0, 3)" :key="keyword.id">
                                     <VaChip
+                                        :text="keyword.keyword"
+                                        color="info"
                                         text-color="BackgroundPrimary"
-                                        size="medium"
+                                        size="small"
                                         square
-                                        color="warning"
-                                       
+                                        class="p-0.5"
                                     >
-                                    {{ keywordList.keyword }}
+                                        <span  class="p-1">{{ keyword.keyword }}</span>
                                     </VaChip>
+                                </template>
+
+                                <!-- Check if there are remaining authors -->
+                                <template v-if="rowData.keywords.length > 2">
+                                  
+                                    <VaDropdown trigger="hover">
+                                        <template #anchor>
+                                            <VaButton class="mr-2 font-serif" size="small" color="info">
+                                                <span class="text-large p-0.5 font-sans" >+{{ rowData.keywords.length - 3 }} more</span>
+                                            </VaButton>
+                                        </template>
+
+                                        <VaDropdownContent 
+                                        v-for="(keyword, index) in rowData.keywords.slice(2)"
+                                        >
+                                           <span class="flex flex-center justify-center">
+                                            {{ keyword.keyword }}
+                                           </span> 
+                                        </VaDropdownContent>
+                                    </VaDropdown>
+                                </template>
                                 </span>
                                 <span 
                                 v-if="rowData.keywords == ''"
                                 class="flex flex-wrap text-wrap items-center"
-                                > No Keyword Tagged</span>
+                                > No keyword Tagged</span>
                             </div>
                         </div>
                         <VaDivider>
@@ -209,16 +233,40 @@
                         <div class=" w-fit py-2">
                             <div class="flex lg:flex-row flex-col gap-1 py-1">
                                
-                                <span v-for="categoryList in rowData.categories" class="flex items-center">
+                                <span class="flex flex-wrap items-center gap-1">
+                                <!-- Loop through the first three authors -->
+                                <template v-for="(category, index) in rowData.categories.slice(0, 3)" :key="category.id">
                                     <VaChip
-                                        text-color="BackgroundPrimary"
-                                        size="medium"
-                                        square
+                                        :text="category.category"
                                         color="warning"
-                                       
+                                        text-color="BackgroundPrimary"
+                                        size="small"
+                                        square
+                                        class="p-0.5"
                                     >
-                                    {{ categoryList.category }}
+                                        <span  class="p-1">{{ category.category }}</span>
                                     </VaChip>
+                                </template>
+
+                                <!-- Check if there are remaining authors -->
+                                <template v-if="rowData.categories.length > 2">
+                                  
+                                    <VaDropdown trigger="hover">
+                                        <template #anchor>
+                                            <VaButton class="mr-2 font-serif" size="small" color="warning">
+                                                <span class="text-large p-0.5 font-sans" >+{{ rowData.categories.length - 3 }} more</span>
+                                            </VaButton>
+                                        </template>
+
+                                        <VaDropdownContent 
+                                        v-for="(category, index) in rowData.categories.slice(2)"
+                                        >
+                                           <span class="flex flex-center justify-center">
+                                            {{ category.category }}
+                                           </span> 
+                                        </VaDropdownContent>
+                                    </VaDropdown>
+                                </template>
                                 </span>
                                 <span 
                                 v-if="rowData.categoryList == ''"
@@ -235,7 +283,7 @@
                         class="py-2">
                             <h2 class="text-lg pdf py-2">
                                 PDF :   <a 
-                                        class="text-blue-500 underline py-2"
+                                    :class="['text-black', 'py-2', rowData.pdf !== null ? 'underline' : '', rowData.pdf !== null ? 'text-blue-500' : '']"
                                         :href="rowData.pdf">
                                             {{ rowData.pdf !== null ? 'Download' : 'Unavailable'}}
                                         </a>
@@ -305,14 +353,14 @@
                                 >
                                     <template #content="{ value }">
                                         <va-chip
-                                            v-for="(req, idx) in value"
-                                            :key="idx"
+                                            v-for="req in value"
+                                            :key="req"
                                             size="small"
                                             color="secondary"
                                             class="mr-1 mb-1"
                                             square
                                             closeable
-                                            @update:modelValue="updateRequirementsArr('create', value)"
+                                            @update:modelValue="deleteChipCreateKeyword(req)"
                                         >
                                             {{ req.keyword }}
                                         </va-chip>
@@ -324,7 +372,6 @@
                                 label="Category to attach"
                                 :options="categoryList"
                                 text-by="category"
-                                value-by="id"
                                 searchable
                                 clearable
                                 multiple
@@ -339,7 +386,7 @@
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
-                                        
+                                        closeable
                                         @update:modelValue="DeleteChipCreateCategory(reqw)"
                                         >
                                             {{ reqw.category }}
@@ -347,13 +394,12 @@
                                     </template>
                                 </VaSelect>
                                 <VaSelect
-                                class="w-full"
-                                multiple
                                 v-model="createThesis.data.authors"
-                                label="Author"
                                 :options="authorList"
+                                class="w-full"
+                                label="Author"
                                 text-by="name"
-                                value-by="id"
+                                multiple
                                 searchable
                                 clearable
                                 clearable-icon="backspace"
@@ -361,13 +407,13 @@
                                 >
                                     <template #content="{ value }">
                                         <va-chip
-                                        v-for="(reqaa, idx) in value"
-                                        :key="idx"
+                                        v-for="reqaa in value"
+                                        :key="reqaa"
                                         size="small"
                                         color="secondary"
                                         class="mr-1 mb-1"
                                         square
-                                        
+                                        closeable
                                         @update:modelValue="deleteChipCreateAuthor(reqaa)"
                                         >
                                             {{ reqaa.name }}
@@ -380,7 +426,7 @@
                             label="Abstract *"
                             class="w-full h-fit mb-2"
                             :autosize="true"
-                            :maxLength="500"
+                            :maxLength="3000"
                             counter
                             max-rows="7"
                             min-rows="7"
@@ -544,7 +590,6 @@
                             v-model="editThesis.data.authors"
                             :options="authorList"
                             text-by="name"
-                            
                             class="w-full"
                             label="Author"
                             multiple
@@ -1131,6 +1176,8 @@ export default {
                     let resDataError = Object.keys(error.response.data.errors);
                     if (resDataError.filter(key => key == 'message').length > 0) {
                         method === 'create' ? (this.createThesis.data = { ...newThesis },
+                            console.log(error.response.data),
+                            this.$root.prompt(error.response.data.message),
                             this.createThesis.modal = false,
                             this.createThesis.TitleEmpty = false,
                             this.createThesis.AbstractEmpty = false,
@@ -1160,7 +1207,8 @@ export default {
                     else {
                         this.editThesis.saved = false;
                     }
-                    this.getThesis();    
+                    this.getThesis(); 
+                    this.$root.prompt(error.response.data.message)   
                 });
             }
             else

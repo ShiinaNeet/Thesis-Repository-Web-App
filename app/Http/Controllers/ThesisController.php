@@ -334,7 +334,7 @@ class ThesisController extends Controller
         $rs = SharedFunctions::default_msg("Something went wrong!");
         $this->validate($request, [
             'title' => 'required|max:120',
-            'abstract' => 'required|max:500',
+            'abstract' => 'required|max:3000',
             'published_at' => 'required|date',
         ]);
     

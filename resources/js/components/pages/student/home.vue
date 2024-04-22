@@ -3,7 +3,6 @@
         <div class="h-[250px] lg:w-full sm:w-full flex justify-center">
             <div class="w-full sm:w-2/3 md:w-1/2 lg:w-1/3 flex items-center justify-center">
                 <div class="w-full flex flex-col items-center">
-
                     <div class="w-1/2 max-sm:w-full pb-2 pt-5 mb-3 flex-row">
                         <VaInput v-model="searchQuery.title" placeholder="Search here" label="Title  " inner-label
                             class="w-full max-w-md shadow-md py-2" color="Info" currentColor="Success" />
@@ -33,7 +32,6 @@
                     <!-- Can't find what you're looking for? -->
                     <div class="text-center text-blue-600 hover:underline">
                         <span @click="$root.redirectToPage('/login')">Can't find what you're looking for?</span> <br/>
-
                     </div>
                     <span class="pb-5 text-start">The search for Author, Keywords and Category are Case Sensitive</span>
                 </div>
@@ -44,116 +42,122 @@
             <div class="flex flex-center justify-center flex-col ">
                 <div v-for="thesis in displayedThesis" class="mb-3 h-full w-1/2 max-sm:w-full shadow-2xl shadow-red-400" 
                 :key="thesis.id">
+                
                     <VaCard class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 shadow-2xl shadow-red-400
-                            translate-x-50">
+                    translate-x-50 py-5">
+                   
                         <VaCardTitle>
-                            <div class="flex w-full ">
-                                <h2 @click="selectThesis(thesis.id)" lang="en" class="break-words hyphens-auto text-2xl font-bold hover:underline text-black-700  text-center hover:bg-slate-100 hover:text-blue hover:cursor-pointer w-full md:flex-grow text-wrap">
-                                    {{ thesis.title }}
-                                </h2>
-                                <br />
-                            </div>
-
+                                <div class="flex w-full ">
+                                    <VaPopover message="Click to view">
+                                        
+                                        <h2 @click="selectThesis(thesis.id)" lang="en" class="break-words hyphens-auto text-2xl font-bold hover:underline text-black-700  text-center hover:bg-slate-100 hover:text-blue hover:cursor-pointer w-full md:flex-grow text-wrap">
+                                            {{ thesis.title }}
+                                        </h2>
+                                        <br />
+                                    </VaPopover>
+                                </div>
                         </VaCardTitle>
                         <VaCardContent>
-                            <div class="title">
-                                <div class="w-fit pb-3 h-1/5">
-                                    <div class="flex sm:flex-col sm:self-center lg:items-start">
-                                        <div class="flex text-lg font-bold flex-wrap whitespace-pre">Author:
-                                            <span
-                                               v-if="thesis.authors && thesis.authors.length !== 0"
-                                                class="flex text-green-700 whitespace-pre text-base flex-center justify-center"
-                                                v-for="(author, index) in thesis.authors" :key="index">
-                                                {{ '' + author.name }}
-                                               
-                                                <span v-if="index !== thesis.authors.length - 1">, </span>
-                                            </span>
-                                            <span v-else>
-                                                No Author
-                                            </span>
+                            <VaPopover message="Click the title to view more">
+                                <div class="title">
+                                    <div class="w-fit pb-3 h-1/5">
+                                        <div class="flex sm:flex-col sm:self-center lg:items-start">
+                                            <div class="flex text-lg font-bold flex-wrap whitespace-pre">Author:
+                                                <span
+                                                v-if="thesis.authors && thesis.authors.length !== 0"
+                                                    class="flex text-green-700 whitespace-pre text-base flex-center justify-center"
+                                                    v-for="(author, index) in thesis.authors" :key="index">
+                                                    {{ '' + author.name }}
+                                                
+                                                    <span v-if="index !== thesis.authors.length - 1">, </span>
+                                                </span>
+                                                <span v-else>
+                                                    No Author
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <!-- date here import formatdate here-->
+                                            <label class="text-lg font-bold" for="thesis.published_at">
+                                                Published Date:
+                                            </label>{{ formatDate(thesis.published_at, 'MMM. Do, YYYY', 'Invalid Date') }}
                                         </div>
                                     </div>
+                                    <!-- Place tags here -->
+                                    <div class="w-fit pb-3">
+                                        <div class="flex flex-col md:flex-row justify-center md:items-start gap-1">
+                                            <div class="w-full sm:w-auto flex-shrink-0 flex-center md:mr-2">
+                                                <label
+                                                    class="justify-center flex-center whitespace-pre-line font-bold">Category:</label>
+                                            </div>
+                                            <div class="w-full md:flex-grow flex flex-wrap">
+                                                <div v-for="category in thesis.categories"
+                                                    class="mr-1 mb-2 flex flex-center justify-center">
+                                                    <VaChip square color="success" class="mr-2">
+                                                        {{ category.category }}
+                                                    </VaChip>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="w-fit pb-3">
+                                        <div class="flex flex-col md:flex-row items-center md:items-start gap-1">
+                                            <div class="w-full md:w-auto flex-shrink-0 flex-center md:mr-2">
+                                                <label
+                                                    class="justify-center flex-center whitespace-pre-line font-bold">Keywords:</label>
+                                            </div>
+                                            <div class="w-full md:flex-grow flex flex-wrap">
+                                                <div v-for="keyword in thesis.keywords"
+                                                    class="mr-1 mb-2 flex flex-center justify-center">
+                                                    <VaChip square color="success" class="mr-2">
+                                                        {{ keyword.keyword }}
+                                                    </VaChip>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div :key="thesis.id">
+                                    <div class="max-h-[150px] overflow-hidden text-justify">
+                                        <p class="text-gray-700 leading-relaxed text-sm md:text-base"
+                                            v-show="!isAbstractOpen(thesis.id)">
+                                            {{ getTruncatedAbstract(thesis.id) }}
+                                        </p>
+                                        <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap "
+                                            v-show="isAbstractOpen(thesis.id)">
+                                            {{ thesis.abstract }}
+                                        </p>
+                                        <button
+                                            class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline mt-2 inline-block"
+                                            @click="toggleAbstract(thesis.id)">
+                                            {{ isAbstractOpen(thesis.id) ? 'Read less' : 'Read more' }}
+                                        </button>
+                                    </div>
+                                </div>
+
+
+                                <div v-if="false"
+                                    class="files flex sm:flex-row lg:grid lg:grid-cols-2 gap-5 pt-5 flex-wrap ">
                                     <div>
-                                        <!-- date here import formatdate here-->
-                                        <label class="text-lg font-bold" for="thesis.published_at">
-                                            Published Date:
-                                        </label>{{ formatDate(thesis.published_at, 'MMM. Do, YYYY', 'Invalid Date') }}
+                                        <VaButton :disabled="thesis.pdf === '' || thesis.pdf === null" icon="download"
+                                            color="info" :href="thesis.pdf" class="hover:animate-bounce ease-in-out w-full">
+                                            <span>
+                                                {{ thesis.pdf === '' || thesis.pdf === null ? 'PDF Unvailable' : ' Download PDF'}}
+                                            </span>
+                                        </VaButton>
                                     </div>
-                                </div>
-                                <!-- Place tags here -->
-                                <div class="w-fit pb-3">
-                                    <div class="flex flex-col md:flex-row justify-center md:items-start gap-1">
-                                        <div class="w-full sm:w-auto flex-shrink-0 flex-center md:mr-2">
-                                            <label
-                                                class="flex text-center whitespace-pre-line font-bold">Category:</label>
-                                        </div>
-                                        <div class="w-full md:flex-grow flex flex-wrap">
-                                            <div v-for="category in thesis.categories"
-                                                class="mr-1 mb-2 flex flex-center justify-center">
-                                                <VaChip square color="success" class="mr-2">
-                                                    {{ category.category }}
-                                                </VaChip>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="w-fit pb-3">
-                                    <div class="flex flex-col md:flex-row items-center md:items-start gap-1">
-                                        <div class="w-full md:w-auto flex-shrink-0 flex-center md:mr-2">
-                                            <label
-                                                class="justify-center flex-center whitespace-pre-line font-bold">Keywords:</label>
-                                        </div>
-                                        <div class="w-full md:flex-grow flex flex-wrap">
-                                            <div v-for="keyword in thesis.keywords"
-                                                class="mr-1 mb-2 flex flex-center justify-center">
-                                                <VaChip square color="success" class="mr-2">
-                                                    {{ keyword.keyword }}
-                                                </VaChip>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div :key="thesis.id">
-                                <div class="max-h-[150px] overflow-hidden text-justify">
-                                    <p class="text-gray-700 leading-relaxed text-sm md:text-base"
-                                        v-show="!isAbstractOpen(thesis.id)">
-                                        {{ getTruncatedAbstract(thesis.id) }}
-                                    </p>
-                                    <p class="text-gray-700 leading-relaxed text-sm md:text-base text-wrap "
-                                        v-show="isAbstractOpen(thesis.id)">
-                                        {{ thesis.abstract }}
-                                    </p>
-                                    <button
-                                        class="text-blue-500 hover:text-blue-700 focus:outline-none focus:underline mt-2 inline-block"
-                                        @click="toggleAbstract(thesis.id)">
-                                        {{ isAbstractOpen(thesis.id) ? 'Read less' : 'Read more' }}
-                                    </button>
-                                </div>
-                            </div>
-
-
-                            <div v-if="false"
-                                class="files flex sm:flex-row lg:grid lg:grid-cols-2 gap-5 pt-5 flex-wrap ">
-                                <div>
-                                    <VaButton :disabled="thesis.pdf === '' || thesis.pdf === null" icon="download"
-                                        color="info" :href="thesis.pdf" class="hover:animate-bounce ease-in-out w-full">
+                                    <VaButton :disabled="thesis.video === '' || thesis.video === null" icon="download"
+                                        color="info" :href="thesis.video" class="hover:animate-bounce ease-in-out w-full">
                                         <span>
-                                            {{ thesis.pdf === '' || thesis.pdf === null ? 'PDF Unvailable' : ' Download PDF'}}
+                                            {{ thesis.video === '' || thesis.video === null ? 'Video Unavailable' : 'Download Video'}}
                                         </span>
                                     </VaButton>
+
                                 </div>
-                                <VaButton :disabled="thesis.video === '' || thesis.video === null" icon="download"
-                                    color="info" :href="thesis.video" class="hover:animate-bounce ease-in-out w-full">
-                                    <span>
-                                        {{ thesis.video === '' || thesis.video === null ? 'Video Unavailable' : 'Download Video'}}
-                                    </span>
-                                </VaButton>
-
-                            </div>
-
+                            </VaPopover>
                         </VaCardContent>
+                 
                     </VaCard>
                 </div>
                 <div v-if="data.thesisList == null || data.thesisList.length === 0"
@@ -166,14 +170,14 @@
                         preset="secondary" hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_back_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
 
-                    <VaButton v-for="pageNumber in pages.slice(page - 1, page+3)" @click="page = pageNumber"
-                        :color="page == pageNumber ? 'Focus' : 'BackgroundElement'" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
+                    <VaButton v-for="pageNumber in pages.slice($root.config.tblCurrPage - 1, $root.config.tblCurrPage+3)" @click="$root.config.tblCurrPage = pageNumber"
+                        :color="$root.config.tblCurrPage == pageNumber ? 'Focus' : 'BackgroundElement'" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" :key="pageNumber">
-                        <span :class="page == pageNumber ? 'text-white' : 'text-black'">
+                        <span :class="$root.config.tblCurrPage == pageNumber ? 'text-white' : 'text-black'">
                             {{ pageNumber }}
                         </span>
                     </VaButton>
-                    <VaButton v-if="page < pages.length || !pages.length == 1" @click="page++" preset="secondary"
+                    <VaButton v-if="$root.config.tblCurrPage < pages.length || !pages.length == 1" @click="$root.config.tblCurrPage++" preset="secondary"
                         hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_forward_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
                 </div>
@@ -189,6 +193,7 @@ export default {
     data() {
         return {
             page: 1,
+            pageNumber: null,
             perPage: 2,
             pages: [],
             showFullAbstract: false,
@@ -241,10 +246,10 @@ export default {
     },
     methods: {
         decrementPage() {
-            if (this.page !== 1) {
-                this.page--; // Decrement page only if it's not already 1
+            if (this.$root.config.tblCurrPage !== 1) {
+                this.$root.config.tblCurrPage--; // Decrement page only if it's not already 1
             }
-            if (this.page === 0) {
+            if (this.$root.config.tblCurrPage === 0) {
                 return;
             }
         },

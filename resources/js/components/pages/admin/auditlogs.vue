@@ -40,7 +40,7 @@
                     </th>
                 </tr>
             </template>
-            <template #cell(category)="{ value }">
+            <template #cell(module)="{ value }">
                 {{
                     auds.auditCategory[
                         $root.arrayFind(

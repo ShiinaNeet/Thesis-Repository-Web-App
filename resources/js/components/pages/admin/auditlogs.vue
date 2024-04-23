@@ -16,9 +16,10 @@
                     <th
                     class="py-1 pr-1"
                     colspan="2"
+                    :key="key"
                     >
                         <va-input
-                        v-model="filter"
+                        v-model="input"
                         placeholder="Search..."
                         >
                             <template #appendInner>
@@ -175,7 +176,8 @@ export default {
             auditTrail: [],
             activePreviewRow: null,
             filtered: null,
-            filter: ""
+            input: "",
+            filter: this.input,
         };
     },
     computed: {
@@ -202,7 +204,16 @@ export default {
                 this.$root.prompt(error.response.data.message);
             });
         },
+        updateFilter(filter) {
+            this.filter = filter;
+        },
         formatDate
+    },
+    watch: {
+        input(newValue) {
+            this.updateFilter(newValue);
+        }
     }
+
 }
 </script>

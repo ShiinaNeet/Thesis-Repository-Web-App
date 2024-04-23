@@ -90,6 +90,9 @@ class ThesisController extends Controller
                         $authorMatch = true;
                         
                     }
+                    else{
+                        $authorMatch = false;
+                    }
                 }
             } 
             if($category !== null || $category === []){
@@ -99,6 +102,9 @@ class ThesisController extends Controller
                     })) {
                         $categoryMatch = true;
                         break;
+                    }
+                    else{
+                        $categoryMatch = false;
                     }
                 }
             }
@@ -110,6 +116,9 @@ class ThesisController extends Controller
                     })) {
                         $keywordMatch = true;
                         break;
+                    }
+                    else{
+                        $keywordMatch = false;
                     }
                 }
             }

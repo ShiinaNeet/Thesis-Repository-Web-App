@@ -30,9 +30,7 @@
                         <VaProgressBar :indeterminate="isloading" size="small" />
                     </div>
                     <!-- Can't find what you're looking for? -->
-                    <div class="text-center text-blue-600 hover:underline">
-                        <span @click="$root.redirectToPage('/login')">Can't find what you're looking for?</span> <br/>
-                    </div>
+                    
                     <span class="pb-5 text-start">The search for Author, Keywords and Category are Case Sensitive</span>
                 </div>
             </div>

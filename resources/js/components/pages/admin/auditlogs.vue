@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 px-2.5 py-5 pb-2.5 bg-white rounded">
+    <div class="mx-5 mb-2 px-2.5 pb-2.5 bg-white rounded">
         <va-data-table
         id="data-table"
         :items="auditTrail"
@@ -8,30 +8,39 @@
         :current-page="$root.config.tblCurrPage"
         no-data-html="No audit log(s) to show"
         :filter="filter"
-        @filtered="filteredCount = $event.items.length"
+        @filtered="filtered = $event.items"
         animated
-        :filter-method="customFilteringFn"
-        itemSize="250px"
-        class="w-full"
         >
             <template #headerAppend>
                 <tr class="table-crud__slot">
                     <th
                     class="py-1 pr-1"
+                    colspan="2"
                     >
                         <va-input
                         v-model="filter"
                         placeholder="Search..."
-                        class="w-full"
                         >
                             <template #appendInner>
                                 <va-icon name="search" color="#C2C2C2" />
                             </template>
                         </va-input>
                     </th>
+                    <th
+                    v-for="key in Object.keys(auds.tblColumns).slice(0, 3)"
+                    :key="key"
+                    class="py-1 pr-1"
+                    >
+                        <va-button
+                        v-if="key.includes(5)"
+                        class="invisible"
+                        preset="primary"
+                        disabled
+                        />
+                    </th>
                 </tr>
             </template>
-            <template #cell(module)="{ value }">
+            <template #cell(category)="{ value }">
                 {{
                     auds.auditCategory[
                         $root.arrayFind(
@@ -39,6 +48,13 @@
                         )
                     ].label
                 }}
+            </template>
+            <template #cell(user_type)="{ value }">
+                <va-badge 
+                :text="auds.types[value].label"
+                :color="auds.types[value].color"
+                />
+                <!-- {{ acc.types[value].label }} -->
             </template>
             <template #cell(userID)="{ value }">
                 <p v-if="value">{{ value }}</p>
@@ -53,6 +69,21 @@
                     <pre>SYSTEM GENERATED</pre>
                 </p>
             </template>
+            <template #cell(action_description)="{ rowData }">
+                <div
+                id="table-row-desc"
+                >
+                    <va-input
+                    type="textarea"
+                    :model-value="rowData.action_description"
+                    placeholder="No description available"
+                    readonly
+                    autosize
+                    outline
+                    />
+                </div>
+            </template>
+           
             <template #cell(action_type)="{ value }">
                 <va-badge
 
@@ -77,13 +108,6 @@
                     )
                 "
                 />
-            </template>
-            <template #cell(user_type)="{ value }">
-                <va-badge 
-                :text="auds.types[value].label"
-                :color="auds.types[value].color"
-                />
-                <!-- {{ acc.types[value].label }} -->
             </template>
             <template #cell(created_at)="{ value }">
                 {{ formatDate(value, 'MMM. Do YYYY', 'Invalid Date') }}
@@ -110,34 +134,14 @@
     </div>
 </template>
 
-<style lang="scss" scoped>
-.table-crud {
- 
-
-    .va-input {
-        display: block;
-    }
-
-    &__slot {
-        th {
-            vertical-align: middle;
-            width: max-content;
-        }
-    }
-}
-</style>
-
 <script>
 import formatDate from '@/functions/formatdate.js';
 
-import { ref, computed } from 'vue';
-const filter = ref("");
-
 export default {
-    setup(){
+    data () {
         const auds = {
             tblColumns: [
-                { key: "module", label: "Module", width: "20%", sortable: false },
+            { key: "module", label: "Module", width: "20%", sortable: false },
                 { key: "userID", label: "User ID", width: "20%", sortable: true },
                 { key: "user_type", label: "Role", width: "20%", sortable: true },
                 { key: "action_type", label: "Action", width: "20%", sortable: false },
@@ -166,37 +170,12 @@ export default {
             ],
         };
 
-        const auditTrail = ref([]);
-        const activePreviewRow = ref(null);
-        const filtered = ref(null);
-
-        const customFilteringFn = (source, cellData) => {
-            if (!filter.value) {
-                return true;
-            }
-
-            if (filterByFields.value.length >= 2) {
-                const searchInCurrentRow = filterByFields.value.some(
-                (field) => cellData.column.key === field
-                );
-                if (!searchInCurrentRow) return false;
-            }
-
-            const filterRegex = new RegExp(filter.value, "i");
-
-            return filterRegex.test(source);
-        };
-        const pages = computed(()=>{
-            return this.$root.config.tblPerPage && this.$root.config.tblPerPage !== 0
-            ? Math.ceil(this.filtered.length / this.$root.config.tblPerPage)
-            : this.filtered.length;
-        });
-        return { auds, auditTrail, activePreviewRow, filtered, filter, customFilteringFn };
-    },
-    data () {
-
         return {
-          
+            auds,
+            auditTrail: [],
+            activePreviewRow: null,
+            filtered: null,
+            filter: ""
         };
     },
     computed: {

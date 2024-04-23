@@ -216,6 +216,10 @@ export default {
             },
             sortList: [
                 {
+                    name: 'Created Date',
+                    value: '3'
+                },
+                {
                     name: 'ASC',
                     value: '1'
                 },
@@ -368,6 +372,10 @@ export default {
                         // if (this.data.thesisList.length > 1) {
                         //     this.page++;
                         // }
+                    }
+                    if(response.data.result.length === 0){
+                        this.getThesis();
+                        console.log("here get thesis")
                     }
                 }
                 this.isloading = false;

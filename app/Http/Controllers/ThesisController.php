@@ -28,15 +28,15 @@ class ThesisController extends Controller
         $theses = Thesis::withTrashed();
         
        
-           $theses = $theses->get()->map(function($q) {
+        $theses = $theses->get()->map(function($q) {
                 $arr = [];
                
                 $authorIds = explode(',', trim($q->authors, '[]'));
                 
                 foreach ($authorIds as $authorId) {
-                    $author = authors::find($authorId);
-                    if ($author) {
-                        $arr[] = $author->toArray();
+                    $authorq = authors::find($authorId);
+                    if ($authorq) {
+                        $arr[] = $authorq->toArray();
                     }
                 }
                 $q->authors = $arr;
@@ -46,9 +46,9 @@ class ThesisController extends Controller
                 $categoryIds = explode(',', trim($q->categories, '[]'));
                 
                 foreach ($categoryIds as $categoryId) {
-                    $category = category::find($categoryId);
-                    if ($category) {
-                        $arrC[] = $category->toArray();
+                    $categoryq = category::find($categoryId);
+                    if ($categoryq) {
+                        $arrC[] = $categoryq->toArray();
                     }
                 }
                 $q->categories = $arrC;
@@ -57,44 +57,38 @@ class ThesisController extends Controller
                 $keywordIds = explode(',', trim($q->keywords, '[]'));
                 
                 foreach ($keywordIds as $keywordId) {
-                    $keyword = keywords::find($keywordId);
-                    if ($keyword) {
-                        $arrK[] = $keyword->toArray();
+                    $keywordq = keywords::find($keywordId);
+                    if ($keywordq) {
+                        $arrK[] = $keywordq->toArray();
                     }
                 }
                 $q->keywords = $arrK;
 
                 return $q;
             });
-        if ($sortFilter === "1") {
-            $theses = $theses->sortBy('published_at');
-        } elseif ($sortFilter === "2") {
         
-            $theses = $theses->sortByDesc('published_at');
-        }
-        else{
-            $theses = $theses->sortByDesc('created_at');
-        }
         $theses = $theses->filter(function ($thesis) use ($author,$category,$keyword, $title) {
             
             $authorsCollection = collect($thesis->authors);
             $categoryCollection = collect($thesis->categories);
             $keywordsCollection = collect($thesis->keywords);
-            $categoryMatch = true;
-            $authorMatch = true;
-            $keywordMatch = true;
-            $titleMatch = true;
+            $categoryMatch = false;
+            $authorMatch = false;
+            $keywordMatch = false;
+            $titleMatch = false;
 
             if ($title !== null && $title !== '') {
+                
                 $titleMatch = stripos($thesis->title, $title) !== false;
             }
+            
             if($author !== null || $author === []){
                 foreach ($author as $auth) {
                     if ($authorsCollection->contains(function ($authorItem) use ($auth) {
                         return stripos($authorItem['name'], $auth) !== false;
                     })) {
                         $authorMatch = true;
-                        break;
+                        
                     }
                 }
             } 
@@ -108,7 +102,7 @@ class ThesisController extends Controller
                     }
                 }
             }
-            if($keyword !== null || $keyword === ''){
+            if($keyword !== null || $keyword === []){
                 foreach ($keyword as $key) {
                     if ($keywordsCollection->contains(function ($keywordItem) use ($key) {
                         return stripos($keywordItem['keyword'], $key) !== false;
@@ -119,11 +113,21 @@ class ThesisController extends Controller
                     }
                 }
             }
-                return $authorMatch & $categoryMatch & $keywordMatch & $titleMatch;
+          
+                return $authorMatch || $categoryMatch || $keywordMatch || $titleMatch;
         });
-
-        $theses = $theses->values()->all();
-        //$theses = $theses->values()->all();
+        
+        if ($sortFilter == "1") {
+            $theses = $theses->sortBy('published_at');
+        } elseif ($sortFilter == "2") {
+        
+            $theses = $theses->sortByDesc('published_at');
+        }
+        else{
+            $theses = $theses->sortByDesc('created_at');
+        }
+         $theses = $theses->values()->all();
+       
         $rs = SharedFunctions::success_msg('Success');
         $rs['result'] = $theses;
         return response()->json($rs);

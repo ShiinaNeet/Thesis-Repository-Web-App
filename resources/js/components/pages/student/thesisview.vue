@@ -1,19 +1,19 @@
 <template>
-    <div class="px-10 max-sm:p-0 text-white transform-none h-full">
+    <div class="px-10 max-sm:p-0 text-black transform-none h-full">
         <div
             v-if="thesis"
-            class="w-2/3 mx-auto max-sm:w-full justify-center h-full px-5 bg-gray-800 shadow-xl overflow-y-hidden"
+            class="w-2/3 mx-auto max-sm:w-full justify-center h-full px-5 text-black shadow-xl overflow-y-hidden"
         >
-            <div class="flex-start bg-inherit text-white h-fit justify-center">
+            <div class="flex-start bg-inherit text-black h-fit justify-center">
                 <VaButton
-                    class="w-fit text-white my-5 hover:bg-blue-200"
+                    class="w-fit text-black my-5 hover:bg-blue-200"
                     preset="secondary"
                     icon="arrow_back_ios_new"
-                    icon-color="#FFFFFF"
+                    icon-color="#000000"
                     @click="$emit('home')"
                     size="large"
                 >
-                    <span class="text-white">Back</span>
+                    <span class="text-black">Back</span>
                 </VaButton>
             </div>
             <div class="w-full flex-wrap py-10 px-5 h-full text-wraps">
@@ -39,56 +39,61 @@
                     </p>
                 </div>
 
-                <div class="text-white">
-                    <VaList class="text-white">
-                        <label class="text-lg" for="authors">Authors</label>
-                        <ul class="text-white text-lg list-inside list-disc">
+                <div class="text-black">
+                    <VaList class="text-black">
+                        <label class="text-lg font-bold" for="authors">Authors</label>
+                        <ul class="text-black text-lg list-inside list-disc">
                             <li v-for="author in thesis.authors">
                                 {{ author.name }}
                             </li>
                         </ul>
                     </VaList>
-                    <VaList class="text-white">
-                        <label class="text-white text-lg py-5" for="category"
+                    <VaList class="text-black">
+                        <label class="text-black text-lg py-5 font-bold" for="category"
                             >Category</label
                         >
-                        <ul class="text-white text-lg list-disc list-inside">
+                        <ul class="text-black text-lg list-disc list-inside">
                             <VaChip
                                 v-for="category in thesis.categories"
-                                color="secondary"
+                                color="primary"
                                 class="mr-2 mb-2"
-                                size="large"
+                                size="medium"
                                 square
                             >
                                 {{ category.category }}
                             </VaChip>
                         </ul>
                     </VaList>
-                    <div class="text-white">
-                        <label class="text-lg py-5" for="category">Tags</label>
-                        <ul class="text-white text-lg list-disc list-inside">
+                    <div class="text-black">
+                        <label class="text-lg py-5 font-bold" for="category">Tags</label>
+                        <ul class="text-black text-lg list-disc list-inside">
                             <VaChip
-                                square
-                                v-for="keyword in thesis.keywords"
-                                color="secondary"
-                                class="mr-2 mb-2"
-                                size="large"
-                                >{{ keyword.keyword }}</VaChip
+                            square
+                            v-for="keyword in thesis.keywords"
+                            color="info"
+                            class="mr-2 mb-2"
+                            size="medium"
                             >
+                            <span class="text-black">{{ keyword.keyword }}</span>
+                               
+                            </VaChip>
                         </ul>
                     </div>
                 </div>
                 <div class="downloads py-5">
                     <div class="flex gap-2 max-sm:flex-col">
                         <VaButton
-                            :disabled="
-                                thesis.pdf === '' || thesis.pdf === null
-                                    ? true
-                                    : false
-                            "
-                            icon-right="arrow_forward"
-                            icon-color="#ffffff50"
-                            @click="openPdf()"
+                        color="#2756f2"
+                        gradient
+                        text-color="warning"
+                        :disabled="
+                            thesis.pdf === '' || thesis.pdf === null
+                                ? true
+                                : false
+                        "
+                        icon-right="arrow_forward"
+                        icon-color="warning"
+                        @click="openPdf()"
                         >
                             {{
                                 thesis.pdf === "" || thesis.pdf === null
@@ -97,14 +102,17 @@
                             }}
                         </VaButton>
                         <VaButton
-                            :disabled="
-                                thesis.video === '' || thesis.video === null
-                                    ? true
-                                    : false
-                            "
-                            icon-right="arrow_forward"
-                            icon-color="#ffffff50"
-                            @click="openVideo()"
+                        gradient
+                        color="#2756f2"
+                        text-color="warning"
+                        :disabled="
+                            thesis.video === '' || thesis.video === null
+                                ? true
+                                : false
+                        "
+                        icon-right="arrow_forward"
+                        icon-color="warning"
+                        @click="openVideo()"
                         >
                             {{
                                 thesis.video === "" || thesis.video === null

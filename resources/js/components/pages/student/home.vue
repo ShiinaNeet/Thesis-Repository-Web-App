@@ -166,7 +166,7 @@
                     <h1>No thesis found.</h1>
                 </div>
                 <div class="flex gap-2 py-5">
-                    <VaButton v-if="pages.length !== 1" @click="decrementPage" :disabled="pageNumber == 1"
+                    <VaButton v-if="pages.length !== 1" @click="decrementPage" :disabled="$root.config.tblCurrPage == 1"
                         preset="secondary" hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_back_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
 
@@ -192,7 +192,7 @@ import formatDate from '@/functions/formatdate.js';
 export default {
     data() {
         return {
-            page: 1,
+            
             pageNumber: null,
             perPage: 2,
             pages: [],
@@ -247,7 +247,7 @@ export default {
     methods: {
         decrementPage() {
             if (this.$root.config.tblCurrPage !== 1) {
-                this.$root.config.tblCurrPage--; // Decrement page only if it's not already 1
+                this.$root.config.tblCurrPage--; //
             }
             if (this.$root.config.tblCurrPage === 0) {
                 return;
@@ -260,7 +260,7 @@ export default {
             }
         },
         paginate(thesis) {
-            let page = this.page;
+            let page = this.$root.config.tblCurrPage;
             let perPage = this.perPage;
             let from = (page * perPage) - perPage;
             let to = (page * perPage);

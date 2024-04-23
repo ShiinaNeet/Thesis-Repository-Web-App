@@ -177,7 +177,7 @@
                         </VaDivider>
                         <span class="px-2 font-bold text-lg p1-5 flex-center justify-center">Abstract</span>
                         <div class="bg-white-500 w-full py-1 pt-3">
-                            <p class="text-wrap break-all text-justify py-2">
+                            <p class="text-wrap text-justify py-2 whitespace-pre-line">
                                 {{ rowData.abstract === 'null' || rowData.abstract === '' ||rowData.abstract === null ? 'Abstract Missing!' : rowData.abstract }}
                             </p>
                         </div>
@@ -212,7 +212,7 @@
                                         </template>
 
                                         <VaDropdownContent 
-                                        v-for="(keyword, index) in rowData.keywords.slice(2)"
+                                        v-for="(keyword, index) in rowData.keywords.slice(3)"
                                         >
                                            <span class="flex flex-center justify-center">
                                             {{ keyword.keyword }}
@@ -1103,18 +1103,18 @@ export default {
                     var newDate = this.formatDate(this.editThesis.data.published_at, 'YYYY-MM-DD');
                     formData.append('published_at', newDate); 
                    
-                    if(this.editThesis.key == 0)
-                    {
-                        this.updateKeywordIds();
-                    }
-                    if(this.editThesis.authr == 0)
-                    {
-                        this.updateAuthorIds();
-                    }
-                    if(this.editThesis.cate == 0)
-                    {
-                        this.updateCategoryIds();
-                    }
+                    // if(this.editThesis.key == 0)
+                    // {
+                    //     this.updateKeywordIds();
+                    // }
+                    // if(this.editThesis.authr == 0)
+                    // {
+                    //     this.updateAuthorIds();
+                    // }
+                    // if(this.editThesis.cate == 0)
+                    // {
+                    //     this.updateCategoryIds();
+                    // }
                    
                     
                     formData.append('authors', JSON.stringify(this.editThesis.data.authors));

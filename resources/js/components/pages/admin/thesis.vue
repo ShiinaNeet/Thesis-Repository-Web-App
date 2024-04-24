@@ -706,10 +706,11 @@
                     </template>
                     This action is irreversible
                 </va-alert>
-                <va-input
-                type="textarea"
+                <VaTextarea
                 :model-value="editThesis.data.title"
-                class="w-full mb-2 force-noresize"
+                class="w-full mb-2 "
+                minRows="3"
+                maxRows="5"
                 readonly
                 autosize
                 />
@@ -749,10 +750,11 @@
                     Thesis Status
                 </div>
                 
-                <va-input
-                type="textarea"
+                <VaTextarea
                 :model-value="editThesis.data.title"
-                class="w-full mb-2 force-noresize"
+                class="w-full mb-2 "
+                minRows="3"
+                maxRows="5"
                 readonly
                 autosize
                 />

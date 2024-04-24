@@ -16,7 +16,6 @@
                     <th
                     class="py-1 pr-1"
                     colspan="2"
-                    :key="key"
                     >
                         <va-input
                         v-model="input"
@@ -51,10 +50,30 @@
                 }}
             </template>
             <template #cell(user_type)="{ value }">
-                <va-badge 
-                :text="auds.types[value].label"
-                :color="auds.types[value].color"
+                <va-badge
+
+                :text="
+                    value &&
+                    (
+                        auds.types[
+                            $root.arrayFind(
+                                auds.auditAction, (item) => item.value === parseInt(value)
+                            )
+                        ].label
+                    )
+                "
+                :color="
+                    value &&
+                    (
+                        auds.types[
+                            $root.arrayFind(
+                                auds.auditAction, (item) => item.value === parseInt(value)
+                            )
+                        ].color
+                    )
+                "
                 />
+                
                 <!-- {{ acc.types[value].label }} -->
             </template>
             <template #cell(userID)="{ value }">
@@ -113,7 +132,6 @@
             <template #cell(created_at)="{ value }">
                 {{ formatDate(value, 'MMM. Do YYYY', 'Invalid Date') }}
             </template>
-
             <template #bodyAppend>
                 <tr v-if="$root.tblPagination(auditTrail)">
                     <td

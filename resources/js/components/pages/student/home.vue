@@ -22,7 +22,7 @@
                                 SEARCH
                             </VaButton>
                             <VaSelect v-model="searchQuery.sort" placeholder="A-Z" :options="sortList"
-                                label="Sort by Published Date" inner-label clearable searchable autocomplete
+                                label="Sort  " inner-label clearable searchable autocomplete
                                 text-by="name" value-by="value" highlight-matched-text clearable-icon="cancel"
                                 class="w-1/3 max-w-md shadow-md ps-1 " color="Info" currentColor="Success" />
                         </div>
@@ -218,11 +218,11 @@ export default {
                     value: '3'
                 },
                 {
-                    name: 'ASC',
+                    name: 'Ascending',
                     value: '1'
                 },
                 {
-                    name: 'DESC',
+                    name: 'Descending',
                     value: '2'
                 },
             ],

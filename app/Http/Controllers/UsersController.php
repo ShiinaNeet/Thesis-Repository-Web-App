@@ -167,6 +167,7 @@ class UsersController extends Controller
         $this->validate($request, [
             'userID' => 'required|numeric',
             'user_type' => 'required',
+            'email' => 'required|email'
         ]);
 
         $authUser = Auth::user()->userID;
@@ -177,11 +178,16 @@ class UsersController extends Controller
             $rs = SharedFunctions::prompt_msg("User ID already taken! Please choose a different one.");
             return response()->json($rs);
         }
-
+        if(Str::length($request->password) < 5)
+        {
+            $rs = SharedFunctions::prompt_msg("Password must be longer than 5 characters!");
+            goto end;
+        }
         $userToUpdate = Users::find($request->id);
 
         $userToUpdate->userID = $request->userID;
         $userToUpdate->email = $request->email;
+        $userToUpdate->password = bcrypt($request->password);  
         $userToUpdate->user_type = $request->user_type;  
 
         if (!$userToUpdate->save()) {

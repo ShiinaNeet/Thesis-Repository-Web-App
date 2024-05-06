@@ -75,7 +75,7 @@
                 preset="plain"
                 icon="edit"
                 :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
-                @click="editAccount.data = { ...rowData }, editAccount.modal = !editAccount.modal"
+                @click="editAccount.data = { ...rowData },editAccount.modal = !editAccount.modal"
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
@@ -257,6 +257,18 @@
                 :error="editAccount.emailEmpty"
                 :error-messages="editAccount.emailErrorMessage"
                 />
+                <VaInput v-model="editAccount.data.password"
+                    :type="editAccount.isPasswordVisible ? 'text' : 'password'" label="Password"
+                    class="w-full mb-3 bg-[editAccount(255,255,255,0.45)]" :disabled="editAccount.isLoading" outline
+                    placeholder="*******"
+                    preset="bordered"
+                    :error="editAccount.passwordEmpty" @keyup="editAccount.passwordEmpty = false">
+                        <template #appendInner>
+                            <va-icon :name="editAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                size="small" color="#154EC1"
+                                @click="editAccount.isPasswordVisible = !editAccount.isPasswordVisible" />
+                        </template>
+                    </VaInput>
                 <VaSelect
                 class="py-2"
                 v-model="editAccount.data.user_type"
@@ -479,6 +491,7 @@ export default {
                 emailEmpty: false,
                 userTypeEmpty: false,
                 passwordEmpty: false,
+                isPasswordVisible: false,
                 passwordMismatch: false,
                 newPassword:null,
                 newpasswordSuccess: false,

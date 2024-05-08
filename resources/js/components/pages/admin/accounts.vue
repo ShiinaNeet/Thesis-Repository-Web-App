@@ -70,11 +70,11 @@
             <template #cell(id)="{ rowData }">
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
-                :class="rowData.userID === $root.auth.userID ? 'opacity-[0!important]' : ''"
+                :class="rowData.userID === $root.auth.userID && !$root.auth.userID == 1 ? 'opacity-[0!important]' : ''"
                 title="Edit"
                 preset="plain"
                 icon="edit"
-                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
+                :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID &&  !$root.auth.userID == 1 ? true : false"
                 @click="editAccount.data = { ...rowData },editAccount.modal = !editAccount.modal"
                 />
                 <va-button

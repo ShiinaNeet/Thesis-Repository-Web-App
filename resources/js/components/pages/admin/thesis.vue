@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded">       
+    <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded overflow-y-auto">       
         <va-data-table
         id="data-table"
         :items="thesisList"
@@ -102,14 +102,13 @@
             </template>
             <template #expandableRow="{ rowData }">
                 <div
-                class="p-2 flex flex-row"
-                id="table-row-d h-1/2 w-2/3"
+                class="p-2 flex max-[700px]:flex-col max-[700px]:w-10/12 overflow-x-auto"
+                id=" "
                 >
-                    <div class="w-1/2 max-w-1/2 h-full pr-3 rounded-lg flex flex-center justify-center">
-                        <div class="h-full">
+                    <div class="w-full h-full text-wrap flex-wrap rounded-lg flex flex-center justify-center min-[700px]:w-1/2">
+                        <div class="h-full max-screen:flex-center p-3">
                             <video class="h-1/2 w-full md:h-[300px] sm:h-[250px] lg:h-1/2 justify-center flex flex-center text-center "  v-if="rowData.video !== null" controls>
                                 <source :src="rowData.video"  type="video/mp4">  
-                                   
                             </video> 
                             <div
                             v-else
@@ -121,14 +120,18 @@
                         </div>
                            
                     </div>
-                    <div class="w-1/2 max-w-1/2 p-3 h-full justify-center rounded-lg">
-                        <h1 class="text-2xl text-wrap break-all text-center font-mono uppercase">
+                    <div class=" w-1/2 p-3 h-full justify-center rounded-lg max-[700px]:w-full  ">
+                        <h1 class="text-2xl text-wrap break-all text-center font-mono uppercase overflow-x-auto">
                         {{ rowData.title }}   
+                        <span class="uppercase text-lg font-sans">
+                            <h3>{{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   </h3> 
+                        </span>
                         </h1>
-                        <div class="w-fit py-3 pt-4 overflow-hidden">
-                            <div class="flex lg:flex-row flex-col gap-1">
-                                <h3 class="text-lg uppercase font-sans flex flex-center justify-center">Author:</h3> 
-                                <span class="flex flex-wrap items-center gap-1">
+                        
+                        <div class="w-full py-3 pt-4 ">
+                            <div class=" lg:flex-row flex-col gap-1">
+                                <!-- <h3 class="text-lg uppercase font-sans">Author:</h3>  -->
+                                <span class="flex flex-wrap gap-1">
                                 <!-- Loop through the first three authors -->
                                 <template v-for="(author, index) in rowData.authors.slice(0, 2)" :key="author.id">
                                     <VaChip
@@ -169,15 +172,13 @@
                             > No registered author</span>
                             </div>
                         </div>
-                        <span class="uppercase font-sans">
-                            <strong>Published Date:</strong> {{ formatDate(rowData.published_at,'MMM. Do YYYY', 'Invalid Date') }}   
-                        </span>
+                        
                         <VaDivider>
                            
                         </VaDivider>
                         <span class="px-2 font-bold text-lg p1-5 flex-center justify-center">Abstract</span>
-                        <div class="bg-white-500 w-full py-1 pt-3">
-                            <p class="text-wrap text-justify py-2 whitespace-pre-line">
+                        <div class="bg-white-500 w-full py-1 pt-3 overflow-x-auto">
+                            <p class="text-wrap text-justify py-2 whitespace-pre-line overflow-x-auto">
                                 {{ rowData.abstract === 'null' || rowData.abstract === '' ||rowData.abstract === null ? 'Abstract Missing!' : rowData.abstract }}
                             </p>
                         </div>
@@ -202,7 +203,7 @@
                                 </template>
 
                                 <!-- Check if there are remaining authors -->
-                                <template v-if="rowData.keywords.length > 2">
+                                <template v-if="rowData.keywords.length > 3">
                                   
                                     <VaDropdown trigger="hover">
                                         <template #anchor>
@@ -320,9 +321,13 @@
         <template #content>
             <VaProgressBar  :indeterminate="createThesis.isloading" />
             <VaInnerLoading 
-            icon="cached"
+            icon="none"
             :loading="createThesis.isloading"
+            :size="70"
             >
+                <div v-if="createThesis.isloading" class="z-50 flex flex-center h-screen absolute top-0 left-0 w-full">
+                    <div class="text-center text-3xl font-bold text-black p-2">Saving... <br/>{{ UploadProgressStatus }} %</div>
+                </div>
                 <div class="w-full px-5 flex flex-center">
                     <div class="py-10">
                         <div class="va-title mb-3">
@@ -507,8 +512,15 @@
         <template #content>
             <VaInnerLoading 
             :loading="editThesis.isloading"
+            :size="50"
+            icon="none"
             >
+                
+             
                 <div class="w-full p-5 flex flex-center justify-center">
+                    <div v-if="editThesis.isloading" class="z-50 flex flex-center h-screen absolute top-0 left-0 w-full">
+                        <div class="text-center text-3xl font-bold text-black p-2">Saving... <br/>{{ UploadProgressStatus }} %</div>
+                    </div>
                     <div class=" justify-center pt-10">
                         <div class="va-title mb-3">
                             Edit Thesis
@@ -875,6 +887,7 @@ export default {
                 key: 0,
                 authr:0,
             },
+            UploadProgressStatus: 0,
             activePreviewRow: null,
             filtered: null,
             filter: ""
@@ -1094,6 +1107,7 @@ export default {
                     formData.append('abstract', this.editThesis.data.abstract);
                     if (this.editThesis.data.video && this.editThesis.data.video.length > 0) {
                         const file = this.editThesis.data.video[0];
+                        
                         formData.append('video', file);
                     }
                     if (this.editThesis.data.pdf && this.editThesis.data.pdf.length > 0) {
@@ -1127,14 +1141,18 @@ export default {
                 const config = {
                     onUploadProgress: (progressEvent) => {
                         const percentCompleted = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                        console.log(percentCompleted)
+                        this.UploadProgressStatus = percentCompleted
                         if (percentCompleted === 100) {
                             this.createThesis.isloading = false;
                             this.editThesis.isloading = false;
+                            
                         }
                     }
                 }
                 this.createThesis.isloading = true;
                 this.editThesis.isloading = true;
+              
                 axios.post('/thesis/save', formData, config).then(response => {
                     if (response.data.status == 1) {
                         this.$root.prompt(response.data.text);

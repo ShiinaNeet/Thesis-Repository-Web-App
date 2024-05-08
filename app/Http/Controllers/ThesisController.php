@@ -9,6 +9,7 @@ use App\Models\authors;
 use App\Models\category;
 use App\Models\keywords;
 use Carbon\Carbon;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -365,13 +366,20 @@ class ThesisController extends Controller
     
        
         if ($request->hasFile('video') && $request->file('video')->isValid()) {
-            $path = $request->file('video')->store('videos');
+            //$path = $request->file('video')->store('videos');
+            $videoName = $request->file('video')->getClientOriginalName();
+            $video = $request->file('video')->getRealPath();
+
+            $path = Storage::put('/videos', $request->file('video'));
+
+            // $path = Storage::disk('public')->move($video,'/videos',$videoName);
             $thesis->video = $path;
         }
     
         if ($request->hasFile('pdf') && $request->file('pdf')->isValid()) {
             $path = $request->file('pdf')->store('pdf');
             $thesis->pdf = $path;
+            
         }
     
         if ($request->has('published_at')) {

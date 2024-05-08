@@ -38,9 +38,9 @@
 
         <div class="bg-white-500 w-full h-full pt-5">
             <div class="flex flex-center justify-center flex-col ">
-                <div v-for="thesis in displayedThesis" class="mb-3 h-full w-1/2 max-sm:w-full shadow-2xl shadow-red-400" 
+                <div v-for="thesis in paginate(data.thesisList)" class="mb-3 h-full w-1/2 max-sm:w-full shadow-2xl shadow-red-400" 
                 :key="thesis.id">
-                
+             
                     <VaCard class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 shadow-2xl shadow-red-400
                     translate-x-50 py-5">
                    
@@ -163,7 +163,16 @@
                 >
                     <h1>No thesis found.</h1>
                 </div>
-                <div class="flex gap-2 py-5">
+                <div class="cl">
+                    <va-pagination
+                    class="justify-center"
+                    v-model="$root.config.tblCurrPage"
+                    :pages="filter == '' ? $root.tblPagination(data.thesisList) : (setPages, $root.config.tblCurrPage = 1)"
+                    input
+                    />
+                </div>
+               
+                <!-- <div class="flex gap-2 py-5">
                     <VaButton v-if="pages.length !== 1" @click="decrementPage" :disabled="$root.config.tblCurrPage == 1"
                         preset="secondary" hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_back_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
@@ -178,7 +187,7 @@
                     <VaButton v-if="$root.config.tblCurrPage < pages.length || !pages.length == 1" @click="$root.config.tblCurrPage++" preset="secondary"
                         hover-behavior="opacity" :hover-opacity="0.4" icon="arrow_forward_ios" class="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300
                             translate-x-50  w-full" />
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -192,7 +201,7 @@ export default {
         return {
             
             pageNumber: null,
-            perPage: 2,
+            perPage: 3,
             pages: [],
             showFullAbstract: false,
             truncatedAbstract: '',
@@ -227,6 +236,7 @@ export default {
                 },
             ],
             filtered: null,
+            filter: "",
 
         }
     },
@@ -237,9 +247,6 @@ export default {
         this.getAuthor();
     },
     computed: {
-        displayedThesis() {
-            return this.paginate(this.data.thesisList);
-        },
     },
     watch: {
         'data.thesisList'() {
@@ -256,14 +263,14 @@ export default {
             }
         },
         setPages() {
-            let numberOfPages = Math.ceil(this.data.thesisList.length / this.perPage);
+            let numberOfPages = Math.ceil(this.data.thesisList.length / this.$root.config.tblPerPage);
             for (let index = 1; index <= numberOfPages; index++) {
                 this.pages.push(index);
             }
         },
         paginate(thesis) {
             let page = this.$root.config.tblCurrPage;
-            let perPage = this.perPage;
+            let perPage = this.$root.config.tblPerPage;
             let from = (page * perPage) - perPage;
             let to = (page * perPage);
 
@@ -361,7 +368,7 @@ export default {
                         this.page = 1;
                         this.perPage = 4
                     } else {
-                        console.log(response.data.result)
+                    
                         this.data.thesisList = Object.values(response.data.result);
                         this.pages = [];
                         this.page = 1;
@@ -373,8 +380,9 @@ export default {
                     }
                     if(response.data.result.length === 0){
                         this.getThesis();
-                        console.log("here get thesis")
+                       
                     }
+                    this.$root.config.tblCurrPage = 1;
                 }
                 this.isloading = false;
             }).catch(error => {

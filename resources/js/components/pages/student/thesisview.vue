@@ -159,6 +159,7 @@
 <script>
 import formatDate from "@/functions/formatdate.js";
 export default {
+    emits: ['home'],
     data() {
         return {
             thesis: {},

@@ -174,7 +174,7 @@
         </div>
         <div class="flex w-full p-0 min-h-[calc(100vh-62px)] overflow-x-hidden">
             <div
-            id="settings-wrapper"
+            id="settings-wrapper" class="overflow-x-scroll"
             >
                 <template v-if="activeSetting === 'Dashboard'">
                     <home_tbl />

@@ -7,6 +7,7 @@
       <VaNavbarItem class="logo" >
         <div
         @click="$root.auth && $root.auth.userType === 3 ? null : $root.redirectToPage('/dashboard')"
+        class="max-sm:hidden"
         >
           Thesis Repository
         </div>

@@ -1,7 +1,7 @@
 <template>
     <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded overflow-y-auto">       
         <va-data-table
-        id="data-table"
+       
         :items="thesisList"
         :columns="keyconfig.tblColumns"
         :per-page="$root.config.tblPerPage"

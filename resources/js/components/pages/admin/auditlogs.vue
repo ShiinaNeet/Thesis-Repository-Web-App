@@ -15,7 +15,7 @@
                 <tr class="table-crud__slot">
                     <th
                     class="py-1 pr-1"
-                    colspan="2"
+                    colspan="1"
                     >
                         <va-input
                         v-model="input"

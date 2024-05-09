@@ -48,7 +48,7 @@
     </head>
     <body class="antialiased">
         <div id="app">
-            <div class="main-content">
+            <div class="main-content overflow-x-auto">
                 @yield('content')
             </div>
         </div>

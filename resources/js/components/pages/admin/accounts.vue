@@ -1,21 +1,7 @@
 <template>
     <div class="mx-5 mb-2 py-5 px-2.5 pb-2.5 bg-white rounded text-wrap ">
         
-        <div class="grid place-content-end ">
-            <div class="flex flex-center justify-content py-2">
-                <VaButton
-                icon="add"
-                color="primary"
-                outlined
-                preset="secondary"
-                border-color="primary"
-                @click="createAccount.modal=true"
-                
-                >
-                    ADD
-                </VaButton>
-            </div>
-        </div>
+       
         
         <VaDataTable
         :items="accounts"
@@ -34,17 +20,34 @@
             <template #headerAppend>
                     <tr class="table-crud__slot ">
                         <th
-                        v-for="key in Object.keys(createAccount.data)"
+                        v-for="key in acc.tblColumns"
                         :key="key"
-                        class="py-0 pr-1 flex flex-col col-auto justify-center"
+                        :style="{ width: key.width }"
+                        class="py-1 pr-1 "
                         >
-                            <va-input
-                            class="flex"
-                            v-if="key.includes('userID')"
-                            v-model="filter"
-                            placeholder="Search..."
-                            />  
+                            <div  v-if="key.key === 'userID'">
+                                <va-input
+                                class="flex w-full"
+                                v-model="filter"
+                                placeholder="Search..."
+                                
+                                /> 
+                            </div>
+                            <div v-else-if="key.key === 'id'" class="flex justify-end">
+                                <VaButton
+                                icon="add"
+                                color="primary"
+                                outlined
+                                preset="secondary"
+                                border-color="primary"
+                                @click="createAccount.modal=true"
+                                
+                                >
+                                    ADD
+                                </VaButton>
+                            </div>
                         </th>
+                        
                     </tr>
             </template>
             <template #cell(user_type)="{ value }">
@@ -117,308 +120,303 @@
         </VaDataTable>
     </div>
     <!-- Create -->
-    <VaModal
-    v-model="createAccount.modal"
-    no-outside-dismiss
-    blur
-    :mobile-fullscreen=true
-    hide-default-actions
-    size="small"
-    close-button
-    >
-        <div class="w-full h-full">
-            <div class="header"> 
-                <h1>Add Account</h1>
-            </div>
-            <div class="flex flex-col text-wrap py-5 text-red-600">
-                <VaInput
-                class="py-2"
-                v-model="createAccount.data.userID"
-                placeholder="User ID"
-                label="User ID"
-                preset="bordered"
-                type="number"
-                immediate-validation
-                :error="createAccount.userIDEmpty"
-                :error-messages="createAccount.userIDErrorMessage"
-                />
-                <VaInput
-                class="py-2"
-                v-model="createAccount.data.email"
-                placeholder="Email Addresss"
-                label="Email"
-                preset="bordered"
-                immediate-validation
-                :error="createAccount.emailEmpty"
-                :error-messages="createAccount.emailErrorMessage"
-                />
-                <VaSelect
-                class="py-2"
-                label="User Role"
-                v-model="createAccount.data.user_type"
-                placeholder="User Role"
-                :options="userTypes"
-                preset="bordered"
-                value-by="id"
-                text-by="name"
-                />
-                <VaInput
-                class="py-2"
-                v-model="createAccount.data.password"
-                :type="createAccount.isPasswordVisible ? 'text' : 'password'"
-                placeholder="Password"
-                label="Password"
-                preset="bordered"
-                immediate-validation
-                :error="createAccount.passwordEmpty"
-                :error-messages="createAccount.passwordErrorMessage"
-                >
-                    <template #appendInner>
-                        <va-icon
-                                :name="createAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
-                                size="small"
-                                color="#154EC1"
-                                @click="createAccount.isPasswordVisible = !createAccount.isPasswordVisible"
-                                />
-                    </template>
-                </VaInput>
-                <VaInput
-                class="py-2"
-                immediate-validation
-                v-model="createAccount.data.repassword"
-                :type="createAccount.isRepasswordVisible ? 'text' : 'password'"
-                placeholder="Password"
-                label="Password"
-                preset="bordered"
-                :error="createAccount.repasswordEmpty"
-                :error-messages="createAccount.repasswordErrorMessage"                
-                >
-                <template #appendInner>
-                        <va-icon
-                                :name="createAccount.isRepasswordVisible ? 'visibility_off' : 'visibility'"
-                                size="small"
-                                color="#154EC1"
-                                @click="createAccount.isRepasswordVisible = !createAccount.isRepasswordVisible"
-                                />
-                    </template>
-                </VaInput>
-            </div>
-            <div class="flex flex-center justify-center">
-                <VaButton
-                @click="createNewAccount(), createAccount.saved = true, createAccount.passwordMismatch = false"
-                class="mx-3"
-                :loading="createAccount.saved"
-                >
-                    Save
-                </VaButton>
-                <VaButton
-                @click="createAccount.modal = !createAccount.modal"
-                preset="primary"
-                class="mx-3"
-                >
-                    Cancel
-                </VaButton>
-            </div>
-        </div>
-    </VaModal>
-    <!-- Edit Modal -->
-    <VaModal
-    v-model="editAccount.modal"
-    no-outside-dismiss
-    blur
-    :mobile-fullscreen=true
-    hide-default-actions
-    size="small"
-    close-button
-    >
-        <div class="w-full h-full">
-            <div class="header"> 
-                <h1>Edit Account</h1>
-            </div>
-            <div class="flex flex-col text-wrap py-5 text-red-600">
-                <VaInput
-                class="py-2"
-                v-model="editAccount.data.userID"
-                placeholder="User ID"
-                label="User ID"
-                preset="bordered"
-                type="number"
-                immediate-validation
-                :error="editAccount.userIDEmpty"
-                :error-messages="editAccount.userIDErrorMessage"
-                />
-                <VaInput
-                class="py-2"
-                v-model="editAccount.data.email"
-                :placeholder="editAccount.data.email === null || editAccount.data.email === '' ? 'No Email Registered' : editAccount.data.email"
-                label="Email Address"
-                preset="bordered"
-                immediate-validation
-                :error="editAccount.emailEmpty"
-                :error-messages="editAccount.emailErrorMessage"
-                />
-                <VaInput v-model="editAccount.data.password"
-                    :type="editAccount.isPasswordVisible ? 'text' : 'password'" label="Password"
-                    class="w-full mb-3 bg-[editAccount(255,255,255,0.45)]" :disabled="editAccount.isLoading" outline
-                    placeholder="*******"
-                    preset="bordered"
-                    :error="editAccount.passwordEmpty" @keyup="editAccount.passwordEmpty = false">
-                        <template #appendInner>
-                            <va-icon :name="editAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
-                                size="small" color="#154EC1"
-                                @click="editAccount.isPasswordVisible = !editAccount.isPasswordVisible" />
-                        </template>
-                    </VaInput>
-                <VaSelect
-                class="py-2"
-                v-model="editAccount.data.user_type"
-                placeholder="User Role"
-                :options="userTypes"
-                preset="bordered"
-                value-by="id"
-                text-by="name"
-                />
-            </div>
-            <div class="flex flex-center justify-center">
-                <VaButton
-                @click="editAccount.isLoading = true,UpdateAccount(), editAccount.saved = true, editAccount.passwordMismatch = false"
-                class="mx-3"
-                :loading="editAccount.isLoading"
-                
-                >
-                    Save
-                </VaButton>
-                
-                <VaButton
-                @click="editAccount.modal = !editAccount.modal"
-                preset="primary"
-                class="mx-3"
-                >
-                    Cancel
-                </VaButton>
-            </div>
-        </div>
-    </VaModal>
-    <!-- Password Modal -->
-    <VaModal
-    v-model="editAccount.passwordModal"
-    no-outside-dismiss
-    blur
-    :mobile-fullscreen=true
-    hide-default-actions
-    size="small"
-    close-button
-    >
-        <div class="w-full h-full">
-            <div class="header"> 
-                <h1 
-                class="py-5 text-2xl uppercase flex-center justify-center"
-                >Generate New Password </h1>
-                <div
-                class=" w-full"
-                v-if="editAccount.isPasswordWindow == false"
-                >
-                    <VaInput
-                    :placeholder="editAccount.data.userID"
-                    label="User ID"
-                    readonly
-                    preset="bordered"
-                    class="flex w-full pb-2"
-                    />
-                    <br />
-                    <VaInput
-                   
-                    :placeholder="editAccount.data.email"
-                    label="Email"
-                    readonly
-                    preset="bordered"
-                    class="flex w-full pt-2"
-                    />
-                </div>
-                <div v-else-if="editAccount.isPasswordWindow == true"
-                class="flex-center justify-center"
-                >
-                    <div class="text-wrap">
+    <div
+    v-if="createAccount.modal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="w-full h-full">
+                    <div class="header"> 
+                        <h1>Add Account</h1>
+                    </div>
+                    <div class="flex flex-col text-wrap py-5 text-red-600">
                         <VaInput
-                        v-model="editAccount.newPassword"
-                        label="New Password"
-                        readonly
+                        class="py-2"
+                        v-model="createAccount.data.userID"
+                        placeholder="User ID"
+                        label="User ID"
                         preset="bordered"
-                        class="flex w-full"
-                        :success="editAccount.newpasswordSuccess"
-                        :messages="editAccount.newPasswordMessage"
+                        type="number"
+                        immediate-validation
+                        :error="createAccount.userIDEmpty"
+                        :error-messages="createAccount.userIDErrorMessage"
+                        />
+                        <VaInput
+                        class="py-2"
+                        v-model="createAccount.data.email"
+                        placeholder="Email Addresss"
+                        label="Email"
+                        preset="bordered"
+                        immediate-validation
+                        :error="createAccount.emailEmpty"
+                        :error-messages="createAccount.emailErrorMessage"
+                        />
+                        <VaSelect
+                        class="py-2"
+                        label="User Role"
+                        v-model="createAccount.data.user_type"
+                        placeholder="User Role"
+                        :options="userTypes"
+                        preset="bordered"
+                        value-by="id"
+                        text-by="name"
+                        />
+                        <VaInput
+                        class="py-2"
+                        v-model="createAccount.data.password"
+                        :type="createAccount.isPasswordVisible ? 'text' : 'password'"
+                        placeholder="Password"
+                        label="Password"
+                        preset="bordered"
+                        immediate-validation
+                        :error="createAccount.passwordEmpty"
+                        :error-messages="createAccount.passwordErrorMessage"
+                        >
+                            <template #appendInner>
+                                <va-icon
+                                        :name="createAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                        size="small"
+                                        color="#154EC1"
+                                        @click="createAccount.isPasswordVisible = !createAccount.isPasswordVisible"
+                                        />
+                            </template>
+                        </VaInput>
+                        <VaInput
+                        class="py-2"
+                        immediate-validation
+                        v-model="createAccount.data.repassword"
+                        :type="createAccount.isRepasswordVisible ? 'text' : 'password'"
+                        placeholder="Password"
+                        label="Password"
+                        preset="bordered"
+                        :error="createAccount.repasswordEmpty"
+                        :error-messages="createAccount.repasswordErrorMessage"                
+                        >
+                        <template #appendInner>
+                                <va-icon
+                                        :name="createAccount.isRepasswordVisible ? 'visibility_off' : 'visibility'"
+                                        size="small"
+                                        color="#154EC1"
+                                        @click="createAccount.isRepasswordVisible = !createAccount.isRepasswordVisible"
+                                        />
+                            </template>
+                        </VaInput>
+                    </div>
+                    <div class="flex flex-center justify-center">
+                        <VaButton
+                        @click="createNewAccount(), createAccount.saved = true, createAccount.passwordMismatch = false"
+                        class="mx-3"
+                        :loading="createAccount.saved"
+                        >
+                            Save
+                        </VaButton>
+                        <VaButton
+                        @click="createAccount.modal = !createAccount.modal"
+                        preset="primary"
+                        class="mx-3"
+                        >
+                            Cancel
+                        </VaButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Edit Modal -->
+    <div
+    v-if="editAccount.modal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="w-full h-full">
+                    <div class="header"> 
+                        <h1>Edit Account</h1>
+                    </div>
+                    <div class="flex flex-col text-wrap py-5 text-red-600">
+                        <VaInput
+                        class="py-2"
+                        v-model="editAccount.data.userID"
+                        placeholder="User ID"
+                        label="User ID"
+                        preset="bordered"
+                        type="number"
+                        immediate-validation
+                        :error="editAccount.userIDEmpty"
+                        :error-messages="editAccount.userIDErrorMessage"
+                        />
+                        <VaInput
+                        class="py-2"
+                        v-model="editAccount.data.email"
+                        :placeholder="editAccount.data.email === null || editAccount.data.email === '' ? 'No Email Registered' : editAccount.data.email"
+                        label="Email Address"
+                        preset="bordered"
+                        immediate-validation
+                        :error="editAccount.emailEmpty"
+                        :error-messages="editAccount.emailErrorMessage"
+                        />
+                        <VaInput v-model="editAccount.data.password"
+                            :type="editAccount.isPasswordVisible ? 'text' : 'password'" label="Password"
+                            class="w-full mb-3 bg-[editAccount(255,255,255,0.45)]" :disabled="editAccount.isLoading" outline
+                            placeholder="*******"
+                            preset="bordered"
+                            :error="editAccount.passwordEmpty" @keyup="editAccount.passwordEmpty = false">
+                                <template #appendInner>
+                                    <va-icon :name="editAccount.isPasswordVisible ? 'visibility_off' : 'visibility'"
+                                        size="small" color="#154EC1"
+                                        @click="editAccount.isPasswordVisible = !editAccount.isPasswordVisible" />
+                                </template>
+                            </VaInput>
+                        <VaSelect
+                        class="py-2"
+                        v-model="editAccount.data.user_type"
+                        placeholder="User Role"
+                        :options="userTypes"
+                        preset="bordered"
+                        value-by="id"
+                        text-by="name"
                         />
                     </div>
+                    <div class="flex flex-center justify-center">
+                        <VaButton
+                        @click="editAccount.isLoading = true,UpdateAccount(), editAccount.saved = true, editAccount.passwordMismatch = false"
+                        class="mx-3"
+                        :loading="editAccount.isLoading"
+                        
+                        >
+                            Save
+                        </VaButton>
+                        
+                        <VaButton
+                        @click="editAccount.modal = !editAccount.modal"
+                        preset="primary"
+                        class="mx-3"
+                        >
+                            Cancel
+                        </VaButton>
+                    </div>
                 </div>
-                
-            </div>
-            <div class="flex flex-col text-wrap py-5 text-red-600">
-                
-            </div>
-            <div class="flex flex-center justify-center">
-                <VaButton
-                @click="editAccount.isLoading = true, GeneratePassword(), editAccount.saved = true"
-                class="mx-3"
-                :loading="editAccount.isLoading"
-                v-if="editAccount.isPasswordWindow == false"
-                >
-                    Generate
-                </VaButton>
-                
-                <VaButton
-                @click="editAccount.passwordModal = !editAccount.passwordModal, editAccount.isPasswordWindow = false"
-                preset="primary"
-                class="mx-3"
-                >
-                    Cancel
-                </VaButton>
             </div>
         </div>
-    </VaModal>
-
-    <va-modal
-    v-model="editAccount.statusModal"
-    @cancel="editAccount.data = { ...editAccount.data = {...newAccount} }"
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-full p-5">
-                <div class="va-title mb-3">
-                    Account Status
-                </div>
-                
-                <va-input
-                type="textarea"
-                :model-value="editAccount.data.userID"
-                class="w-full mb-2 force-noresize"
-                readonly
-                autosize
-                />
-                
-                <div class="flex w-full gap-x-3 mt-[15px]">
-                    <div class="flex w-1/2 justify-between">
-                        <va-button
-                        preset="secondary"
-                        @click="editAccount.data = { ...newAccount }, editAccount.statusModal = !editAccount.statusModal"
+    </div>
+    <!-- Password Modal -->
+    <div
+    v-if="editAccount.passwordModal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="w-full h-full">
+                    <div class="header"> 
+                        <h1 
+                        class="py-5 text-2xl uppercase flex-center justify-center"
+                        >Generate New Password </h1>
+                        <div
+                        class=" w-full"
+                        v-if="editAccount.isPasswordWindow == false"
                         >
-                            <p class="font-normal">Cancel</p>
-                        </va-button>
+                            <VaInput
+                            :placeholder="editAccount.data.userID"
+                            label="User ID"
+                            readonly
+                            preset="bordered"
+                            class="flex w-full pb-2"
+                            />
+                            <br />
+                            <VaInput
+                        
+                            :placeholder="editAccount.data.email"
+                            label="Email"
+                            readonly
+                            preset="bordered"
+                            class="flex w-full pt-2"
+                            />
+                        </div>
+                        <div v-else-if="editAccount.isPasswordWindow == true"
+                        class="flex-center justify-center"
+                        >
+                            <div class="text-wrap">
+                                <VaInput
+                                v-model="editAccount.newPassword"
+                                label="New Password"
+                                readonly
+                                preset="bordered"
+                                class="flex w-full"
+                                :success="editAccount.newpasswordSuccess"
+                                :messages="editAccount.newPasswordMessage"
+                                />
+                            </div>
+                        </div>
+                        
                     </div>
-                    <div class="flex w-1/2 justify-between">
-                        <va-button
-                        :icon="!editAccount.data.deleted_at ? 'lock' : 'lock_open'"
-                        :loading="editAccount.saved"
-                        :disabled="editAccount.saved"
-                        @click="editAccount.saved = true,handleButtonClick()"
+                    <div class="flex flex-col text-wrap py-5 text-red-600">
+                        
+                    </div>
+                    <div class="flex flex-center justify-center">
+                        <VaButton
+                        @click="editAccount.isLoading = true, GeneratePassword(), editAccount.saved = true"
+                        class="mx-3"
+                        :loading="editAccount.isLoading"
+                        v-if="editAccount.isPasswordWindow == false"
                         >
-                            <p class="font-normal">{{ !editAccount.data.deleted_at ? "Deactivate" : "Activate" }}</p>
-                        </va-button>
+                            Generate
+                        </VaButton>
+                        
+                        <VaButton
+                        @click="editAccount.passwordModal = !editAccount.passwordModal, editAccount.isPasswordWindow = false"
+                        preset="primary"
+                        class="mx-3"
+                        >
+                            Cancel
+                        </VaButton>
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>
+    </div>
+
+    <div
+    v-if="editAccount.statusModal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div >
+                    <div class="w-full p-0">
+                        <div class="va-title mb-3">
+                            Account Status
+                        </div>
+                        
+                        <va-input
+                        type="textarea"
+                        :model-value="editAccount.data.userID"
+                        class="w-full mb-2 force-noresize"
+                        readonly
+                        autosize
+                        />
+                        
+                        <div class="flex w-full gap-x-3 mt-[15px]">
+                            <div class="flex w-1/2 justify-between">
+                                <va-button
+                                preset="secondary"
+                                @click="editAccount.data = { ...newAccount }, editAccount.statusModal = !editAccount.statusModal"
+                                >
+                                    <p class="font-normal">Cancel</p>
+                                </va-button>
+                            </div>
+                            <div class="flex w-1/2 justify-between">
+                                <va-button
+                                :icon="!editAccount.data.deleted_at ? 'lock' : 'lock_open'"
+                                :loading="editAccount.saved"
+                                :disabled="editAccount.saved"
+                                @click="editAccount.saved = true,handleButtonClick()"
+                                >
+                                    <p class="font-normal">{{ !editAccount.data.deleted_at ? "Deactivate" : "Activate" }}</p>
+                                </va-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 

@@ -701,14 +701,13 @@
         </template>
     </va-modal>
 
-    <va-modal
-    v-model="editThesis.deleteModal"
+    <div
+    v-if="editThesis.deleteModal"
     @cancel="editThesis.data = { ...createThesis.resetData }"
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-full p-5">
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+            <div class="w-full p-0">
                 <div class="va-title mb-3">
                     Delete Thesis
                 </div>
@@ -747,52 +746,52 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+            </div>
+        </div>
+    </div>
 
-    <va-modal
-    v-model="editThesis.statusModal"
-    @cancel="editThesis.data = { ...createThesis.resetData }"
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-full p-5">
-                <div class="va-title mb-3">
-                    Thesis Status
-                </div>
-                
-                <VaTextarea
-                :model-value="editThesis.data.title"
-                class="w-full mb-2 "
-                minRows="3"
-                maxRows="5"
-                readonly
-                autosize
-                />
-                <div class="flex w-full gap-x-3 mt-[15px]">
-                    <div class="flex w-1/2 justify-between">
-                        <va-button
-                        preset="secondary"
-                        @click="editThesis.data = { ...createThesis.resetData }, editThesis.statusModal = !editThesis.statusModal"
-                        >
-                            <p class="font-normal">Cancel</p>
-                        </va-button>
+    <div
+    v-if="editThesis.statusModal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="w-full p-0">
+                    <div class="va-title mb-3">
+                        Thesis Status
                     </div>
-                    <div class="flex w-1/2 justify-between">
-                        <va-button
-                        :icon="!editThesis.data.deleted_at ? 'lock' : 'lock_open'"
-                        :loading="editThesis.saved"
-                        :disabled="editThesis.saved"
-                        @click="editThesis.saved = true,handleButtonClick()"
-                        >
-                            <p class="font-normal">{{ !editThesis.data.deleted_at ? "Deactivate" : "Activate" }}</p>
-                        </va-button>
+                    
+                    <VaTextarea
+                    :model-value="editThesis.data.title"
+                    class="w-full mb-2 "
+                    minRows="3"
+                    maxRows="5"
+                    readonly
+                    autosize
+                    />
+                    <div class="flex w-full gap-x-3 mt-[15px]">
+                        <div class="flex w-1/2 justify-between">
+                            <va-button
+                            preset="secondary"
+                            @click="editThesis.data = { ...createThesis.resetData }, editThesis.statusModal = !editThesis.statusModal"
+                            >
+                                <p class="font-normal">Cancel</p>
+                            </va-button>
+                        </div>
+                        <div class="flex w-1/2 justify-between">
+                            <va-button
+                            :icon="!editThesis.data.deleted_at ? 'lock' : 'lock_open'"
+                            :loading="editThesis.saved"
+                            :disabled="editThesis.saved"
+                            @click="editThesis.saved = true,handleButtonClick()"
+                            >
+                                <p class="font-normal">{{ !editThesis.data.deleted_at ? "Deactivate" : "Activate" }}</p>
+                            </va-button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>

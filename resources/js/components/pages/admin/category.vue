@@ -102,14 +102,12 @@
     </div>
 
 
-    <va-modal
-    v-model="createKeyword.modal"
-    noOutsideDismiss
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-[410px] p-5">
+    <div
+    v-if="createKeyword.modal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+            <div class="w-[410px] p-1">
                 <div class="va-title mb-3">
                     Add Category
                 </div>
@@ -149,22 +147,21 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>
+        </div>
+    </div>
 
-    <va-modal
-    v-model="editKeyword.modal"
-    noOutsideDismiss
-    noPadding
-    size="auto"
-    >
-        <template #content>
+    <div
+    v-if="editKeyword.modal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
             <div class="w-[410px] p-5">
                 <div class="va-title mb-3">
                     Edit Category
                 </div>
                 <va-input
-                v-model="editKeyword.data.category"
+                v-if="editKeyword.data.category"
                 label="keyword *"
                 class="w-full mb-2"
                 maxlength="120"
@@ -199,17 +196,16 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>
+        </div>
+    </div>
 
-    <va-modal
-    v-model="editKeyword.deleteModal"
-    @cancel="editKeyword.data = { ...createKeyword.resetData }"
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-[410px] p-5">
+    <div
+    v-if="editKeyword.deleteModal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+            <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
                     Delete Keyword
                 </div>
@@ -248,17 +244,16 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>
+        </div>
+    </div>
 
-    <va-modal
-    v-model="editKeyword.statusModal"
-    @cancel="editKeyword.data = { ...createKeyword.resetData }"
-    noPadding
-    size="auto"
-    >
-        <template #content>
-            <div class="w-[410px] p-5">
+    <div
+    v-if="editKeyword.statusModal"
+    class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-content">
+            <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
                     Keyword Status
                 </div>
@@ -291,8 +286,8 @@
                     </div>
                 </div>
             </div>
-        </template>
-    </va-modal>
+        </div>  </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>

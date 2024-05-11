@@ -158,7 +158,7 @@
             <div class="modal-content">
             <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
-                    Edit Help
+                    Edit Keyword
                 </div>
                 <va-input
                 v-model="editKeyword.data.keyword"
@@ -466,10 +466,11 @@ export default {
                     let resDataError = Object.keys(error.response.data.errors);
 
                     if (resDataError.filter(key => key == 'keyword').length) {
-                        method === 'create' ? this.createKeyword.keywordEmpty = true
+                        method === 'create' ? this.createKeyword.keywordEmpty = true 
                         : (
                             method === 'save' && (this.editKeyword.keywordEmpty = true)
                         );
+                        this.$root.prompt(error.response.data.message);
                     }
                    
 

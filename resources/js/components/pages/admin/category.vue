@@ -156,13 +156,13 @@
     class="modal-overlay">
         <div class="modal-container">
             <div class="modal-content">
-            <div class="w-[410px] p-5">
+            <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
                     Edit Category
                 </div>
                 <va-input
-                v-if="editKeyword.data.category"
-                label="keyword *"
+                v-model="editKeyword.data.category"
+                label="Category *"
                 class="w-full mb-2"
                 maxlength="120"
                 :rules="[(v) => v && v.length > 0 || 'The keyword field is required.']"
@@ -207,7 +207,7 @@
             <div class="modal-content">
             <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
-                    Delete Keyword
+                    Delete Category
                 </div>
                 <va-alert color="warning">
                     <template #icon>
@@ -255,7 +255,7 @@
             <div class="modal-content">
             <div class="w-[410px] p-0">
                 <div class="va-title mb-3">
-                    Keyword Status
+                    Category Status
                 </div>
                 
                 <va-input
@@ -456,7 +456,7 @@ export default {
                                 this.editKeyword.saved = false
                             )
                         );
-
+                        
                         this.getKeywords();
                     } else this.$root.prompt(response.data.text);
                 }).catch(error => {
@@ -469,7 +469,7 @@ export default {
                             method === 'save' && (this.editKeyword.keywordEmpty = true)
                         );
                     }
-                   
+                    this.$root.prompt(error.response.data.message);
 
                     method === 'create' ? this.createKeyword.saved = false
                     : (method === 'save' && (this.editKeyword.saved = false));

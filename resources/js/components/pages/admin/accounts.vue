@@ -87,7 +87,7 @@
                 preset="plain"
                 icon="password"
                 :disabled="rowData.deleted_at || rowData.userID === $root.auth.userID ? true : false"
-                @click="editAccount.data = { ...rowData },editAccount.passwordModal = !editAccount.passwordModal"
+                @click="editAccount.data = { ...rowData },editAccount.passwordModal = !editAccount.passwordModal "
                 />
                 <va-button
                 class="mb-2 mr-2 hover:opacity-[0.65!important]"
@@ -95,7 +95,7 @@
                 title="Toggle Status"
                 preset="plain"
                 :icon="rowData.deleted_at ? 'lock' : 'lock_open'"
-                @click="editAccount.data = { ...rowData }, editAccount.statusModal = !editAccount.statusModal"
+                @click="editAccount.data = { ...rowData }, editAccount.statusModal = !editAccount.statusModal, editAccount.saved = false"
                 />
                 
             </template>

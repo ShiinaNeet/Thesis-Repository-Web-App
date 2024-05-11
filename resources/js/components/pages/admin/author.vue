@@ -471,7 +471,7 @@ export default {
                             method === 'save' && (this.editKeyword.keywordEmpty = true)
                         );
                     }
-                   
+                    this.$root.prompt(error.response.data.message);
 
                     method === 'create' ? this.createKeyword.saved = false
                     : (method === 'save' && (this.editKeyword.saved = false));
